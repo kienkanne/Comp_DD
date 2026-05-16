@@ -11,7 +11,7 @@ def base(cfg, title=None):
                 os.chdir(cfg.common.working_dir)
                 
                 logger = cfg.common.logger
-                if not title:
+                if title is not None:
                     logger.info(f"Running: {title}")
 
                 return func(*args, **kwargs)

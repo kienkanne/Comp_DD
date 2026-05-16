@@ -3,14 +3,15 @@ libs:
   chimera: "/usr/local/chimera/chimera-1.8/bin/chimera"
 
   mgltools: "/home/kbui/Apps/mgltools_1.5.7/mgltools_x86_64Linux2_1.5.7/"
-  dock_home: "/localscratch/kbui/Apps/dock6/"
+  dock_home: "/home/kbui/Apps/dock6/"
 
   obabel: "obabel"
   parallel: "parallel"
   vina: "vina"
 
 common:
-  working_dir: "/localscratch/kbui/Comp_DD/tests/artifacts"
+  project_name: "test_dock6"
+  working_dir: "/home/kbui/Comp_DD/tests/artifacts"
   logger: "/home/kbui/Comp_DD/tests/artifacts/logger.log"
   manifest: "/home/kbui/Comp_DD/tests/artifacts/manifest.log"
   runstate: "/home/kbui/Comp_DD/tests/artifacts/runstate.log"

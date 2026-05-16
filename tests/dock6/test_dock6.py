@@ -7,7 +7,7 @@ cfg = load_config("/home/kbui/Comp_DD/tests/test_config.yaml")
 
 selected_spheres = _dock6_prep_rec(cfg)
 
-out_files, lig_names = _dock6_docking(cfg, [Path("/home/kbui/Comp_DD/tests/data/mol16_prepped.mol2"),
+out_files = _dock6_docking(cfg, [Path("/home/kbui/Comp_DD/tests/data/mol16_prepped.mol2"),
                                 Path("/home/kbui/Comp_DD/tests/data/mol17_prepped.mol2")])
 
-_write_summary_csv(cfg, out_files, lig_names, program="dock6")
+_write_summary_csv(cfg, out_files, program="dock6")

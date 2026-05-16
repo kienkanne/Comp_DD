@@ -51,8 +51,8 @@ dock_home: "$HOME/Apps/dock6/"
 Use the CLI with a config file:
 
 ```bash
-compdd run-vina --config sample_configs/default.yaml
-compdd run-dock6 --config sample_configs/default.yaml
+compdd vina --config sample_configs/default.yaml
+compdd dock6 --config sample_configs/default.yaml
 ```
 
 ## Ligand CSV
@@ -139,7 +139,7 @@ dock6:
   radius: 10.0
 ```
 
-DOCK6 jobs are single-core, so the parallel job count is `common.total_cpu`.
+DOCK6 jobs are single-core; set `common.n_jobs` to the total number of CPU cores you want to use (for example, the number of available CPU cores on the machine).
 
 ## Outputs
 

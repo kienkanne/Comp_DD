@@ -28,15 +28,19 @@ def parse_scores(output, max_poses, program):
     return scores
 
 
-def _write_summary_csv(cfg, out_files, lig_names, program):
+def _write_summary_csv(cfg, out_files, program):
 
     @main_tracker(cfg, "Write summary csv")
     @base(cfg)
     def _run():
+        project_name = cfg.common.project_name
         receptor_name = Path(cfg.common.receptor).stem
         max_poses = cfg.common.max_poses
 
         rows = []
+        
+        # outfiles = ["..._scored.mol2/pdbqt", ...]
+        lig_names = [Path(outfile).stem.replace("_scored", "") for outfile in out_files]
 
         for out_file, lig_name in zip(out_files, lig_names):
             scores = parse_scores(out_file, max_poses, program)
@@ -49,11 +53,10 @@ def _write_summary_csv(cfg, out_files, lig_names, program):
             return float(score) if score != "" else math.inf
 
         rows = sorted(rows, key=pose1_sort)
-        with open(f"{receptor_name}_docking_summary.csv", "w", newline="") as handle:
+        with open(f"{project_name}_{receptor_name}_docking_summary.csv", "w", newline="") as handle:
             writer = csv.writer(handle)
             writer.writerow(headers)
             writer.writerows(rows)
 
-
-        return receptor_name
-    _run()
+        return f"{project_name}_{receptor_name}_docking_summary.csv"
+    return _run()

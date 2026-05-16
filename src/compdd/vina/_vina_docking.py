@@ -5,7 +5,6 @@ from compdd.utils.main_tracker import main_tracker
 
 def _vina_docking(cfg, lig_files, prepped_rec, vina_config):
 
-    lig_names = []
     out_files = []
 
     @main_tracker(cfg, "Batch docking with Vina")
@@ -19,7 +18,6 @@ def _vina_docking(cfg, lig_files, prepped_rec, vina_config):
             ligand_name = Path(prepped_lig).stem.replace("_prepped", "")
             output_name = f"{receptor_name}_{ligand_name}_scored.pdbqt"
 
-            lig_names.append(ligand_name)
             out_files.append(output_name)
 
             cmds.append([vina, 
@@ -31,4 +29,4 @@ def _vina_docking(cfg, lig_files, prepped_rec, vina_config):
         return cmds
     _run()
 
-    return out_files, lig_names
+    return out_files

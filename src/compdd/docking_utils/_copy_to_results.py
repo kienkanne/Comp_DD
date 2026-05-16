@@ -4,7 +4,7 @@ from compdd.executors.base import base
 from compdd.utils.main_tracker import main_tracker
 
 
-def _copy_to_results(cfg, prepped_rec, out_files):
+def _copy_to_results(cfg, prepped_rec, docking_summary, out_files):
     @main_tracker(cfg, "Copy to results")
     @base(cfg)
     def _run():
@@ -20,6 +20,7 @@ def _copy_to_results(cfg, prepped_rec, out_files):
 
             selected_copy = [
                 prepped_rec,
+                docking_summary,
                 "rec_box.pdb",
                 "run.log",
                 "manifest.json",

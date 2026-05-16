@@ -15,7 +15,7 @@ class DOCK6Pipeline():
         lig_files = _ligands_prep(self.cfg, program="dock6")
         prepped_rec, selected_spheres = _dock6_prep_rec(self.cfg)
         out_files, lig_names = _dock6_docking(self.cfg, lig_files, selected_spheres)
-        _write_summary_csv(self.cfg, out_files, lig_names, program="dock6")
+        _write_summary_csv(self.cfg, out_files, program="dock6")
         _copy_to_results(self.cfg, prepped_rec, out_files)
 
         logger = self.cfg.common.logger

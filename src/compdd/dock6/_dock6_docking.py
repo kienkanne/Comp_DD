@@ -6,7 +6,6 @@ from compdd.utils.main_tracker import main_tracker
 
 def _dock6_docking(cfg, lig_files, selected_spheres="selected_spheres.sph"):
 
-    lig_names = []
     out_files = []
     
     @main_tracker(cfg, "Batch docking with DOCK 6")
@@ -36,7 +35,6 @@ def _dock6_docking(cfg, lig_files, selected_spheres="selected_spheres.sph"):
             ligand_name = Path(prepped_lig).stem.replace("_prepped", "")
             output_prefix = f"{receptor_name}_{ligand_name}"
 
-            lig_names.append(ligand_name)
             out_files.append(f"{output_prefix}_scored.mol2")
 
             input_file = Template(flex_template).substitute(prepped_lig=prepped_lig, 
@@ -53,4 +51,4 @@ def _dock6_docking(cfg, lig_files, selected_spheres="selected_spheres.sph"):
         return cmds
     _run()
 
-    return out_files, lig_names
+    return out_files

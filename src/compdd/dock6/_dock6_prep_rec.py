@@ -99,6 +99,6 @@ def _dock6_prep_rec(cfg):
             return ([dock_home/"bin"/"grid", "-i", "grid.in", "-o", "grid.out"], None)
         grid()
 
-        return f"{name}_prepped.mol2" "selected_spheres.sph"
+        return f"{name}_prepped.mol2", "selected_spheres.sph"
 
     return _run()
