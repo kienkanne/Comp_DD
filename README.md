@@ -2,20 +2,6 @@
 
 ## Merged Platform Migration
 
-This repo now includes a merged docking + AMBER MD platform package at
-`src/molsim_platform`. The older `src/docking` package and `docking` CLI remain
-available for compatibility, while new development should target:
-
-```bash
-molsim run-vina --config configs/vina.yaml
-molsim run-dock6 --config configs/dock6.yaml
-molsim amber-full-run --config configs/amber_md.yaml
-molsim amber-generate-system --config configs/amber_md.yaml
-```
-
-The new architecture is documented in
-[docs/platform_architecture.md](docs/platform_architecture.md).
-
 This repository runs end-to-end molecular docking workflows for a receptor PDB and a CSV of ligands. It currently supports:
 
 - AutoDock Vina
@@ -52,16 +38,11 @@ parallel: "parallel"
 vina: "vina"
 ```
 
-Some tools usually need explicit paths:
+Some others needed to be pointed at their installed directories:
 
-- `prepare_receptor` and `prepare_ligand` must include the MGLTools `pythonsh` executable plus the full script path.
-- DOCK6 tools such as `dock6`, `sphgen`, `sphere_selector`, `showbox`, and `grid` are usually installed outside conda and should be absolute paths.
-- `chimerax` should point to the ChimeraX executable if it is not on `PATH`.
-- Some environment variables can be exported to make the paths easier to read, for example:
-
-```bash
-export MGLTOOLS=$HOME/Apps/mgltools_1.5.7/mgltools_x86_64Linux2_1.5.7
-export DOCK_HOME=$HOME/Apps/dock6
+```yaml
+mgltools: "$HOME/Apps/mgltools_1.5.7/mgltools_x86_64Linux2_1.5.7/"
+dock_home: "$HOME/Apps/dock6/"
 ```
 
 ## Running
@@ -69,18 +50,9 @@ export DOCK_HOME=$HOME/Apps/dock6
 Use the CLI with a config file:
 
 ```bash
-docking run_vina --config configs/docking_config.yaml
-docking run_dock6 --config configs/docking_config.yaml
+compdd run-vina --config sample_configs/default.yaml
+compdd run-dock6 --config sample_configs/default.yaml
 ```
-
-There are also thin scripts:
-
-```bash
-python scripts/run_vina.py
-python scripts/run_dock6.py
-```
-
-Those scripts load `configs/docking_config.yaml` by default.
 
 ## Ligand CSV
 
@@ -96,7 +68,7 @@ Ligand names are used in output filenames, so keep them short and file-friendly.
 
 ## Config Format
 
-See [configs/docking_config.yaml](configs/docking_config.yaml) for a working example.
+See [sample_configs/default.yaml](sample_configs/default.yaml) for a working example.
 
 ### `libs`
 
@@ -105,16 +77,14 @@ Tool locations and executable names.
 ```yaml
 libs:
   chimerax: "/usr/local/chimerax/bin/ChimeraX"
+  chimera: "/usr/local/chimera/chimera-1.8/bin/chimera"
+
+  mgltools: "/localscratch/kbui/Apps/mgltools_1.5.7/mgltools_x86_64Linux2_1.5.7/"
+  dock_home: "/localscratch/kbui/Apps/dock6/"
+
   obabel: "obabel"
   parallel: "parallel"
   vina: "vina"
-  prepare_receptor: "$MGLTOOLS/bin/pythonsh $MGLTOOLS/MGLToolsPckgs/AutoDockTools/Utilities24/prepare_receptor4.py"
-  prepare_ligand: "$MGLTOOLS/bin/pythonsh $MGLTOOLS/MGLToolsPckgs/AutoDockTools/Utilities24/prepare_ligand4.py"
-  dock6: "$DOCK_HOME/bin/dock6"
-  sphgen: "$DOCK_HOME/bin/sphgen"
-  sphere_selector: "$DOCK_HOME/bin/sphere_selector"
-  showbox: "$DOCK_HOME/bin/showbox"
-  grid: "$DOCK_HOME/bin/grid"
 ```
 
 ### `common`
@@ -123,20 +93,24 @@ Inputs, scratch directory, results directory, and batch settings.
 
 ```yaml
 common:
-  working_dir: "/path/to/scratch/sample_vina"
-  receptor: "/path/to/data/6W63.pdb"
-  ligand: "/path/to/data/sample_ligands.csv"
-  results_dir: "/path/to/results/results_vina"
-  pocket_name: "catalytic_site"
-  total_cpu: 16
+  project_name: vina_mpro_catalytic
+  working_dir: "/localscratch/kbui/Comp_DD/artifacts"
+  results_dir: "/localscratch/kbui/Comp_DD/results/"
+
+  receptor: "/localscratch/kbui/Comp_DD/data/6W63.pdb"
+  ligands_csv: "/localscratch/kbui/Comp_DD/data/ligands_list.csv"
+  
+  pocket_selection: "chain A and resi 41+145+140+143+144+145+163+166"
+  padding: 5.0
+  n_jobs: 16
   max_poses: 8
 ```
-
-- `working_dir`: scratch space where intermediate files are written.
+- `project_name`: name of the folder in working_dir and results_dir
+- `working_dir`: parent folder of scratch space where intermediate files are written.
+- `results_dir`: parent folder of where final selected outputs and summary CSV are copied.
 - `receptor`: starting receptor PDB.
 - `ligand`: CSV path with `smiles,name`.
-- `results_dir`: final selected outputs and summary CSV are copied here.
-- `total_cpu`: total CPU budget for ligand docking.
+- `n_jobs`: total concurrent jobs.
 - `max_poses`: maximum number of scores to parse per ligand into the summary CSV.
 
 ### `vina`
@@ -144,20 +118,15 @@ common:
 Vina-specific settings.
 
 ```yaml
-vina:
   exhaustiveness: 32
   num_modes: 8
+  reference: "/localscratch/kbui/Comp_DD/data/ref_ligand.pdb"
   cpu: 1
-  padding: 5.0
-  pocket_option: "res"
-  reference: "/path/to/ref_ligand.pdb"
-  residue_selection: "chain A and resi 41+145"
+  write_box: True
 ```
 
 - `cpu` is the CPU count per ligand job.
-- Vina parallel job count is `common.total_cpu // vina.cpu`.
-- `pocket_option: "res"` uses `residue_selection`.
-- `pocket_option: "lig"` uses `reference`.
+- `reference`: uses to represent the pocket, set to None if uses pocket_selection instead
 
 ### `dock6`
 
@@ -165,10 +134,8 @@ DOCK6-specific settings.
 
 ```yaml
 dock6:
-  max_orientations: 5000
+  max_orientations: 1000
   radius: 10.0
-  padding: 5.0
-  residue_selection: "chain A and resi 41+145"
 ```
 
 DOCK6 jobs are single-core, so the parallel job count is `common.total_cpu`.
@@ -177,10 +144,8 @@ DOCK6 jobs are single-core, so the parallel job count is `common.total_cpu`.
 
 The results directory contains selected final files:
 
-- Vina poses: `*_docked.pdbqt`
-- Vina docking logs: `*_docked.log`
+- Vina poses: `*_scored.pdbqt`
 - DOCK6 poses: `*_scored.mol2`
-- DOCK6 docking logs: `*_scored.log`
 - Pipeline logs: `run.log`, `manifest.json`, `state.json`
 - Summary CSV: `<receptor_stem>_docking_summary.csv`
 
