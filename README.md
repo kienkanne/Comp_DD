@@ -1,6 +1,6 @@
-# SARS-CoV-2 Docking Pipeline
+# Computational tools for drug discovery
 
-## Merged Platform Migration
+## Introduction
 
 This repository runs end-to-end molecular docking workflows for a receptor PDB and a CSV of ligands. It currently supports:
 
@@ -28,7 +28,8 @@ Other needed tools that have to be installed:
 
 - DOCK6: See [https://github.com/docking-org/dock6](https://github.com/docking-org/dock6)
 - MGLTOOLS: See [https://ccsb.scripps.edu/mgltools/downloads](https://ccsb.scripps.edu/mgltools/downloads)
-- ChimeraX: See [https://www.cgl.ucsf.edu/chimerax/download.html](https://www.cgl.ucsf.edu/chimerax/download.html) 
+- ChimeraX: See [https://www.cgl.ucsf.edu/chimerax/download.html](https://www.cgl.ucsf.edu/chimerax/download.html)
+- Chimera: See [https://www.cgl.ucsf.edu/chimera/download.html](https://www.cgl.ucsf.edu/chimera/download.html) 
 
 Most command-line tools can be installed into the active conda/mamba environment and referenced by executable name in the config:
 
