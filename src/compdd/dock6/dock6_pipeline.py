@@ -14,11 +14,7 @@ class DOCK6Pipeline():
     def run(self):
         lig_files = _ligands_prep(self.cfg, program="dock6")
         prepped_rec, selected_spheres = _dock6_prep_rec(self.cfg)
-        out_files, lig_names = _dock6_docking(self.cfg, lig_files, selected_spheres)
-        _write_summary_csv(self.cfg, out_files, program="dock6")
-        _copy_to_results(self.cfg, prepped_rec, out_files)
+        out_files = _dock6_docking(self.cfg, lig_files, selected_spheres)
+        docking_summary = _write_summary_csv(self.cfg, out_files, program="dock6")
 
-        logger = self.cfg.common.logger
-        manifest = self.cfg.common.manifest
-        manifest.finalize(success=True)
-        logger.info("DOCK 6 pipeline completed")
+        _copy_to_results(self.cfg, prepped_rec, docking_summary, out_files)

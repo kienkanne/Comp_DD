@@ -1,13 +1,17 @@
 import shutil
 from pathlib import Path
 from compdd.executors.base import base
-from compdd.utils.main_tracker import main_tracker
 
 
 def _copy_to_results(cfg, prepped_rec, docking_summary, out_files):
-    @main_tracker(cfg, "Copy to results")
-    @base(cfg)
+    @base(cfg, "copy_to_results()")
     def _run():
+
+        logger = cfg.common.logger
+        manifest = cfg.common.manifest
+        manifest.finalize(success=True)
+        logger.info("Pipeline completed")
+
         working_dir = cfg.common.working_dir
         results_dir = cfg.common.results_dir
 

@@ -8,7 +8,7 @@ def _dock6_docking(cfg, lig_files, selected_spheres="selected_spheres.sph"):
 
     out_files = []
     
-    @main_tracker(cfg, "Batch docking with DOCK 6")
+    @main_tracker(cfg, "Batch docking with DOCK6")
     @gnu_parallel(cfg, "dock6_docking()")
     def _run():
         receptor = cfg.common.receptor

@@ -12,13 +12,10 @@ class VinaPipeline():
     cfg: RootConfig
 
     def run(self):
-        lig_files = _ligands_prep(self.cfg, program="vina")
+        #lig_files = _ligands_prep(self.cfg, program="vina")
+        lig_files = ["x77_prepped.pdb"]
         prepped_rec, vina_config = _vina_prep_rec(self.cfg)
         out_files = _vina_docking(self.cfg, lig_files, prepped_rec, vina_config)
         docking_summary = _write_summary_csv(self.cfg, out_files, program="vina")
-        _copy_to_results(self.cfg, prepped_rec, docking_summary, out_files)
 
-        logger = self.cfg.common.logger
-        manifest = self.cfg.common.manifest
-        manifest.finalize(success=True)
-        logger.info("Vina pipeline completed")
+        _copy_to_results(self.cfg, prepped_rec, docking_summary, out_files)

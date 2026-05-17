@@ -13,59 +13,61 @@ def _sanitize_name(name: str) -> str:
     return sanitized
 
 
+def _parse_ligands_csv(csv_path):
+    csv_path = Path(csv_path)
+    if not csv_path.exists():
+        raise FileNotFoundError(f"Ligand CSV not found: {csv_path}")
+
+    seen_smiles = set()
+    seen_names = set()
+    ligands = []
+
+    with open(csv_path, newline="") as handle:
+        reader = csv.DictReader(handle)
+        if reader.fieldnames != ["smiles", "name"]:
+            raise ValueError("Ligand CSV must have exactly this header: smiles,name")
+
+        for row_number, row in enumerate(reader, start=2):
+            smiles = (row.get("smiles") or "").strip()
+            raw_name = (row.get("name") or "").strip()
+            if not smiles or not raw_name:
+                raise ValueError(f"Ligand CSV row {row_number} must include smiles and name")
+
+            name = _sanitize_name(raw_name)
+
+            if smiles in seen_smiles:
+                raise ValueError(f"Duplicate smiles: {smiles!r}")
+            seen_smiles.add(smiles)
+
+            if name in seen_names:
+                raise ValueError(f"Duplicate ligand name after sanitization: {raw_name!r}")
+            seen_names.add(name)
+
+            ligands.append((smiles, name))
+
+    if not ligands:
+        raise ValueError(f"Ligand CSV contains no ligands: {csv_path}")
+
+    return ligands
+
+
 def _ligands_prep(cfg, program):
     @main_tracker(cfg, "Prepare ligands")
     def _run():
-        def parse_ligs():
-            csv_path = Path(cfg.common.ligands_csv)
-            if not csv_path.exists():   
-                raise FileNotFoundError(f"Ligand CSV not found: {csv_path}")
-
-            seen_smiles = set()
-            seen_names = set()
-
-            with open(csv_path, newline="") as handle:
-                reader = csv.DictReader(handle)
-                if reader.fieldnames != ["smiles", "name"]:
-                    raise ValueError("Ligand CSV must have exactly this header: smiles,name")
-
-                for row_number, row in enumerate(reader, start=2):
-                    smiles = (row.get("smiles") or "").strip()
-                    raw_name = (row.get("name") or "").strip()
-                    if not smiles or not raw_name:
-                        raise ValueError(f"Ligand CSV row {row_number} must include smiles and name")
-
-                    name = _sanitize_name(raw_name)
-
-                    if smiles in seen_smiles:
-                        raise ValueError(f"Duplicate smiles: {smiles!r}")
-                    seen_smiles.add(smiles)
-
-                    if name in seen_names:
-                        raise ValueError(f"Duplicate ligand name after sanitization: {raw_name!r}")
-                    seen_names.add(name)
-
-            if not seen_smiles or not seen_names:
-                raise ValueError(f"Ligand CSV contains no ligands: {csv_path}")
-
-            if len(seen_smiles) != len(seen_names):
-                raise ValueError("Number of smiles is not equal to number of names")
-
-            return seen_smiles, seen_names
-        smiles_list, lig_names = parse_ligs()
-        
+        ligands = _parse_ligands_csv(cfg.common.ligands_csv)
+        lig_names = [name for _, name in ligands]
 
         @gnu_parallel(cfg, "charge_ligs_obabel()")
         def charge_ligs_obabel():
             obabel = cfg.libs.obabel
 
             cmds = []
-            for smiles, lig_name in zip(smiles_list, lig_names):
+            for smiles, lig_name in ligands:
                 cmds.append([
                     obabel,
                     f"-:'{smiles}'",
                     "-O", f"{lig_name}_prepped.mol2",
-                    "--gen3d", "--partialcharge", "gasteiger"
+                    "--gen3d", "-p", "7.4", "--minimize", "--steps 5000", "--ff GAFF"
                 ])
 
             return cmds
@@ -89,14 +91,11 @@ def _ligands_prep(cfg, program):
 
             return cmds
 
-        # For Vina we need pdbqt ligand files (prepare_ligand4 -> pdbqt).
-        # For DOCK6 we use the prepped .mol2 files produced by obabel.
         if program == "vina":
             charge_rec_mgltools()
         else:
-            # return the .mol2 files created by obabel
             prepped_ligs = [f"{lig_name}_prepped.mol2" for lig_name in lig_names]
 
         return prepped_ligs
-    
+
     return _run()

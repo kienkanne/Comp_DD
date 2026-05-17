@@ -10,7 +10,7 @@ libs:
   vina: "vina"
 
 common:
-  project_name: "test_dock6"
+  project_name: "x77"
   working_dir: "/home/kbui/Comp_DD/tests/artifacts"
   logger: "/home/kbui/Comp_DD/tests/artifacts/logger.log"
   manifest: "/home/kbui/Comp_DD/tests/artifacts/manifest.log"
@@ -18,7 +18,7 @@ common:
   results_dir: "/home/kbui/Comp_DD/tests/results/"
 
   receptor: "/home/kbui/Comp_DD/tests/data/6W63.pdb"
-  ligands_csv: "data/ligands_list.csv"
+  ligands_csv: "/home/kbui/Comp_DD/data/validation_6w63.csv"
   pocket_selection: "chain A and resi 41+145+140+143+144+145+163+166"
   padding: 5.0
   n_jobs: 16
