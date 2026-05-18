@@ -51,6 +51,11 @@ def _vina_prep_rec(cfg):
             cpu = cfg.vina.cpu
             exhaustiveness = cfg.vina.exhaustiveness
             num_modes = cfg.vina.num_modes
+            
+            if cfg.vina.reference is not None:
+                input = cfg.vina.reference
+            else: 
+                input = prepped_receptor_pdbqt
 
             with open(Path(__file__).resolve().parents[0] / "templates" / "vina_config_template.txt") as f:
                 vina_config_template = f.read()
@@ -59,7 +64,7 @@ def _vina_prep_rec(cfg):
             import numpy as np
             with pymol2.PyMOL() as pymol:
                 pymol.start()
-                pymol.cmd.load(prepped_receptor_pdbqt, "receptor")
+                pymol.cmd.load(input, "receptor")
                 stored = {"xyz": []}
                 pymol.cmd.iterate_state(
                     1,

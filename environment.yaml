@@ -9,6 +9,7 @@ dependencies:
   - openbabel
   - vina
   - meeko
+  - rdkit
   - pydantic
   - pymol-open-source
   - pytest

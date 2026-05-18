@@ -62,8 +62,8 @@ flex_drive_file                                              $dock_home/paramete
 ligand_outfile_prefix                                        $output_prefix
 write_mol_solvation                                          no
 write_orientations                                           no
-num_final_scored_poses                                       8
-num_preclustered_conformers                                  20
+num_final_scored_poses                                       16
+num_preclustered_conformers                                  24
 write_conformations                                          no
 cluster_conformations                                        yes
 cluster_rmsd_threshold                                       2.0
