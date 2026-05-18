@@ -15,9 +15,8 @@ def _vina_docking(cfg, lig_files, prepped_rec, vina_config):
 
         cmds = []
         for prepped_lig in lig_files:
-            receptor_name = _strip_prepared_suffix(prepped_rec, suffix)
             ligand_name = _strip_prepared_suffix(prepped_lig, suffix)
-            output_name = f"{receptor_name}_{ligand_name}_scored.pdbqt" # "_scored" stays fixed.
+            output_name = f"{ligand_name}_scored.pdbqt" # "_scored" stays fixed.
 
             out_files.append(output_name)
 

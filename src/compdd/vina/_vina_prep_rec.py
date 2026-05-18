@@ -47,15 +47,16 @@ def _vina_prep_rec(cfg):
         @base(cfg, "generate_box()")
         def generate_box():
             padding = cfg.common.padding
-            pocket_selection = cfg.common.pocket_selection
             cpu = cfg.vina.cpu
             exhaustiveness = cfg.vina.exhaustiveness
             num_modes = cfg.vina.num_modes
             
             if cfg.vina.reference is not None:
                 input = cfg.vina.reference
+                pocket_selection = f"all"
             else: 
                 input = prepped_receptor_pdbqt
+                pocket_selection = cfg.common.pocket_selection
 
             with open(Path(__file__).resolve().parents[0] / "templates" / "vina_config_template.txt") as f:
                 vina_config_template = f.read()

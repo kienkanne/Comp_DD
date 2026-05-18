@@ -1,0 +1,30 @@
+libs:
+  chimerax: "/usr/local/chimerax/bin/ChimeraX"
+  chimera: "/usr/local/chimera/chimera-1.8/bin/chimera"
+
+  mgltools: "/home/kbui/Apps/mgltools_1.5.7/mgltools_x86_64Linux2_1.5.7"
+  dock_home: "/home/kbui/Apps/dock6"
+
+  obabel: "obabel"
+  parallel: "parallel"
+  vina: "vina"
+
+common:
+  project_name: compdd_validation
+  working_dir: "/home/kbui/COMPDD/artifacts"
+  results_dir: "/home/kbui/COMPDD/results"
+  
+  validation_data: "/home/kbui/coreset"
+  prepare_tool: "meeko" # or "obabel"
+
+  padding: 6.0
+  n_jobs: 16
+  max_poses: 16
+
+vina:
+  exhaustiveness: 64
+  num_modes: 16
+
+dock6:
+  max_orientations: 5000
+  radius: 10.0

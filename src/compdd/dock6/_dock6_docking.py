@@ -33,9 +33,8 @@ def _dock6_docking(cfg, lig_files, selected_spheres="selected_spheres.sph"):
             with open(Path(__file__).resolve().parents[0] / "templates" / "flex_template.txt") as f:
                 flex_template = f.read()
 
-            receptor_name = Path(receptor).stem
             ligand_name = _strip_prepared_suffix(prepped_lig, suffix)
-            output_prefix = f"{receptor_name}_{ligand_name}"
+            output_prefix = f"{ligand_name}"
 
             out_files.append(f"{output_prefix}_scored.mol2")
 
