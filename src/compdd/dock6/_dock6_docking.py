@@ -1,5 +1,6 @@
 from pathlib import Path
 from string import Template
+from compdd.docking_utils._ligands_common import _strip_prepared_suffix
 from compdd.executors.gnu_parallel import gnu_parallel
 from compdd.utils.main_tracker import main_tracker
 
@@ -14,6 +15,7 @@ def _dock6_docking(cfg, lig_files, selected_spheres="selected_spheres.sph"):
         receptor = cfg.common.receptor
         dock_home = cfg.libs.dock_home
         max_orientations = cfg.dock6.max_orientations
+        suffix = cfg.common.prepared_suffix
 
         required_files = ["grid.in", "grid.bmp", "grid.nrg", "grid.out"]
         missing_files = []
@@ -32,7 +34,7 @@ def _dock6_docking(cfg, lig_files, selected_spheres="selected_spheres.sph"):
                 flex_template = f.read()
 
             receptor_name = Path(receptor).stem
-            ligand_name = Path(prepped_lig).stem.replace("_prepped", "")
+            ligand_name = _strip_prepared_suffix(prepped_lig, suffix)
             output_prefix = f"{receptor_name}_{ligand_name}"
 
             out_files.append(f"{output_prefix}_scored.mol2")

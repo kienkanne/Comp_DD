@@ -10,23 +10,23 @@ libs:
   vina: "vina"
 
 common:
-  project_name: meeko_dock6_validation
+  project_name: high_vina_mpro_cat
   working_dir: "/home/kbui/Comp_DD/artifacts"
   results_dir: "/home/kbui/Comp_DD/results"
 
-  receptor: "/home/kbui/Comp_DD/data/6w63_waters.pdb"
-  ligands_csv: "/home/kbui/Comp_DD/data/validation_6w63.csv"
+  receptor: "/home/kbui/Comp_DD/data/6W63.pdb"
+  prepared_suffix: "prepped"
   
   pocket_selection: "chain A and resi 41+145+140+143+144+145+163+166"
-  padding: 6.0
+  padding: 8.0
   n_jobs: 16
   max_poses: 16
 
 vina:
-  exhaustiveness: 128
+  exhaustiveness: 96
   num_modes: 16
   reference: "data/ref_ligand.pdb" # Set to None if use pocket_selection
-  cpu: 4
+  cpu: 1
   write_box: True
 
 dock6:

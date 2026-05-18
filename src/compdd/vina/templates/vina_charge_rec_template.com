@@ -2,4 +2,4 @@ open $receptor
 delete solvent
 delete ligand
 dockprep
-save ${name}_prepped.pdb
+save ${prepped_receptor_pdb}

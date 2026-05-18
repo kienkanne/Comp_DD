@@ -12,6 +12,9 @@ def _vina_prep_rec(cfg):
     def _run():
         receptor = cfg.common.receptor
         name = Path(receptor).stem
+        suffix = cfg.common.prepared_suffix
+        prepped_receptor_pdb = f"{name}_{suffix}.pdb"
+        prepped_receptor_pdbqt = f"{name}_{suffix}.pdbqt"
 
         @shell(cfg)
         def charge_rec_chimerax():
@@ -20,7 +23,10 @@ def _vina_prep_rec(cfg):
             with open(Path(__file__).resolve().parents[0] / "templates" / "vina_charge_rec_template.com") as f:
                 vina_charge_rec_template = f.read()     
 
-            stdin = Template(vina_charge_rec_template).substitute(receptor=receptor,name=name)
+            stdin = Template(vina_charge_rec_template).substitute(
+                receptor=receptor,
+                prepped_receptor_pdb=prepped_receptor_pdb,
+            )
 
             return ([chimerax, "--nogui"], stdin)
         charge_rec_chimerax()
@@ -32,8 +38,8 @@ def _vina_prep_rec(cfg):
 
             return ([mgltools/"bin"/"pythonsh",
                     mgltools/"MGLToolsPckgs"/"AutoDockTools"/"Utilities24"/"prepare_receptor4.py",
-                    "-r", f"{name}_prepped.pdb",
-                    "-o", f"{name}_prepped.pdbqt",
+                    "-r", prepped_receptor_pdb,
+                    "-o", prepped_receptor_pdbqt,
                     ], None)
         charge_rec_mgltools()
 
@@ -53,7 +59,7 @@ def _vina_prep_rec(cfg):
             import numpy as np
             with pymol2.PyMOL() as pymol:
                 pymol.start()
-                pymol.cmd.load(f"{name}_prepped.pdbqt", "receptor")
+                pymol.cmd.load(prepped_receptor_pdbqt, "receptor")
                 stored = {"xyz": []}
                 pymol.cmd.iterate_state(
                     1,
@@ -85,6 +91,6 @@ def _vina_prep_rec(cfg):
                     _write_box(center, size)
         generate_box()
 
-        return f"{name}_prepped.pdbqt", "vina_config.txt"
+        return prepped_receptor_pdbqt, "vina_config.txt"
 
     return _run()

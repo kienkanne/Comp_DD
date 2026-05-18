@@ -15,7 +15,7 @@ pip install -e .
 2. Run a pipeline locally for quick testing:
 
 ```bash
-compdd vina --config sample_configs/default.yaml
+compdd run_vina --config sample_configs/sample_docking.yaml --ligands sample_configs/sample_ligands.yaml
 ```
 
 Check `artifacts/` and `results/` for produced files during development.

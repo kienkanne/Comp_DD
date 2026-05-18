@@ -5,21 +5,22 @@ This document explains the per-run data flow from inputs to final outputs.
 1. Inputs
 
    - Receptor PDB file (`common.receptor`)
-   - Ligand CSV file (`common.ligands_csv`) with header `smiles,name`
-   - Config YAML that points to executables and common parameters
+   - Docking config YAML that points to executables, receptor input, and common parameters
+   - Ligand config YAML that either points to a `smiles,name` CSV or a directory of prepared ligands
 
 2. Configuration loading
 
-   - `load_config(path)` (see [src/compdd/config.py](src/compdd/config.py#L1-L200)) builds a `RootConfig` and augments `cfg.common` with:
+   - `load_docking_config(path)` builds a `RootConfig` and augments `cfg.common` with:
      - `working_dir` and `results_dir` (each appended with `project_name`)
      - `logger` (file + stdout)
      - `manifest` (writes `manifest.json`)
      - `runstate` (writes `state.json` for checkpoints)
+   - `load_ligands_config(path, program=...)` builds a `LigandsConfig`; the CLI passes `vina` or `dock6` from the selected command.
 
 3. Pipeline orchestration
 
    - CLI triggers one of the pipeline classes (e.g., `VinaPipeline`, `DOCK6Pipeline`).
-   - Each pipeline executes a fixed sequence of stages (prepare ligands, prepare receptor, docking, write summary, copy outputs).
+   - Each pipeline executes a fixed sequence of stages (resolve or prepare ligands, prepare receptor, docking, write summary, copy outputs).
 
 4. Parallel execution
 

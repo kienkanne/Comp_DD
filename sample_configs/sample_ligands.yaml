@@ -1,0 +1,10 @@
+source: "smiles" # or "files"
+prepared_suffix: "prepped"
+
+# used if source == "smiles"
+smiles_csv: /home/kbui/Comp_DD/data/ligands_list.csv
+results_dir: /home/kbui/Comp_DD/results/ligands_dir # ligand preparation output directory
+prepare_tool: "obabel" # or "meeko"
+
+# used if source == "files"
+ligands_dir: /home/kbui/Comp_DD/results/ligands_dir

@@ -1,13 +1,5 @@
-from compdd.dock6._dock6_prep_rec import _dock6_prep_rec
-from compdd.dock6._dock6_docking import _dock6_docking
-from compdd.docking_utils._write_summary_csv import _write_summary_csv
-from compdd.config import load_config
-from pathlib import Path
-cfg = load_config("/home/kbui/Comp_DD/tests/test_config.yaml")
+from compdd.docking_utils._ligands_common import _prepared_filename
 
-selected_spheres = _dock6_prep_rec(cfg)
 
-out_files = _dock6_docking(cfg, [Path("/home/kbui/Comp_DD/tests/data/mol16_prepped.mol2"),
-                                Path("/home/kbui/Comp_DD/tests/data/mol17_prepped.mol2")])
-
-_write_summary_csv(cfg, out_files, program="dock6")
+def test_prepared_filename_adds_separator_before_suffix():
+    assert _prepared_filename("mol16", "ready", ".mol2") == "mol16_ready.mol2"

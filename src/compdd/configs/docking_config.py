@@ -1,6 +1,7 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional
+from typing import Literal, Optional
 from pathlib import Path
+import os
 
 
 class LibsConfig(BaseModel):
@@ -23,12 +24,13 @@ class CommonConfig(BaseModel):
     results_dir: Path
 
     receptor: Path
-    ligands_csv: Path
+    prepared_suffix: str = "prepped"
 
     padding: Optional[float] = 5.0
     n_jobs: int = 1
     max_poses: int = 8
     pocket_selection: Optional[str] = None
+    program: Optional[Literal["vina", "dock6"]] = None
 
 
 class VinaConfig(BaseModel):
@@ -55,14 +57,23 @@ from compdd.utils.logging_utils import setup_logger
 from compdd.utils.manifest import Manifest
 from compdd.utils.runstate import State
 
-def load_config(path):
+
+def _expand_path(path):
+    return Path(os.path.expandvars(str(path))).expanduser()
+
+
+def load_docking_config(path):
     import yaml
     with open(path) as f:
         data = yaml.safe_load(f)
     cfg = RootConfig.model_validate(data)
     
-    cfg.common.working_dir = Path(cfg.common.working_dir / cfg.common.project_name)
-    cfg.common.results_dir = Path(cfg.common.results_dir / cfg.common.project_name)
+    cfg.common.working_dir = _expand_path(cfg.common.working_dir) / cfg.common.project_name
+    cfg.common.results_dir = _expand_path(cfg.common.results_dir) / cfg.common.project_name
+    cfg.common.receptor = _expand_path(cfg.common.receptor)
+
+    for field_name in LibsConfig.model_fields:
+        setattr(cfg.libs, field_name, _expand_path(getattr(cfg.libs, field_name)))
 
     cfg.common.logger = setup_logger(Path(cfg.common.working_dir / "run.log"))
     cfg.common.manifest = Manifest(Path(cfg.common.working_dir / "manifest.json"))
@@ -71,3 +82,5 @@ def load_config(path):
     return cfg
 
 
+def load_config(path):
+    return load_docking_config(path)

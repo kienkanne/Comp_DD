@@ -18,7 +18,7 @@ common:
   results_dir: "/home/kbui/Comp_DD/tests/results/"
 
   receptor: "/home/kbui/Comp_DD/tests/data/6W63.pdb"
-  ligands_csv: "/home/kbui/Comp_DD/data/validation_6w63.csv"
+  prepared_suffix: "prepped"
   pocket_selection: "chain A and resi 41+145+140+143+144+145+163+166"
   padding: 5.0
   n_jobs: 16

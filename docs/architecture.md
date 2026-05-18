@@ -6,7 +6,7 @@ This project implements end-to-end molecular docking pipelines organized around 
 
 The high-level pipeline sequence is:
 
-- Prepare ligands
+- Resolve or prepare ligands
 - Prepare receptor / define box or spheres
 - Run docking jobs (parallelized)
 - Parse scores and write a summary CSV
@@ -16,7 +16,7 @@ The high-level pipeline sequence is:
 ## Package layout
 
 - `compdd.cli` — CLI entrypoint and subcommands ([src/compdd/cli/main.py](src/compdd/cli/main.py#L1-L80)).
-- `compdd.config` — Pydantic models and `load_config()` that builds `RootConfig` and attaches `logger`, `manifest`, and `runstate` ([src/compdd/config.py](src/compdd/config.py#L1-L200)).
+- `compdd.configs` — Pydantic models for docking and ligand configs. `load_docking_config()` attaches `logger`, `manifest`, and `runstate`; the CLI injects the selected docking program.
 - `compdd.vina`, `compdd.dock6` — pipeline orchestrators (`VinaPipeline` and `DOCK6Pipeline`) that call a small set of helpers in `docking_utils`.
 - `compdd.docking_utils` — step implementations (ligand prep, receptor prep, parsing, summary, copying) such as `_ligands_prep.py`, `_write_summary_csv.py`, and `_copy_to_results.py`.
 - `compdd.executors` — process runners and decorators (`base.py`, `gnu_parallel.py`) that manage working directories and invoke external commands via GNU `parallel`.
@@ -24,7 +24,7 @@ The high-level pipeline sequence is:
 
 ## Execution model
 
-Pipelines are implemented as small dataclass wrappers (e.g., `VinaPipeline(cfg).run()`) which orchestrate a sequence of pure helper functions. Helpers that perform IO or execute external programs are wrapped with decorators:
+Pipelines are implemented as small dataclass wrappers (e.g., `VinaPipeline(cfg, ligands_cfg).run()`) which orchestrate a sequence of pure helper functions. Helpers that perform IO or execute external programs are wrapped with decorators:
 
 - `@main_tracker(cfg, "Stage Name")` — records stage start/done/failed in the manifest and `runstate`, and logs progress.
 - `@base(cfg)` — switches to the configured working directory for the duration of the wrapped function and ensures the original cwd is restored.
@@ -47,9 +47,9 @@ This keeps orchestration code simple while providing consistent logging, manifes
 - `manifest.json` — stage metadata and timings
 - `state.json` — checkpointing state
 - `poses/` — per-ligand scored pose files
-- `<receptor>_docking_summary.csv` — summary CSV of top poses
+- `<project_name>_<receptor>_docking_summary.csv` — summary CSV of top poses
 
-Working paths are configured via `common.working_dir` and `common.results_dir`. `load_config()` appends the `project_name` to both paths, so the effective working and results folders are under the configured parents.
+Working paths are configured via `common.working_dir` and `common.results_dir`. `load_docking_config()` appends the `project_name` to both paths, so the effective working and results folders are under the configured parents.
 
 ## Extensibility
 
@@ -62,7 +62,7 @@ To add a new backend pipeline:
 ## Useful files
 
 - CLI: [src/compdd/cli/main.py](src/compdd/cli/main.py#L1-L120)
-- Config: [src/compdd/config.py](src/compdd/config.py#L1-L220)
+- Configs: [src/compdd/configs/docking_config.py](src/compdd/configs/docking_config.py#L1-L220), [src/compdd/configs/ligands_config.py](src/compdd/configs/ligands_config.py#L1-L160)
 - Executors: [src/compdd/executors/base.py](src/compdd/executors/base.py#L1-L120), [src/compdd/executors/gnu_parallel.py](src/compdd/executors/gnu_parallel.py#L1-L240)
 - Helpers: [src/compdd/docking_utils/_ligands_prep.py](src/compdd/docking_utils/_ligands_prep.py#L1-L220)
 - Utilities: [src/compdd/utils/manifest.py](src/compdd/utils/manifest.py#L1-L240), [src/compdd/utils/runstate.py](src/compdd/utils/runstate.py#L1-L240)

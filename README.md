@@ -2,12 +2,14 @@
 
 ## Introduction
 
-This repository runs end-to-end molecular docking workflows for a receptor PDB and a CSV of ligands. It currently supports:
+Current package version: `1.2.0`.
+
+This repository runs end-to-end molecular docking workflows from a receptor config plus a separate ligand config. It currently supports:
 
 - AutoDock Vina
 - DOCK6
 
-The pipeline prepares the receptor, prepares each ligand from SMILES, docks ligands in parallel with GNU parallel, copies selected outputs to a results folder, and writes a docking summary CSV sorted by the best pose score.
+The pipeline prepares the receptor, resolves or prepares ligands, docks ligands in parallel with GNU parallel, copies selected outputs to a results folder, and writes a docking summary CSV sorted by the best pose score.
 
 ## Installation
 
@@ -48,16 +50,16 @@ dock_home: "$HOME/Apps/dock6/"
 
 ## Running
 
-Use the CLI with a config file:
+Use the CLI with a docking config and a ligand config:
 
 ```bash
-compdd vina --config sample_configs/default.yaml
-compdd dock6 --config sample_configs/default.yaml
+compdd run_vina --config sample_configs/sample_docking.yaml --ligands sample_configs/sample_ligands.yaml
+compdd run_dock6 --config sample_configs/sample_docking.yaml --ligands sample_configs/sample_ligands.yaml
 ```
 
 ## Ligand CSV
 
-The ligand file must be a CSV with exactly this header:
+When `sample_ligands.yaml` uses `source: smiles`, the ligand file must be a CSV with exactly this header:
 
 ```csv
 smiles,name
@@ -65,11 +67,11 @@ CC(=O)OC1=CC=CC=C1C(=O)O,aspirin
 CC1=C(C=C(C=C1)C(C)C)O,carvacrol
 ```
 
-Ligand names are used in output filenames, so keep them short and file-friendly. The loader sanitizes names and raises an error for duplicate names after sanitization. Each SMILES string is validated with Open Babel before docking starts.
+Ligand names are used in output filenames, so keep them short and file-friendly. The loader sanitizes names and raises an error for duplicate names after sanitization.
 
 ## Config Format
 
-See [sample_configs/default.yaml](sample_configs/default.yaml) for a working example.
+See [sample_configs/sample_docking.yaml](sample_configs/sample_docking.yaml) and [sample_configs/sample_ligands.yaml](sample_configs/sample_ligands.yaml) for working examples.
 
 ### `libs`
 
@@ -99,7 +101,7 @@ common:
   results_dir: "/localscratch/kbui/Comp_DD/results/"
 
   receptor: "/localscratch/kbui/Comp_DD/data/6W63.pdb"
-  ligands_csv: "/localscratch/kbui/Comp_DD/data/ligands_list.csv"
+  prepared_suffix: "prepped"
   
   pocket_selection: "chain A and resi 41+145+140+143+144+145+163+166"
   padding: 5.0
@@ -110,9 +112,32 @@ common:
 - `working_dir`: parent folder of scratch space where intermediate files are written.
 - `results_dir`: parent folder of where final selected outputs and summary CSV are copied.
 - `receptor`: starting receptor PDB.
-- `ligand`: CSV path with `smiles,name`.
+- `prepared_suffix`: suffix used for prepared receptor files, written as `<name>_<prepared_suffix>.<ext>`.
 - `n_jobs`: total concurrent jobs.
 - `max_poses`: maximum number of scores to parse per ligand into the summary CSV.
+
+### Ligand config
+
+Ligand inputs are configured separately:
+
+```yaml
+source: "smiles" # or "files"
+prepared_suffix: "prepped"
+
+# source: smiles
+smiles_csv: "/localscratch/kbui/Comp_DD/data/ligands_list.csv"
+results_dir: "/localscratch/kbui/Comp_DD/results/ligands_dir"
+prepare_tool: "obabel" # or "meeko"
+
+# source: files
+ligands_dir: "/localscratch/kbui/Comp_DD/results/ligands_dir"
+```
+
+- `source: smiles` prepares ligands from a `smiles,name` CSV.
+- `source: files` reads already-prepared ligands from `ligands_dir`.
+- Vina reads `*_<prepared_suffix>.pdbqt`; DOCK6 reads `*_<prepared_suffix>.mol2`.
+- `prepare_tool: obabel` keeps the previous Open Babel/MGLTools workflow.
+- `prepare_tool: meeko` writes PDBQT with RDKit/Meeko; for DOCK6, Open Babel converts the PDBQT output to MOL2.
 
 ### `vina`
 
@@ -148,7 +173,7 @@ The results directory contains selected final files:
 - Vina poses: `*_scored.pdbqt`
 - DOCK6 poses: `*_scored.mol2`
 - Pipeline logs: `run.log`, `manifest.json`, `state.json`
-- Summary CSV: `<receptor_stem>_docking_summary.csv`
+- Summary CSV: `<project_name>_<receptor_stem>_docking_summary.csv`
 
 The summary CSV has this format:
 
@@ -162,6 +187,7 @@ Rows are sorted by `pose1`, with lower scores first.
 
 ## More Documentation
 
+- [Changelog](CHANGELOG.md)
 - [Architecture](docs/architecture.md)
 - [Data Flow](docs/data_flow.md)
 - [Configuration Reference](docs/configuration.md)

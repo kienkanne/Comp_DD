@@ -1,17 +1,6 @@
-from compdd.vina._vina_prep_rec import _vina_prep_rec
-from compdd.vina._vina_docking import _vina_docking
-from compdd.docking_utils._write_summary_csv import _write_summary_csv
-from compdd.config import load_config
-from pathlib import Path
-cfg = load_config("/home/kbui/Comp_DD/tests/test_config.yaml")
-
-prepped_rec, vina_config = _vina_prep_rec(cfg)
-
-out_files, lig_names = _vina_docking(cfg, [Path("/home/kbui/Comp_DD/tests/data/mol16_prepped.pdbqt"),
-                                Path("/home/kbui/Comp_DD/tests/data/mol17_prepped.pdbqt")],
-                                prepped_rec,
-                                vina_config)
-
-_write_summary_csv(cfg, out_files, lig_names, program="vina")
+from compdd.docking_utils._ligands_common import _strip_prepared_suffix
 
 
+def test_strip_prepared_suffix_for_vina_names():
+    assert _strip_prepared_suffix("6W63_ready.pdbqt", "ready") == "6W63"
+    assert _strip_prepared_suffix("mol16_ready.pdbqt", "ready") == "mol16"

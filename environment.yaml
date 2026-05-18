@@ -1,4 +1,4 @@
-name: in_house_docking
+name: compdd
 channels:
   - conda-forge
   - defaults
@@ -8,6 +8,7 @@ dependencies:
   - parallel
   - openbabel
   - vina
+  - meeko
   - pydantic
   - pymol-open-source
   - pytest

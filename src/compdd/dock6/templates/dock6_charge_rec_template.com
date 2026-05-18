@@ -2,7 +2,7 @@ open $receptor
 delete solvent
 delete ligand
 dockprep
-save ${name}_prepped.mol2
+save ${prepped_receptor_mol2}
 delete H
-save ${name}_prepped_noH.mol2
-save ${name}_prepped_noH.pdb
+save ${prepped_receptor_noH_mol2}
+save ${prepped_receptor_noH_pdb}
