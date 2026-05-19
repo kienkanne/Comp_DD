@@ -56,6 +56,7 @@ class LigandsConfig(BaseModel):
 
     smiles_csv: Optional[Path] = None
     sdf_dir: Optional[Path] = None
+    output_dir : Optional[Path] = None
     existing_dir: Optional[Path] = None
 
 
@@ -78,7 +79,7 @@ def _expand_path(path):
     return Path(os.path.expandvars(str(path))).expanduser()
 
 
-def load_docking_config(path):
+def load_config(path):
     import yaml
     with open(path) as f:
         data = yaml.safe_load(f)
@@ -89,17 +90,17 @@ def load_docking_config(path):
 
         for field_name in subcfg.__class__.model_fields:
             value = getattr(subcfg, field_name)
-            setattr(subcfg, field_name, _expand_path(value))
+            if isinstance(value, Path):
+                expanded_path = _expand_path(value)
+                setattr(subcfg, field_name, expanded_path)
+                if not expanded_path.is_file():
+                    expanded_path.mkdir(parents=True, exist_ok=True)
 
     cfg.common.working_dir = cfg.common.working_dir/ cfg.common.project_name
     cfg.common.results_dir = cfg.common.results_dir / cfg.common.project_name
     
-    cfg.common.logger = setup_logger(Path(cfg.common.working_dir / "run.log"))
-    cfg.common.manifest = Manifest(Path(cfg.common.working_dir / "manifest.json"))
-    cfg.common.runstate = State(Path(cfg.common.working_dir / "state.json"))   
+    cfg.common.logger = setup_logger(cfg.common.working_dir / "run.log")
+    cfg.common.manifest = Manifest(cfg.common.working_dir / "manifest.json")
+    cfg.common.runstate = State(cfg.common.working_dir / "state.json") 
 
     return cfg
-
-
-def load_config(path):
-    return load_docking_config(path)

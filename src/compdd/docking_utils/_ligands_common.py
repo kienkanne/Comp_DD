@@ -1,11 +1,6 @@
 from pathlib import Path
 import csv
-import os
 import re
-
-
-def _expand_path(path):
-    return Path(os.path.expandvars(str(path))).expanduser()
 
 
 def _sanitize_name(name: str) -> str:
@@ -17,13 +12,13 @@ def _sanitize_name(name: str) -> str:
 
 
 def _parse_ligands_csv(csv_path):
-    csv_path = _expand_path(csv_path)
     if not csv_path.exists():
         raise FileNotFoundError(f"Ligand CSV not found: {csv_path}")
 
     seen_smiles = set()
     seen_names = set()
-    ligands = []
+    smiles_list = []
+    names = []
 
     with open(csv_path, newline="") as handle:
         reader = csv.DictReader(handle)
@@ -46,12 +41,13 @@ def _parse_ligands_csv(csv_path):
                 raise ValueError(f"Duplicate ligand name after sanitization: {raw_name!r}")
             seen_names.add(name)
 
-            ligands.append((smiles, name))
+            smiles_list.append(smiles)
+            names.append(name)
 
-    if not ligands:
+    if not smiles_list:
         raise ValueError(f"Ligand CSV contains no ligands: {csv_path}")
 
-    return ligands
+    return smiles_list, names
 
 
 def _ligand_extension(program):
@@ -62,13 +58,13 @@ def _ligand_extension(program):
     raise ValueError(f"Unsupported docking program: {program}")
 
 
-def _prepared_filename(name, prepared_suffix, extension):
-    if not extension.startswith("."):
-        extension = f".{extension}"
-    return f"{name}_{prepared_suffix}{extension}"
-
 
 def _prepared_path(directory, name, prepared_suffix, extension):
+    def _prepared_filename(name, prepared_suffix, extension):
+        if not extension.startswith("."):
+            extension = f".{extension}"
+        return f"{name}_{prepared_suffix}{extension}"
+    
     return Path(directory) / _prepared_filename(name, prepared_suffix, extension)
 
 
@@ -80,16 +76,18 @@ def _strip_prepared_suffix(path, prepared_suffix):
     return stem
 
 
-def _discover_prepared_ligands(ligands_cfg):
-    ligands_dir = _expand_path(ligands_cfg.ligands_dir).resolve()
-    if not ligands_dir.is_dir():
-        raise FileNotFoundError(f"Ligand directory not found: {ligands_dir}")
+def _discover_prepared_ligands(cfg):
+    existing_dir = cfg.ligands.existing_dir
+    if not existing_dir.is_dir():
+        raise FileNotFoundError(f"Ligand directory not found: {existing_dir}")
 
-    extension = _ligand_extension(ligands_cfg.program)
-    pattern = f"*_{ligands_cfg.prepared_suffix}{extension}"
-    ligands = sorted(ligands_dir.glob(pattern))
+    extension = _ligand_extension(cfg.common.program)
+    pattern = f"*_{cfg.common.prepared_suffix}{extension}"
+    ligands = sorted(existing_dir.glob(pattern))
 
     if not ligands:
-        raise FileNotFoundError(f"No prepared ligand files matched {ligands_dir / pattern}")
+        raise FileNotFoundError(f"No prepared ligand files matched {existing_dir / pattern}")
+    if ligands is None:
+        raise ValueError("ngu")
 
     return ligands

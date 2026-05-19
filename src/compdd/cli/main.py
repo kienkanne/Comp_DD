@@ -1,6 +1,6 @@
 import argparse
 from pathlib import Path
-from compdd.configs.docking_config import load_docking_config
+from compdd.configs.docking_config import load_config
 from compdd.configs.ligands_config import load_ligands_config
 
 
@@ -44,7 +44,7 @@ def main():
     if args.command == "run_vina":
         from compdd.vina.vina_pipeline import VinaPipeline
 
-        cfg = load_docking_config(args.config)
+        cfg = load_config(args.config)
         cfg.common.program = "vina"
         ligands_cfg = load_ligands_config(args.ligands, program=cfg.common.program)
         VinaPipeline(cfg, ligands_cfg).run()
@@ -53,7 +53,7 @@ def main():
     elif args.command == "run_dock6":
         from compdd.dock6.dock6_pipeline import DOCK6Pipeline
 
-        cfg = load_docking_config(args.config)
+        cfg = load_config(args.config)
         cfg.common.program = "dock6"
         ligands_cfg = load_ligands_config(args.ligands, program=cfg.common.program)
         DOCK6Pipeline(cfg, ligands_cfg).run()

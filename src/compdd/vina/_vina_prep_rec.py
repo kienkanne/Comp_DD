@@ -82,10 +82,11 @@ def _vina_prep_rec(cfg):
                         "num_modes": num_modes,
                     }
             with open(f"{name}_{suffix}_vina_config.txt", "a") as config_file:
+                config_file.write("\n")
                 for key, value in extra_configs.items():
                     config_file.write(f"{key} = {value}\n")
         add_configs()       
 
-        return prepped_receptor_pdbqt, f"{name}_{suffix}_vina_box.txt"
+        return prepped_receptor_pdbqt, f"{name}_{suffix}_vina_config.txt"
 
     return _run()

@@ -28,13 +28,13 @@ def parse_scores(output, max_poses, program):
     return scores
 
 
-def _write_summary_csv(cfg, out_files, program):
+def _write_summary_csv(cfg, out_files):
 
     @main_tracker(cfg, "Write summary csv")
     @base(cfg)
     def _run():
         project_name = cfg.common.project_name
-        receptor_name = Path(cfg.common.receptor).stem
+        receptor_name = Path(cfg.receptors.pdb).stem
         max_poses = cfg.common.max_poses
 
         rows = []
@@ -43,7 +43,7 @@ def _write_summary_csv(cfg, out_files, program):
         lig_names = [Path(outfile).stem.replace("_scored", "") for outfile in out_files]
 
         for out_file, lig_name in zip(out_files, lig_names):
-            scores = parse_scores(out_file, max_poses, program)
+            scores = parse_scores(out_file, max_poses, cfg.common.program)
             rows.append([lig_name] + scores + [""] * (max_poses - len(scores)))
 
         headers = ["name"] + [f"pose{i}" for i in range(1, max_poses + 1)]

@@ -1,7 +1,7 @@
-from compdd.validation.casf import UnsupportedLigandError, discover_casf_entries, parse_mol2_ligand_id
-from compdd.validation.config import load_validation_config
-from compdd.validation.pipeline import _result_headers, _result_row
-from compdd.validation.rcsb import RCSBClient
+from build.validation.casf import UnsupportedLigandError, discover_casf_entries, parse_mol2_ligand_id
+from build.validation.config import load_validation_config
+from build.validation.pipeline import _result_headers, _result_row
+from build.validation.rcsb import RCSBClient
 
 
 def _write_minimal_mol2(path, residue="ABC"):
@@ -129,7 +129,7 @@ def test_dynamic_result_headers_and_row():
 def test_calculate_pose_rmsds_with_mocked_conversion(tmp_path, monkeypatch):
     from rdkit import Chem
     from rdkit.Chem import AllChem
-    from compdd.validation import analysis
+    from build.validation import analysis
 
     smiles = "CCO"
     mol = Chem.AddHs(Chem.MolFromSmiles(smiles))

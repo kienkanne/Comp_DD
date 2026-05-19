@@ -3,7 +3,7 @@ from pathlib import Path
 from compdd.executors.base import base
 
 
-def _copy_to_results(cfg, prepped_rec, docking_summary, out_files):
+def _copy_to_results(cfg, prepped_rec, docking_summary, out_files, others=None):
     @base(cfg, "copy_to_results()")
     def _run():
 
@@ -25,11 +25,13 @@ def _copy_to_results(cfg, prepped_rec, docking_summary, out_files):
             selected_copy = [
                 prepped_rec,
                 docking_summary,
-                "rec_box.pdb",
                 "run.log",
                 "manifest.json",
                 "state.json"
             ]
+
+            for f in others:
+                selected_copy.append(f)
 
             for file in selected_copy:
                 src = working_dir / file

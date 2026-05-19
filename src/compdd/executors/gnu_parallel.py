@@ -28,12 +28,13 @@ def gnu_parallel(cfg, title=None):
                     wrapped_cmds.append(wrapped)
 
                 stdin = "\n".join(wrapped_cmds)
-
-                n_jobs = str(cfg.common.n_jobs)
-
+                
+                total_jobs = len(cmds)
                 local_title = title if title is not None else ""
                 logger = cfg.common.logger
-                logger.info(f"Running: Parallel {local_title} for {n_jobs} jobs")
+                logger.info(f"Running: Parallel {local_title} for {total_jobs} jobs")
+
+                n_jobs = str(cfg.common.n_jobs)
 
                 result = subprocess.run(
                     ["parallel", "-k", "-j", n_jobs],

@@ -9,12 +9,12 @@ libs:
   vina: "vina"
 
 common:
-  project_name: test_vina
+  project_name: full_run_vina
   working_dir: "/localscratch/kbui/COMPDD/artifacts"
   results_dir: "/localscratch/kbui/COMPDD/results"
   prepared_suffix: "prepped"
 
-  padding: 6.0
+  padding: 3.0
   n_jobs: 16
   max_poses: 16
 
@@ -44,9 +44,9 @@ ligands:
 
   # used if source == "smiles"
   smiles_csv: /localscratch/kbui/COMPDD/data/ligands_list.csv
-
   # used if source == "sdf"
-  sdf_dir: /localscratch/kbui/COMPDD/data/ligands.sdf
+  sdf_dir: /localscratch/kbui/COMPDD/data/all_ligands.sdf
+  output_dir: /localscratch/kbui/COMPDD/data/vina_meeko_prepped_test
 
   # used if source == "existing"
-  existing_dir: /localscratch/kbui/COMPDD/data/dock6_meeko_prepped
+  existing_dir: /localscratch/kbui/COMPDD/data/vina_meeko_prepped
