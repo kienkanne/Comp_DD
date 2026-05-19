@@ -8,7 +8,6 @@ class LibsConfig(BaseModel):
     chimerax: Path
     chimera: Path
 
-    mgltools: Path
     dock_home: Path
 
     obabel: Path
@@ -22,26 +21,18 @@ class CommonConfig(BaseModel):
     project_name: str
     working_dir: Path
     results_dir: Path
-
-    receptor: Path
     prepared_suffix: str = "prepped"
 
     padding: Optional[float] = 5.0
     n_jobs: int = 1
     max_poses: int = 8
-    pocket_option: Literal["selection", "reference"] = "selection"
-    pocket_selection: Optional[str] = None
-    reference: Optional[Path] = None
+
     program: Optional[Literal["vina", "dock6"]] = None
 
 
 class VinaConfig(BaseModel):
-    model_config = ConfigDict(extra='allow')
-
     exhaustiveness: Optional[int] = 32
     num_modes: Optional[int] = 8
-    cpu: Optional[int] = 1
-    write_box : Optional[bool] = True
 
 
 class DOCK6Config(BaseModel):
@@ -49,11 +40,33 @@ class DOCK6Config(BaseModel):
     radius: Optional[float] = 10.0
 
 
+class ReceptorsConfig(BaseModel):
+    source: Optional[Literal["pdb", "existing"]] = "pdb"
+
+    pdb: Optional[Path] = None
+    pocket_option: Literal["selection", "reference"] = "selection"
+    pocket_selection: Optional[str] = None
+    reference: Optional[Path] = None
+
+    existing_dir: Optional[Path] = None
+
+
+class LigandsConfig(BaseModel):
+    source: Literal["smiles", "sdf","existing"] = "smiles"
+
+    smiles_csv: Optional[Path] = None
+    sdf_dir: Optional[Path] = None
+    existing_dir: Optional[Path] = None
+
+
 class RootConfig(BaseModel):
     libs: LibsConfig
     common: CommonConfig
     vina: VinaConfig
     dock6: DOCK6Config
+    receptors: ReceptorsConfig
+    ligands: LigandsConfig
+    
 
 
 from compdd.utils.logging_utils import setup_logger
@@ -70,19 +83,17 @@ def load_docking_config(path):
     with open(path) as f:
         data = yaml.safe_load(f)
     cfg = RootConfig.model_validate(data)
+
+    for subcfg_name in RootConfig.model_fields:
+        subcfg = getattr(cfg, subcfg_name)
+
+        for field_name in subcfg.__class__.model_fields:
+            value = getattr(subcfg, field_name)
+            setattr(subcfg, field_name, _expand_path(value))
+
+    cfg.common.working_dir = cfg.common.working_dir/ cfg.common.project_name
+    cfg.common.results_dir = cfg.common.results_dir / cfg.common.project_name
     
-    if getattr(cfg.vina, "reference", None) is not None and cfg.common.reference is None:
-        cfg.common.reference = cfg.vina.reference
-
-    cfg.common.working_dir = _expand_path(cfg.common.working_dir) / cfg.common.project_name
-    cfg.common.results_dir = _expand_path(cfg.common.results_dir) / cfg.common.project_name
-    cfg.common.receptor = _expand_path(cfg.common.receptor)
-    if cfg.common.reference is not None:
-        cfg.common.reference = _expand_path(cfg.common.reference)
-
-    for field_name in LibsConfig.model_fields:
-        setattr(cfg.libs, field_name, _expand_path(getattr(cfg.libs, field_name)))
-
     cfg.common.logger = setup_logger(Path(cfg.common.working_dir / "run.log"))
     cfg.common.manifest = Manifest(Path(cfg.common.working_dir / "manifest.json"))
     cfg.common.runstate = State(Path(cfg.common.working_dir / "state.json"))   
