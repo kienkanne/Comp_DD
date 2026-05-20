@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Current package version: `1.3.1`.
+Current package version: `1.3.2`.
 
 This repository runs end-to-end molecular docking workflows from a receptor config plus a separate ligand config. It currently supports:
 
@@ -50,11 +50,11 @@ dock_home: "$HOME/Apps/dock6/"
 
 ## Running
 
-Use the CLI with a docking config and a ligand config:
+Use the CLI with a single unified config YAML file:
 
 ```bash
-compdd run_vina --config sample_configs/sample_docking.yaml --ligands sample_configs/sample_ligands.yaml
-compdd run_dock6 --config sample_configs/sample_docking.yaml --ligands sample_configs/sample_ligands.yaml
+compdd run_vina --config sample_configs/sample_docking.yaml
+compdd run_dock6 --config sample_configs/sample_docking.yaml
 ```
 
 ## Ligand CSV
@@ -92,67 +92,118 @@ libs:
 
 ### `common`
 
-Inputs, scratch directory, results directory, and batch settings.
+Scratch directory, results directory, and batch settings.
 
 ```yaml
 common:
   project_name: vina_mpro_catalytic
   working_dir: "/localscratch/kbui/Comp_DD/artifacts"
   results_dir: "/localscratch/kbui/Comp_DD/results/"
-
-  receptor: "/localscratch/kbui/Comp_DD/data/6W63.pdb"
   prepared_suffix: "prepped"
-  
-  pocket_selection: "chain A and resi 41+145+140+143+144+145+163+166"
   padding: 5.0
   n_jobs: 16
   max_poses: 8
 ```
+
 - `project_name`: name of the folder in working_dir and results_dir
 - `working_dir`: parent folder of scratch space where intermediate files are written.
 - `results_dir`: parent folder of where final selected outputs and summary CSV are copied.
-- `receptor`: starting receptor PDB.
 - `prepared_suffix`: suffix used for prepared receptor files, written as `<name>_<prepared_suffix>.<ext>`.
 - `n_jobs`: total concurrent jobs.
 - `max_poses`: maximum number of scores to parse per ligand into the summary CSV.
 
-### Ligand config
+### `receptors`
 
-Ligand inputs are configured separately:
+Receptor input and pocket definition (resolved at config-load time).
 
 ```yaml
-source: "smiles" # or "files"
-prepared_suffix: "prepped"
+receptors:
+  pdbs: "/localscratch/kbui/Comp_DD/data/6W63.pdb"
+  pocket_option: "selection"
+  selection: "chain A and resi 41+145+140+143+144+145+163+166"
+  reference_suffix: "_pocket.pdb"
+```
 
-# source: smiles
-smiles_csv: "/localscratch/kbui/Comp_DD/data/ligands_list.csv"
-results_dir: "/localscratch/kbui/Comp_DD/results/ligands_dir"
-prepare_tool: "obabel" # or "meeko"
+Alternatively, use a reference pocket file:
 
-# source: files
-ligands_dir: "/localscratch/kbui/Comp_DD/results/ligands_dir"
+```yaml
+receptors:
+  pdbs: "/localscratch/kbui/Comp_DD/data/6W63.pdb"
+  pocket_option: "reference"
+  reference: "/localscratch/kbui/Comp_DD/data/6W63_pocket.pdb"
+```
+
+Or use multiple receptors with per-receptor selections (from a CSV):
+
+```yaml
+receptors:
+  pdbs:
+    - "/path/to/receptor1.pdb"
+    - "/path/to/receptor2.pdb"
+  pocket_option: "selection"
+  selection: "/path/to/selection_strings.csv"
+```
+
+Where `selection_strings.csv` has the format:
+
+```csv
+receptor1,chain A and resi 41+145
+receptor2,chain B and resi 50+100+150
+```
+
+- `pdbs`: single PDB file, directory of PDB files, or list of PDB file paths.
+- `pocket_option`: `selection` (use PyMOL selection string) or `reference` (use reference pocket file).
+- `selection`: PyMOL selection string (applied to all receptors) or path to a per-receptor CSV file.
+- `reference`: single reference pocket file (for all receptors) or path to a directory of reference files.
+- `reference_suffix`: suffix used when matching reference files by base name (default: `_pocket.pdb`).
+
+**Note (1.3.2+):** All receptor configuration (selection CSV parsing and reference matching) is resolved at config-load time. The resolved receptor bundles are immediately available to the pipeline and prep functions, eliminating runtime parsing errors.
+
+### `ligands`
+
+Ligand inputs are configured in the same YAML file:
+
+```yaml
+ligands:
+  source: "smiles" # or "sdf" or "existing"
+  smiles_csv: "/localscratch/kbui/Comp_DD/data/ligands_list.csv"
+  output_dir: "/localscratch/kbui/Comp_DD/results/ligands_prepped"
+```
+
+Alternatively, from SDF files:
+
+```yaml
+ligands:
+  source: "sdf"
+  sdfs: "/path/to/ligands.sdf"  # or a list of SDF files
+  output_dir: "/localscratch/kbui/Comp_DD/results/ligands_prepped"
+```
+
+Or from pre-prepared ligands:
+
+```yaml
+ligands:
+  source: "existing"
+  existing_dir: "/path/to/prepped/ligands"
 ```
 
 - `source: smiles` prepares ligands from a `smiles,name` CSV.
-- `source: files` reads already-prepared ligands from `ligands_dir`.
+- `source: sdf` prepares ligands from SDF files.
+- `source: existing` skips preparation and uses already-prepared ligands.
 - Vina reads `*_<prepared_suffix>.pdbqt`; DOCK6 reads `*_<prepared_suffix>.mol2`.
-- `prepare_tool: obabel` keeps the previous Open Babel/MGLTools workflow.
-- `prepare_tool: meeko` writes PDBQT with RDKit/Meeko; for DOCK6, Open Babel converts the PDBQT output to MOL2.
 
 ### `vina`
 
 Vina-specific settings.
 
 ```yaml
+vina:
   exhaustiveness: 32
   num_modes: 8
-  reference: "/localscratch/kbui/Comp_DD/data/ref_ligand.pdb"
-  cpu: 1
-  write_box: True
 ```
 
-- `cpu` is the CPU count per ligand job.
-- `reference`: uses to represent the pocket, set to None if uses pocket_selection instead
+- `exhaustiveness`: search exhaustiveness (higher = more thorough but slower).
+- `num_modes`: maximum number of output poses per ligand
 
 ### `dock6`
 
@@ -163,6 +214,9 @@ dock6:
   max_orientations: 1000
   radius: 10.0
 ```
+
+- `max_orientations`: maximum number of ligand orientations to sample.
+- `radius`: radius of the binding sphere (in Angstroms) around the selected atoms.
 
 DOCK6 jobs are single-core; set `common.n_jobs` to the total number of CPU cores you want to use (for example, the number of available CPU cores on the machine).
 

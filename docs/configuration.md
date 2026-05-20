@@ -2,8 +2,8 @@
 
 CompDD now uses two Pydantic-backed YAML configs:
 
-- Docking config: loaded with `load_docking_config(path)` from `src/compdd/configs/docking_config.py`.
-- Ligand config: loaded with `load_ligands_config(path, program=...)` from `src/compdd/configs/ligands_config.py`.
+- Root config: loaded with `load_config(path)` from `src/compdd/configs/root_config.py` (unified docking config). The loader calls `validate_and_normalize_receptors()` which parses per-receptor selection CSVs and matches references at config-load time, building receptor bundles and attaching them to `cfg.receptors.bundles`.
+- Ligand config: loaded internally by the pipeline based on the program selected from the CLI.
 
 Run commands pass the docking program into both configs at runtime:
 
@@ -18,16 +18,27 @@ compdd run_dock6 --config sample_configs/sample_docking.yaml --ligands sample_co
 - `common.project_name` — appended to `working_dir` and `results_dir`.
 - `common.working_dir` — parent path for scratch; the loader appends `project_name`.
 - `common.results_dir` — parent path for final results; the loader appends `project_name`.
-- `common.receptor` — receptor PDB file.
 - `common.prepared_suffix` — suffix used as `<name>_<prepared_suffix>.<ext>` for prepared receptor files.
-- `common.pocket_option` — `selection` or `reference`.
-- `common.pocket_selection` — PyMOL selection used when `pocket_option: selection`.
-- `common.reference` — reference pocket atoms used when `pocket_option: reference`.
 - `common.padding`, `common.n_jobs`, `common.max_poses` — shared runtime options.
+
+### Receptor Configuration (resolved at config-load time)
+
+- `receptors.pdbs` — path to a single PDB file, a directory, or a list of paths.
+- `receptors.pocket_option` — `selection` (use PyMOL selection string or CSV mapping) or `reference` (use reference pocket files).
+- `receptors.selection` — PyMOL selection string used for all receptors, or path to a per-receptor selection CSV file.
+- `receptors.reference` — single reference pocket file, directory of references, or path; matched to receptors by base name.
+- `receptors.reference_suffix` — file suffix used when matching references (default: `_pocket.pdb`).
+
+At config-load time, `validate_and_normalize_receptors()` normalizes these fields:
+- Extracts all PDB files from the provided paths/directories.
+- If `pocket_option: selection` and a CSV file is provided, parses it to map receptor names to selection strings.
+- If `pocket_option: reference` and multiple references are provided, matches them to receptors by base name.
+- Builds `ReceptorConfigBundle` objects containing the resolved selection string or reference path for each receptor.
+- Attaches these bundles to `cfg.receptors.bundles` so prep functions can use them directly.
 - `vina` — `exhaustiveness`, `num_modes`, `cpu`, and `write_box`.
 - `dock6` — `max_orientations` and `radius`.
 
-The docking loader attaches runtime-only objects to `cfg.common`: `logger`, `manifest`, and `runstate`. The CLI also sets `cfg.common.program` to `vina` or `dock6`.
+The config loader attaches runtime-only objects to `cfg.common`: `logger`, `manifest`, and `runstate`. The CLI also sets `cfg.common.program` to `vina` or `dock6`. Receptor bundles are attached to `cfg.receptors.bundles` after validation and normalization.
 
 ## Ligand Config
 

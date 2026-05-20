@@ -1,30 +1,28 @@
 from pathlib import Path
 
-def extract_files(input_inputs, pattern):
+def extract_files(input_path, pattern, recursive=False):
     """
-    Accepts a single file path, a folder path, or a list of file/folder paths.
+    Accepts exactly one file path or exactly one directory path.
+
+    - If `input_path` is a file, returns a list containing that file (no pattern filtering).
+    - If `input_path` is a directory, returns child files matching `*{pattern}`. Recursive is an option
+
+    NOTE: Passing a list is no longer supported to avoid ambiguity when matching references/selections.
     """
-    # 1. Normalize the input into a list of Path objects
-    if isinstance(input_inputs, (str, Path)):
-        input_list = [Path(input_inputs)]
-    elif isinstance(input_inputs, list):
-        input_list = [Path(p) for p in input_inputs]
+    # Normalize input and enforce single-path API
+    if isinstance(input_path, (str, Path)):
+        path = Path(input_path)
     else:
-        raise TypeError("Input must be a string path, Path object, or a list of them.")
+        raise TypeError("extract_files() expects a single file path or a single directory path, not a list.")
 
-    # 2. Resolve folders into individual file paths
-    final_file_list = []
-    for path in input_list:
-        if not path.exists():
-            print(f"Warning: Path does not exist, skipping: {path}")
-            continue
+    if not path.exists():
+        raise FileNotFoundError(f"Path does not exist: {path}")
 
-        if path.is_dir():
-            # Find all .sdf files in the folder (case-insensitive)
-            # Use path.rglob('*.sdf') instead if you want to search subfolders recursively
-            folder_sdfs = sorted(list(path.glob(f'*{pattern}')))
-            final_file_list.extend(folder_sdfs)
+    if path.is_dir():
+        if recursive:
+            matched = sorted(list(path.rglob(f'*{pattern}')))
         else:
-            final_file_list.append(path)
-    
-    return final_file_list
+            matched = sorted(list(path.glob(f'*{pattern}')))
+        return matched
+    else:
+        return [path]

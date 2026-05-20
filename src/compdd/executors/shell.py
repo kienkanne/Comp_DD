@@ -42,7 +42,3 @@ def shell(cfg):
 
         return wrapper
     return decorator
-
-@shell
-def ngu():
-    return (['ls', "-la"], None)

@@ -15,12 +15,12 @@ def ligands_prep(cfg):
         
         if cfg.ligands.source == "sdf":
             from compdd.ligands._load_sdf import _load_sdf
-            mol_with_h_list, names = _load_sdf(cfg.ligands.sdf_dir)
+            mol_with_h_list, names = _load_sdf(cfg.ligands.sdfs)
             
         if cfg.ligands.source == "smiles":
             smiles_list, names = _parse_ligands_csv(cfg.ligands.smiles_csv)
 
-            @python_parallel(cfg, "rdkit_gen3d_parallel()")
+            @python_parallel(cfg, "rdkit_gen3d_parallel()", skip=True)
             def _rdkit_gen3d_parallel(smiles_list):
                 from compdd.ligands._rdkit_gen3d import _rdkit_gen3d
                 tasks = []
@@ -29,8 +29,9 @@ def ligands_prep(cfg):
                 return tasks
             mol_with_h_list = _rdkit_gen3d_parallel(smiles_list)
 
+
         if cfg.common.program == "vina":
-            @python_parallel(cfg, "meeko_charge_parallel()")
+            @python_parallel(cfg, "meeko_charge_parallel()", skip=True)
             def _meeko_charge_parallel(mol_with_h_list, names):
                 from compdd.ligands._meeko_charge import _meeko_charge
                 tasks = []

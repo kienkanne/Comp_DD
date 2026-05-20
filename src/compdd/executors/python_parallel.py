@@ -15,7 +15,7 @@ def _execute_parallel_task(task):
     return func(*args, **kwargs)
 
 
-def python_parallel(cfg, title=None):
+def python_parallel(cfg, title=None, skip=False):
     def decorator(func):
         def wrapper(*args, **kwargs):
             original_cwd = os.getcwd()
@@ -50,9 +50,21 @@ def python_parallel(cfg, title=None):
                         try:
                             results[index] = future.result()
                         except Exception as e:
-                            logger.error(f"Task {index} failed with error: {e}")
-                            raise
+                            if skip:
+                                # Log it, but don't re-raise. results[index] remains None.
+                                logger.error(f"Task {index} failed with error: {e}. 'skip=True' is active, skipping task.")
+                            else:
+                                # Strict behavior: log and crash the entire pipeline immediately
+                                logger.error(f"Task {index} failed with error: {e}. Crashing pipeline.")
+                                raise
 
+                # --- Handling the downstream return strategy ---
+                if skip:
+                    # Strategy A: Filter out None values so downstream doesn't process broken data
+                    filtered_results = [r for r in results if r is not None]
+                    logger.info(f"Parallel execution completed. Kept {len(filtered_results)}/{len(tasks)} successful jobs.")
+                    return filtered_results
+                
                 return results
 
             finally:

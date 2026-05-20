@@ -1,10 +1,8 @@
 from pathlib import Path
 from rdkit import Chem
 
-from compdd.utils.extract_files import extract_files
 
-def _load_sdf(input_inputs):
-    final_file_list = extract_files(input_inputs, ".sdf")
+def _load_sdf(final_file_list):
     mol_with_h_list = []
     names = []
     for file_path in final_file_list:

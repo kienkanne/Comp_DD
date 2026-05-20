@@ -16,7 +16,7 @@ The high-level pipeline sequence is:
 ## Package layout
 
 - `compdd.cli` — CLI entrypoint and subcommands ([src/compdd/cli/main.py](src/compdd/cli/main.py#L1-L80)).
-- `compdd.configs` — Pydantic models for docking and ligand configs. `load_docking_config()` attaches `logger`, `manifest`, and `runstate`; the CLI injects the selected docking program.
+- `compdd.configs` — Pydantic models for docking and ligand configs. `load_config()` (renamed from `load_docking_config()` in 1.3.2) validates and normalizes receptor configuration by calling `validate_and_normalize_receptors()`, which parses selection CSVs, matches references, and attaches resolved receptor bundles to `cfg.receptors.bundles`. The loader also attaches `logger`, `manifest`, and `runstate`; the CLI injects the selected docking program.
 - `compdd.vina`, `compdd.dock6` — pipeline orchestrators (`VinaPipeline` and `DOCK6Pipeline`) that call a small set of helpers in `docking_utils`.
 - `compdd.docking_utils` — step implementations (ligand prep, receptor prep, parsing, summary, copying) such as `_ligands_prep.py`, `_write_summary_csv.py`, and `_copy_to_results.py`.
 - `compdd.executors` — process runners and decorators (`base.py`, `gnu_parallel.py`) that manage working directories and invoke external commands via GNU `parallel`.
@@ -28,7 +28,10 @@ Pipelines are implemented as small dataclass wrappers (e.g., `VinaPipeline(cfg, 
 
 - `@main_tracker(cfg, "Stage Name")` — records stage start/done/failed in the manifest and `runstate`, and logs progress.
 - `@base(cfg)` — switches to the configured working directory for the duration of the wrapped function and ensures the original cwd is restored.
-- `@gnu_parallel(cfg)` — builds commands returned by the inner function and runs them through GNU `parallel`, capturing stdout/stderr and returning per-job outputs.
+- `@shell(cfg)` — runs shell commands in the working directory and captures output.
+- `@python_parallel(cfg)` — parallelizes tasks across multiple processes, with each task receiving pre-built partial functions (e.g., receptor bundles) that contain all resolved config values needed for execution.
+
+As of 1.3.2, receptor bundles are built at config-load time and passed directly to prep functions, eliminating runtime parsing of selection CSVs and reference matching logic.
 
 This keeps orchestration code simple while providing consistent logging, manifesting, and checkpointing.
 

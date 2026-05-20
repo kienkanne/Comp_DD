@@ -10,17 +10,28 @@ This document explains the per-run data flow from inputs to final outputs.
 
 2. Configuration loading
 
-   - `load_docking_config(path)` builds a `RootConfig` and augments `cfg.common` with:
-     - `working_dir` and `results_dir` (each appended with `project_name`)
-     - `logger` (file + stdout)
-     - `manifest` (writes `manifest.json`)
-     - `runstate` (writes `state.json` for checkpoints)
-   - `load_ligands_config(path, program=...)` builds a `LigandsConfig`; the CLI passes `vina` or `dock6` from the selected command.
+   - `load_config(path)` builds a `RootConfig` and:
+     - Calls `validate_and_normalize_receptors()` to:
+       - Parse per-receptor selection CSVs (if `pocket_option: selection` and CSV file is provided).
+       - Match reference pocket files to receptors by base name (if `pocket_option: reference` and multiple references are provided).
+       - Build `ReceptorConfigBundle` objects with resolved selection/reference for each receptor.
+       - Attach bundles to `cfg.receptors.bundles`.
+     - Augments `cfg.common` with:
+       - `working_dir` and `results_dir` (each appended with `project_name`)
+       - `logger` (file + stdout)
+       - `manifest` (writes `manifest.json`)
+       - `runstate` (writes `state.json` for checkpoints)
+   - The pipeline (e.g., `VinaPipeline`) uses receptor bundles from `cfg.receptors.bundles` directly when calling prep functions.
 
 3. Pipeline orchestration
 
    - CLI triggers one of the pipeline classes (e.g., `VinaPipeline`, `DOCK6Pipeline`).
-   - Each pipeline executes a fixed sequence of stages (resolve or prepare ligands, prepare receptor, docking, write summary, copy outputs).
+   - Each pipeline executes a fixed sequence of stages:
+     - Resolve or prepare ligands.
+     - Prepare receptors (using pre-built bundles from `cfg.receptors.bundles` that already contain resolved selections/references).
+     - Docking.
+     - Write summary CSV.
+     - Copy outputs.
 
 4. Parallel execution
 

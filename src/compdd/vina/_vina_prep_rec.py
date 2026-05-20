@@ -13,7 +13,14 @@ class VinaReceptorBundle:
     name: str
 
 
-def _prep_rec(cfg, receptor):
+def _prep_rec(cfg, receptor_bundle):
+    # receptor_bundle may be either a Path (legacy) or a ReceptorConfigBundle-like object
+    if hasattr(receptor_bundle, "receptor"):
+        receptor = receptor_bundle.receptor
+        bundle = receptor_bundle
+    else:
+        receptor = receptor_bundle
+        bundle = None
     name = Path(receptor).stem
     suffix = cfg.common.prepared_suffix
     cleaned_receptor_pdb = f"{name}_{suffix}.pdb"
@@ -37,26 +44,23 @@ def _prep_rec(cfg, receptor):
 
     @shell(cfg)
     def meeko_prep_rec():
-        import pymol2
         padding = cfg.common.padding
+        import pymol2
 
-        if cfg.receptors.pocket_option == "reference":
-            if cfg.receptors.reference is None:
-                raise ValueError("receptors.reference is required when pocket_option is 'reference'")
-            input_file = cfg.receptors.reference
+        if bundle is not None and bundle.reference_path is not None:
+            input_file = bundle.reference_path
             selection = "all"
-        else:
-            if cfg.receptors.selection is None:
-                raise ValueError("receptors.selection is required when pocket_option is 'selection'")
-            input_file = cleaned_receptor_pdb
-            selection = cfg.receptors.selection
 
-            with pymol2.PyMOL() as pymol:
-                pymol.start()
-                pymol.cmd.load(input_file, "target")
-                pymol.cmd.select("to_delete", f"target and not ({selection})")
-                pymol.cmd.remove("to_delete")
-                pymol.cmd.save(f"{name}_pocket.pdb", "target")
+        elif bundle is not None and bundle.selection_string is not None:
+            input_file = cleaned_receptor_pdb
+            selection = bundle.selection_string
+
+        with pymol2.PyMOL() as pymol:
+            pymol.start()
+            pymol.cmd.load(input_file, "target")
+            pymol.cmd.select("to_delete", f"target and not ({selection})")
+            pymol.cmd.remove("to_delete")
+            pymol.cmd.save(f"{name}_pocket.pdb", "target")
 
         cmd = [
                 "mk_prepare_receptor.py",
@@ -99,17 +103,19 @@ def _prep_rec(cfg, receptor):
 
 from compdd.executors.python_parallel import python_parallel
 from compdd.utils.main_tracker import main_tracker
-from compdd.utils.extract_files import extract_files
 from functools import partial
 
 
 def vina_receptors_prep(cfg):
     @main_tracker(cfg, "Prepare receptor for Vina")
-    @python_parallel(cfg, "prep_rec()")
+    @python_parallel(cfg, "prep_rec()", skip=True)
     def _run():
-        receptors = extract_files(cfg.receptors.pdbs, ".pdb")
         tasks = []
-        for receptor in receptors:
-            tasks.append(partial(_prep_rec, cfg, receptor))
+        bundles = getattr(cfg.receptors, "bundles", None)
+        if bundles:
+            for b in bundles:
+                tasks.append(partial(_prep_rec, cfg, b))
+        else:
+            raise ValueError()
         return tasks
     return _run()

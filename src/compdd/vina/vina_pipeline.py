@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from compdd.configs.docking_config import RootConfig
+from compdd.configs.root_config import RootConfig
 from compdd.ligands.ligands_prep import ligands_prep
 from compdd.vina._vina_prep_rec import vina_receptors_prep
 from compdd.utils.matchmixer import matchmixer
@@ -13,6 +13,8 @@ class VinaPipeline():
     cfg: RootConfig
 
     def run(self):
+        self.cfg.common.program = "vina"
+
         prepped_ligs = ligands_prep(self.cfg)
         prepped_recs = vina_receptors_prep(self.cfg)
 
@@ -25,10 +27,10 @@ class VinaPipeline():
         copy_to_results(self.cfg, prepped_recs, docking_summary, out_files, config_files)
 
 
-#test
+"""#test
 from compdd.configs.docking_config import load_config
 
 cfg = load_config("/localscratch/kbui/COMPDD/sample_configs/sample_docking.yaml")
 cfg.common.program = "vina"
 print (cfg.ligands.output_dir)
-VinaPipeline(cfg).run()
+VinaPipeline(cfg).run()"""

@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.3.2
+- Receptor configuration is now fully normalized and resolved at config-load time via `validate_and_normalize_receptors()` in `src/compdd/configs/config_helpers.py`.
+- Per-receptor selection CSVs are parsed during config loading (not during prep), eliminating runtime selection string parsing bugs and improving error reporting.
+- Reference pocket matching by base name is now performed early; matched references are attached to receptor bundles before any prep step.
+- Receptor bundles (containing receptor path, name, and pre-resolved selection string or reference path) are built and attached to `cfg.receptors.bundles` during config validation.
+- Prep functions (`_prep_rec` in Vina and DOCK6 backends) now accept receptor bundles and prefer pre-resolved selection/reference values, with fallback to legacy cfg-based parsing for backward compatibility.
+- `src/compdd/utils/extract_files.py` now only accepts a single file or directory for consistency.
+- Improved error messages for missing selections or references to be raised at config-load time rather than during pipeline execution.
+
 ## 1.3.1
 
 - Documentation refresh to reflect the 1.3.0 pipeline refactor and multi-receptor support.

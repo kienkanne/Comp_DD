@@ -44,10 +44,11 @@ class DOCK6Config(BaseModel):
 class ReceptorsConfig(BaseModel):
     source: Optional[Literal["pdb", "existing"]] = "pdb"
 
-    pdbs: list[Path] | Path | None = None
+    pdbs: Optional[Path | list[Path]] = None
     pocket_option: Literal["selection", "reference"] = "selection"
-    selection: Optional[str] = None
+    selection: Optional[Path | str] = None
     reference: Optional[Path] = None
+    reference_suffix : str = "_pocket.pdb"
 
     existing_dir: Optional[Path] = None
 
@@ -56,9 +57,15 @@ class LigandsConfig(BaseModel):
     source: Literal["smiles", "sdf","existing"] = "smiles"
 
     smiles_csv: Optional[Path] = None
-    sdfs: list[Path] | Path | None = None
+    sdfs: Optional[list[Path] | Path] = None
     output_dir : Optional[Path] = None
     existing_dir: Optional[Path] = None
+
+
+class ValidationConfig(BaseModel):
+    coreset: Optional[bool] = False
+    data: Optional[Path] = None
+    num_analysis: Optional[int] = 5
 
 
 class RootConfig(BaseModel):
@@ -68,17 +75,39 @@ class RootConfig(BaseModel):
     dock6: DOCK6Config
     receptors: ReceptorsConfig
     ligands: LigandsConfig
+    validation: ValidationConfig
+
+
+def _setup_dirs(cfg: RootConfig):
+    from compdd.utils.logging_utils import setup_logger
+    from compdd.utils.manifest import Manifest
+    from compdd.utils.runstate import State
+
+    for subcfg_name in RootConfig.model_fields:
+        subcfg = getattr(cfg, subcfg_name)
+        for field_name in subcfg.__class__.model_fields:
+            value = getattr(subcfg, field_name)
+            if isinstance(value, Path):
+                expanded_path = Path(os.path.expandvars(str(value))).expanduser()
+                setattr(subcfg, field_name, expanded_path)
+
+    cfg.common.working_dir = cfg.common.working_dir/ cfg.common.project_name
+    cfg.common.results_dir = cfg.common.results_dir / cfg.common.project_name
     
-    
+    cfg.common.logger = setup_logger(cfg.common.working_dir / "run.log")
+    cfg.common.manifest = Manifest(cfg.common.working_dir / "manifest.json")
+    cfg.common.runstate = State(cfg.common.working_dir / "state.json") 
+
+    return cfg
 
 
-from compdd.utils.logging_utils import setup_logger
-from compdd.utils.manifest import Manifest
-from compdd.utils.runstate import State
-
-
-def _expand_path(path):
-    return Path(os.path.expandvars(str(path))).expanduser()
+def _find_files(cfg: RootConfig):
+    from compdd.utils.extract_files import extract_files
+    cfg.receptors.pdbs = extract_files(cfg.receptors.pdbs, ".pdb")
+    cfg.ligands.sdfs = extract_files(cfg.ligands.sdfs, ".sdf")
+    if cfg.receptors.reference is not None:
+        cfg.receptors.reference = extract_files(cfg.receptors.reference, cfg.receptors.reference_suffix)
+    return cfg
 
 
 def load_config(path):
@@ -87,22 +116,12 @@ def load_config(path):
         data = yaml.safe_load(f)
     cfg = RootConfig.model_validate(data)
 
-    for subcfg_name in RootConfig.model_fields:
-        subcfg = getattr(cfg, subcfg_name)
+    cfg = _setup_dirs(cfg)
+    print (type(cfg.receptors.reference))
+    cfg = _find_files(cfg)
 
-        for field_name in subcfg.__class__.model_fields:
-            value = getattr(subcfg, field_name)
-            if isinstance(value, Path):
-                expanded_path = _expand_path(value)
-                setattr(subcfg, field_name, expanded_path)
-                if not expanded_path.is_file():
-                    expanded_path.mkdir(parents=True, exist_ok=True)
-
-    cfg.common.working_dir = cfg.common.working_dir/ cfg.common.project_name
-    cfg.common.results_dir = cfg.common.results_dir / cfg.common.project_name
-    
-    cfg.common.logger = setup_logger(cfg.common.working_dir / "run.log")
-    cfg.common.manifest = Manifest(cfg.common.working_dir / "manifest.json")
-    cfg.common.runstate = State(cfg.common.working_dir / "state.json") 
+    # Validate and normalize receptor-related configuration (selection/reference semantics)
+    from compdd.configs.config_helpers import validate_and_normalize_receptors
+    validate_and_normalize_receptors(cfg, cfg.receptors.reference_suffix)
 
     return cfg

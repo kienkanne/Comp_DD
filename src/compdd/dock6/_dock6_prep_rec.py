@@ -12,7 +12,14 @@ class Dock6ReceptorBundle:
     name: str
 
 
-def _prep_rec(cfg, receptor):
+def _prep_rec(cfg, receptor_bundle):
+    # receptor_bundle may be either a Path (legacy) or a ReceptorConfigBundle-like object
+    if hasattr(receptor_bundle, "receptor"):
+        receptor = receptor_bundle.receptor
+        bundle = receptor_bundle
+    else:
+        receptor = receptor_bundle
+        bundle = None
     name = Path(receptor).stem
     dock_home = cfg.libs.dock_home
     suffix = cfg.common.prepared_suffix
@@ -38,30 +45,25 @@ def _prep_rec(cfg, receptor):
     charge_rec()
 
 
-    if cfg.receptors.pocket_option == "reference":
-        @shell(cfg)
-        def generate_site_from_reference():
-            if cfg.receptors.reference is None:
-                raise ValueError("common.reference is required when pocket_option is 'reference'")
-            return ([cfg.libs.obabel, cfg.receptors.reference, "-O", f"{name}_pocket.mol2"], None)
-        generate_site_from_reference()
-    else:
-        @base(cfg, "generate_site()")
-        def generate_site():
-            selection = cfg.receptors.selection
-            if selection is None:
-                raise ValueError("common.selection is required when pocket_option is 'selection'")
+    @base(cfg, "generate_site()")
+    def generate_site():
+        import pymol2
+        if bundle is not None and bundle.reference_path is not None:
+            input_file = bundle.reference_path
+            selection = "all"
 
-            import pymol2
-            with pymol2.PyMOL() as pymol:
-                pymol.start()
-                pymol.cmd.load(prepped_receptor_noH_pdb, "target")
-                pymol.cmd.select("to_delete", f"target and not ({selection})")
-                pymol.cmd.remove("to_delete")
-                pymol.cmd.save(f"{name}_pocket.mol2", "target")
+        elif bundle is not None and bundle.selection_string is not None:
+            input_file = prepped_receptor_noH_pdb
+            selection = bundle.selection_string
 
-            return None
-        generate_site()
+        with pymol2.PyMOL() as pymol:
+            pymol.start()
+            pymol.cmd.load(input_file, "target")
+            pymol.cmd.select("to_delete", f"target and not ({selection})")
+            pymol.cmd.remove("to_delete")
+            pymol.cmd.save(f"{name}_pocket.pdb", "target")
+        return None
+    generate_site()
 
 
     @shell(cfg)
@@ -146,7 +148,6 @@ def _prep_rec(cfg, receptor):
 
 from compdd.executors.python_parallel import python_parallel
 from compdd.utils.main_tracker import main_tracker
-from compdd.utils.extract_files import extract_files
 from functools import partial
 
 
@@ -154,9 +155,12 @@ def dock6_prep_rec(cfg):
     @main_tracker(cfg, "Prepare receptor for DOCK6")
     @python_parallel(cfg, "prep_rec()")
     def _run():
-        receptors = extract_files(cfg.receptors.pdbs, ".pdb")
         tasks = []
-        for receptor in receptors:
-            tasks.append(partial(_prep_rec, cfg, receptor))
+        bundles = getattr(cfg.receptors, "bundles", None)
+        if bundles:
+            for b in bundles:
+                tasks.append(partial(_prep_rec, cfg, b))
+        else:
+            raise ValueError
         return tasks
     return _run()
