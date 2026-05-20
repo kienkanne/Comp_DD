@@ -61,7 +61,7 @@ def _prep_rec(cfg, receptor_bundle):
             pymol.cmd.load(input_file, "target")
             pymol.cmd.select("to_delete", f"target and not ({selection})")
             pymol.cmd.remove("to_delete")
-            pymol.cmd.save(f"{name}_pocket.pdb", "target")
+            pymol.cmd.save(f"{name}_pocket.mol2", "target")
         return None
     generate_site()
 
@@ -85,7 +85,9 @@ def _prep_rec(cfg, receptor_bundle):
     writedms()
     
 
-    def spheres():
+    def spheres(cfg):
+        logger = cfg.common.logger
+        logger.info("Running sphgen and sphere_selector")
         import subprocess
         import shutil
         with open(Path(__file__).resolve().parents[0] / "templates" / "INSPH_template.txt") as f:
@@ -114,7 +116,7 @@ def _prep_rec(cfg, receptor_bundle):
         if ss.exists():
             ss.rename(named_ss)
         shutil.rmtree(cwd)
-    spheres()
+    spheres(cfg)
 
 
     @shell(cfg)
@@ -153,7 +155,7 @@ from functools import partial
 
 def dock6_prep_rec(cfg):
     @main_tracker(cfg, "Prepare receptor for DOCK6")
-    @python_parallel(cfg, "prep_rec()")
+    @python_parallel(cfg, "prep_rec()", skip=True)
     def _run():
         tasks = []
         bundles = getattr(cfg.receptors, "bundles", None)

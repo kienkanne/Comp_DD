@@ -63,9 +63,7 @@ class LigandsConfig(BaseModel):
 
 
 class ValidationConfig(BaseModel):
-    coreset: Optional[bool] = False
     data: Optional[Path] = None
-    num_analysis: Optional[int] = 5
 
 
 class RootConfig(BaseModel):
@@ -93,7 +91,8 @@ def _setup_dirs(cfg: RootConfig):
 
     cfg.common.working_dir = cfg.common.working_dir/ cfg.common.project_name
     cfg.common.results_dir = cfg.common.results_dir / cfg.common.project_name
-    
+    cfg.ligands.output_dir = cfg.ligands.output_dir / cfg.common.project_name
+
     cfg.common.logger = setup_logger(cfg.common.working_dir / "run.log")
     cfg.common.manifest = Manifest(cfg.common.working_dir / "manifest.json")
     cfg.common.runstate = State(cfg.common.working_dir / "state.json") 
@@ -117,7 +116,6 @@ def load_config(path):
     cfg = RootConfig.model_validate(data)
 
     cfg = _setup_dirs(cfg)
-    print (type(cfg.receptors.reference))
     cfg = _find_files(cfg)
 
     # Validate and normalize receptor-related configuration (selection/reference semantics)

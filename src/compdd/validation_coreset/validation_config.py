@@ -24,11 +24,15 @@ def load_validation_config(path):
     cfg.ligands.sdfs = sdfs
     cfg.ligands.output_dir = cfg.common.working_dir
 
+    cfg.common.mode = "match"
+
     cfg = _setup_dirs(cfg)
 
     validate_and_normalize_receptors(cfg, cfg.receptors.reference_suffix)
 
     return cfg
+
+# test
 
 cfg = load_validation_config("/localscratch/kbui/COMPDD/sample_configs/sample_docking.yaml")
 

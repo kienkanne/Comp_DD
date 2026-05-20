@@ -47,9 +47,8 @@ ligands:
   sdfs: /localscratch/kbui/COMPDD/data/all_ligands.sdf
 
   # used if source == "existing"
-  existing_dir: /localscratch/kbui/COMPDD/data/vina_meeko_prepped
+  existing_dir: /localscratch/kbui/COMPDD/data/dock6_meeko_prepped
 
 validation:
   ### Only used in validation mode
-  data: "/localscratch/kbui/coreset/1bcu"
-  num_analysis: 5
+  data: "/localscratch/kbui/coreset"

@@ -14,8 +14,16 @@ def ligands_prep(cfg):
             return _discover_prepared_ligands(cfg)
         
         if cfg.ligands.source == "sdf":
-            from compdd.ligands._load_sdf import _load_sdf
-            mol_with_h_list, names = _load_sdf(cfg.ligands.sdfs)
+            @python_parallel(cfg, "load_sdf_parallel()", skip=True)
+            def _load_sdf_parallel(sdfs):
+                from compdd.ligands._load_sdf import _load_sdf
+                tasks = []
+                for sdf in sdfs:
+                    tasks.append(partial(_load_sdf, sdf))
+                return tasks
+
+            parallel_output = _load_sdf_parallel(cfg.ligands.sdfs)
+            mol_with_h_list, names = map(list, zip(*parallel_output))
             
         if cfg.ligands.source == "smiles":
             smiles_list, names = _parse_ligands_csv(cfg.ligands.smiles_csv)
