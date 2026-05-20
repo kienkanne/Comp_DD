@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.1
+- Added new `compdd retrieve` CLI support for direct RCSB retrieval using the RCSB API.
+- Retrieval now supports `cif` input files in addition to `pdb` for modern workflows.
+- Validation module updated to be more flexible and simplified by removing legacy support.
+- Added unit tests for retrieval and validation configuration behavior.
+
 ## 1.4.0
 - Added the new validation module with `compdd validate_run_vina` and `compdd validate_run_dock6`.
 - Validation mode now loads receptor and ligand sets from a validation data root and forces matched docking mode.
@@ -10,7 +16,7 @@
 - Added dedicated docs for validation and test-set structure.
 
 ## 1.3.2
-- Receptor configuration is now fully normalized and resolved at config-load time via `validate_and_normalize_receptors()` in `src/compdd/configs/config_helpers.py`.
+- Receptor configuration is now fully normalized and resolved at config-load time via `validate_and_normalize_receptors()` in `src/compdd/docking_configs/config_helpers.py`.
 - Per-receptor selection CSVs are parsed during config loading (not during prep), eliminating runtime selection string parsing bugs and improving error reporting.
 - Reference pocket matching by base name is now performed early; matched references are attached to receptor bundles before any prep step.
 - Receptor bundles (containing receptor path, name, and pre-resolved selection string or reference path) are built and attached to `cfg.receptors.bundles` during config validation.

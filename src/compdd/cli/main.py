@@ -1,18 +1,17 @@
 import argparse
 from pathlib import Path
-from compdd.configs.root_config import load_config
+from compdd.docking_configs.root_config import load_config
 
 
 def add_config_arg(parser: argparse.ArgumentParser):
     parser.add_argument(
         "--config",
+        "-c",
         type=Path,
         required=True,
         help="Path to config YAML file",
     )
     return parser
-
-
 
 
 def main():
@@ -32,6 +31,10 @@ def main():
 
     validate_dock6_parser = subparsers.add_parser("validate_run_dock6", help="Run validation DOCK6 pipeline")
     add_config_arg(validate_dock6_parser)
+
+
+    retrieve_parser = subparsers.add_parser("retrieve", help="Retrieve receptors and ligands from rcsb.org")
+    add_config_arg(retrieve_parser)
 
 
     amber_md_parser = subparsers.add_parser("amber_md", help="Full AMBER molecular dynamics pipeline")
@@ -76,16 +79,12 @@ def main():
         DOCK6Pipeline(cfg).run()
         return True
 
-    elif args.command == "validate_run_dock6":
-        # Run the validation pipeline using the existing validation loader and RMSD utilities
-        from compdd.validation_coreset.validation_config import load_validation_config
-        from compdd.validation_coreset.rmsd import compute_validation_rmsds
-        from compdd.dock6.dock6_pipeline import DOCK6Pipeline
+    elif args.command == "retrieve":
+        from compdd.retrieval.structure_retrieval import retrieve_structure
+        from compdd.retrieval.retrieval_config import load_retrieval_config
 
-        cfg = load_validation_config(args.config)
-        cfg.common.program = "dock6"
-        DOCK6Pipeline(cfg).run()
-        compute_validation_rmsds(cfg)
+        rcfg = load_retrieval_config(args.config)
+        retrieve_structure(rcfg)
         return True
 
     elif args.command == "amber_md":

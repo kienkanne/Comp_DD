@@ -16,8 +16,9 @@ The high-level pipeline sequence is:
 ## Package layout
 
 - `compdd.cli` — CLI entrypoint and subcommands ([src/compdd/cli/main.py](src/compdd/cli/main.py#L1-L80)).
-- `compdd.configs` — Pydantic models for docking and ligand configs. `load_config()` (renamed from `load_docking_config()` in 1.3.2) validates and normalizes receptor configuration by calling `validate_and_normalize_receptors()`, which parses selection CSVs, matches references, and attaches resolved receptor bundles to `cfg.receptors.bundles`. The loader also attaches `logger`, `manifest`, and `runstate`; the CLI injects the selected docking program.
+- `compdd.docking_configs` — Pydantic models for docking and ligand configs. `load_config()` validates and normalizes receptor configuration by calling `validate_and_normalize_receptors()`, which parses selection CSVs, matches references, and attaches resolved receptor bundles to `cfg.receptors.bundles`. The loader also attaches `logger`, `manifest`, and `runstate`; the CLI injects the selected docking program.
 - `compdd.vina`, `compdd.dock6` — pipeline orchestrators (`VinaPipeline` and `DOCK6Pipeline`) that call a small set of helpers in `docking_utils`.
+- `compdd.retrieval` — RCSB retrieval support for direct CIF assembly downloads, ligand extraction, and receptor cleanup.
 - `compdd.docking_utils` — step implementations (ligand prep, receptor prep, parsing, summary, copying) such as `_ligands_prep.py`, `_write_summary_csv.py`, and `_copy_to_results.py`.
 - `compdd.executors` — process runners and decorators (`base.py`, `gnu_parallel.py`) that manage working directories and invoke external commands via GNU `parallel`.
 - `compdd.utils` — supporting utilities: `logging_utils`, `manifest`, `runstate` and `main_tracker` for logging, metadata, checkpointing, and stage tracking.
@@ -52,7 +53,7 @@ This keeps orchestration code simple while providing consistent logging, manifes
 - `poses/` — per-ligand scored pose files
 - `<project_name>_<receptor>_docking_summary.csv` — summary CSV of top poses
 
-Working paths are configured via `common.working_dir` and `common.results_dir`. `load_docking_config()` appends the `project_name` to both paths, so the effective working and results folders are under the configured parents.
+Working paths are configured via `common.working_dir` and `common.results_dir`. `load_config()` appends the `project_name` to both paths, so the effective working and results folders are under the configured parents.
 
 ## Extensibility
 
@@ -65,7 +66,7 @@ To add a new backend pipeline:
 ## Useful files
 
 - CLI: [src/compdd/cli/main.py](src/compdd/cli/main.py#L1-L120)
-- Configs: [src/compdd/configs/docking_config.py](src/compdd/configs/docking_config.py#L1-L220), [src/compdd/configs/ligands_config.py](src/compdd/configs/ligands_config.py#L1-L160)
+- Configs: [src/compdd/docking_configs/root_config.py](src/compdd/docking_configs/root_config.py#L1-L220), [src/compdd/docking_configs/config_helpers.py](src/compdd/docking_configs/config_helpers.py#L1-L160)
 - Executors: [src/compdd/executors/base.py](src/compdd/executors/base.py#L1-L120), [src/compdd/executors/gnu_parallel.py](src/compdd/executors/gnu_parallel.py#L1-L240)
 - Helpers: [src/compdd/docking_utils/_ligands_prep.py](src/compdd/docking_utils/_ligands_prep.py#L1-L220)
 - Utilities: [src/compdd/utils/manifest.py](src/compdd/utils/manifest.py#L1-L240), [src/compdd/utils/runstate.py](src/compdd/utils/runstate.py#L1-L240)

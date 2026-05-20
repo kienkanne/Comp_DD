@@ -15,9 +15,11 @@ compdd validate_run_dock6 --config sample_configs/sample_docking.yaml
 
 The validation loader expects a root directory containing recursive validation entries. Each entry should include:
 
-- `*_protein.pdb` — receptor protein structure
-- `*_pocket.pdb` — reference pocket structure
+- `*_protein.pdb` or `*_protein.cif` — receptor protein structure
+- `*_pocket.pdb` or `*_pocket.cif` — reference pocket structure
 - `*_ligand.sdf` — validation ligand set
+
+Validation suffixes are configurable via `validation.protein_suffix`, `validation.pocket_suffix`, and `validation.ligand_suffix`.
 
 Recommended layout for a coreset root such as `/localscratch/kbui/coreset`:
 

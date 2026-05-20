@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Current package version: `1.4.0`.
+Current package version: `1.4.1`.
 
 This repository runs end-to-end molecular docking workflows from a unified YAML config file. It currently supports:
 
@@ -30,7 +30,6 @@ pip install -e .
 Other needed tools that have to be installed:
 
 - DOCK6: See [https://github.com/docking-org/dock6](https://github.com/docking-org/dock6)
-- MGLTOOLS: See [https://ccsb.scripps.edu/mgltools/downloads](https://ccsb.scripps.edu/mgltools/downloads)
 - ChimeraX: See [https://www.cgl.ucsf.edu/chimerax/download.html](https://www.cgl.ucsf.edu/chimerax/download.html)
 - Chimera: See [https://www.cgl.ucsf.edu/chimera/download.html](https://www.cgl.ucsf.edu/chimera/download.html) 
 
@@ -45,7 +44,6 @@ vina: "vina"
 Some others needed to be pointed at their installed directories:
 
 ```yaml
-mgltools: "$HOME/Apps/mgltools_1.5.7/mgltools_x86_64Linux2_1.5.7/"
 dock_home: "$HOME/Apps/dock6/"
 ```
 
@@ -64,6 +62,14 @@ Run validation workflows with the same config:
 compdd validate_run_vina --config sample_configs/sample_docking.yaml
 compdd validate_run_dock6 --config sample_configs/sample_docking.yaml
 ```
+
+Retrieve receptor assemblies and ligand SDFs directly from RCSB with the new `retrieve` command:
+
+```bash
+compdd retrieve --config sample_configs/structure_retrieval.yaml
+```
+
+The retrieval module downloads biological assemblies in mmCIF format, cleans waters and unwanted ligands, and writes cleaned `.cif` receptor outputs.
 
 ## Ligand CSV
 
@@ -90,7 +96,6 @@ libs:
   chimerax: "/usr/local/chimerax/bin/ChimeraX"
   chimera: "/usr/local/chimera/chimera-1.8/bin/chimera"
 
-  mgltools: "/localscratch/kbui/Apps/mgltools_1.5.7/mgltools_x86_64Linux2_1.5.7/"
   dock_home: "/localscratch/kbui/Apps/dock6/"
 
   obabel: "obabel"
@@ -104,19 +109,21 @@ Scratch directory, results directory, and batch settings.
 
 ```yaml
 common:
-  project_name: vina_mpro_catalytic
-  working_dir: "/localscratch/kbui/Comp_DD/artifacts"
-  results_dir: "/localscratch/kbui/Comp_DD/results/"
+  project_name: Mpro_vina_docking
+  working_dir: "/localscratch/kbui/COMPDD/artifacts"
+  results_dir: "/localscratch/kbui/COMPDD/results"
   prepared_suffix: "prepped"
-  padding: 5.0
+
+  padding: 4.0
   n_jobs: 16
-  max_poses: 8
+  max_poses: 16
 ```
 
 - `project_name`: name of the folder in working_dir and results_dir
 - `working_dir`: parent folder of scratch space where intermediate files are written.
 - `results_dir`: parent folder of where final selected outputs and summary CSV are copied.
 - `prepared_suffix`: suffix used for prepared receptor files, written as `<name>_<prepared_suffix>.<ext>`.
+- `padding`: extra buffer space (in Angstroms) added to the outer edges of the docking grid box.
 - `n_jobs`: total concurrent jobs.
 - `max_poses`: maximum number of scores to parse per ligand into the summary CSV.
 
@@ -126,10 +133,17 @@ Receptor input and pocket definition (resolved at config-load time).
 
 ```yaml
 receptors:
-  pdbs: "/localscratch/kbui/Comp_DD/data/6W63.pdb"
+  source: "cif"
+
+  cifs: "/localscratch/kbui/COMPDD/data/cleaned_mpro_receptors2"
+  pdbs: "/localscratch/kbui/COMPDD/data"
+  existing_dir: "/localscratch/kbui/COMPDD/data/6W63.cif"
+
   pocket_option: "selection"
-  selection: "chain A and resi 41+145+140+143+144+145+163+166"
-  reference_suffix: "_pocket.pdb"
+  reference: null
+  selection: "chain A and resi 25+26+41+42+49+54"
+  reference_suffix: null
+
 ```
 
 Alternatively, use a reference pocket file:
@@ -159,11 +173,11 @@ receptor1,chain A and resi 41+145
 receptor2,chain B and resi 50+100+150
 ```
 
-- `pdbs`: single PDB file, directory of PDB files, or list of PDB file paths.
+- `pdbs`/`cifs`: single PDB file, directory of PDB files, or list of PDB file paths.
 - `pocket_option`: `selection` (use PyMOL selection string) or `reference` (use reference pocket file).
 - `selection`: PyMOL selection string (applied to all receptors) or path to a per-receptor CSV file.
 - `reference`: single reference pocket file (for all receptors) or path to a directory of reference files.
-- `reference_suffix`: suffix used when matching reference files by base name (default: `_pocket.pdb`).
+- `reference_suffix`: suffix used when matching multiple receptor files to reference files by base name (default: `_pocket.pdb`).
 
 **Note (1.3.2+):** All receptor configuration (selection CSV parsing and reference matching) is resolved at config-load time. The resolved receptor bundles are immediately available to the pipeline and prep functions, eliminating runtime parsing errors.
 
@@ -226,8 +240,6 @@ dock6:
 - `max_orientations`: maximum number of ligand orientations to sample.
 - `radius`: radius of the binding sphere (in Angstroms) around the selected atoms.
 
-DOCK6 jobs are single-core; set `common.n_jobs` to the total number of CPU cores you want to use (for example, the number of available CPU cores on the machine).
-
 ## Validation
 
 The repository now supports dedicated validation workflows via:
@@ -237,11 +249,17 @@ compdd validate_run_vina --config sample_configs/sample_docking.yaml
 compdd validate_run_dock6 --config sample_configs/sample_docking.yaml
 ```
 
-Validation mode reuses the same config file, but `validation.data` is used to load:
+Validation specific settings.
 
-- receptor proteins from `*_protein.pdb`
-- reference pockets from `*_pocket.pdb`
-- ligands from `*_ligand.sdf`
+```yaml
+validation:
+  data: "/localscratch/kbui/coreset"
+  protein_suffix: "_protein.pdb"
+  pocket_suffix: "_pocket.pdb"
+  ligand_suffix: "_ligand.sdf"
+```
+
+Validation mode reuses the same config file, but `validation.data` is used to load receptor proteins, reference pockets, and ligands. These files are searched recursively in the input folder path. All should have matching names. All settings in `receptors` and `ligands` are ignored when validation is used.
 
 For recommended dataset layout and formatting, see `docs/validation.md`.
 

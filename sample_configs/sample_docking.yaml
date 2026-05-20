@@ -9,7 +9,7 @@ libs:
   vina: "vina"
 
 common:
-  project_name: kdsafhdkfjreal_Mpro_vina_docking
+  project_name: Mpro_vina_docking
   working_dir: "/localscratch/kbui/COMPDD/artifacts"
   results_dir: "/localscratch/kbui/COMPDD/results"
   prepared_suffix: "prepped"
@@ -17,6 +17,32 @@ common:
   padding: 4.0
   n_jobs: 16
   max_poses: 16
+
+receptors:
+  source: "cif" # or "pdb" or "existing"
+
+  cifs: "/localscratch/kbui/COMPDD/data/cleaned_mpro_receptors2"
+  pdbs: "/localscratch/kbui/COMPDD/data"
+  existing_dir: "/localscratch/kbui/COMPDD/data/6W63.cif"
+
+  pocket_option: "selection" # or "reference"
+  reference: null
+  selection: "chain A and resi 25+26+41+42+49+54+119+140+141+142+143+144+145+163+164+165+166+167+168+172+187+188+189+190+191+192"
+  reference_suffix: null
+
+ligands:
+  source: "existing" # or "sdf" or "smiles"
+
+  # used if source == "smiles" or "sdf"
+  output_dir: /localscratch/kbui/COMPDD/data/vina_meeko_prepped_test
+
+  # used if source == "smiles"
+  smiles_csv: /localscratch/kbui/COMPDD/data/ligands_list.csv
+  # used if source == "sdf"
+  sdfs: /localscratch/kbui/COMPDD/data/all_ligands.sdf
+
+  # used if source == "existing"
+  existing_dir: /localscratch/kbui/COMPDD/data/dock6_meeko_prepped
 
 vina:
   exhaustiveness: 64
@@ -26,30 +52,8 @@ dock6:
   max_orientations: 5000
   radius: 10.0
 
-receptors:
-  source: "cif" # or "pdb" or "existing"
-
-  cifs: "/localscratch/kbui/COMPDD/data/cleaned_mpro_receptors2"
-  pdbs: "/localscratch/kbui/COMPDD/data"
-  pocket_option: "selection" # or "reference"
-  reference: null
-  selection: "chain A and resi 25+26+41+42+49+54+119+140+141+142+143+144+145+163+164+165+166+167+168+172+187+188+189+190+191+192"
-  
-  # existing
-  existing_dir: "/localscratch/kbui/COMPDD/data/6W63.cif"
-  
-ligands:
-  source: "existing" # or "sdf" or "smiles"
-
-  output_dir: /localscratch/kbui/COMPDD/data/vina_meeko_prepped_test
-  # used if source == "smiles"
-  smiles_csv: /localscratch/kbui/COMPDD/data/ligands_list.csv
-  # used if source == "sdf"
-  sdfs: /localscratch/kbui/COMPDD/data/all_ligands.sdf
-
-  # used if source == "existing"
-  existing_dir: /localscratch/kbui/COMPDD/data/dock6_meeko_prepped
-
 validation:
-  ### Only used in validation mode
-  data: "/localscratch/kbui/tinycoreset"
+  data: "/localscratch/kbui/coreset"
+  protein_suffix: "_protein.pdb"
+  pocket_suffix: "_pocket.pdb"
+  ligand_suffix: "_ligand.sdf"

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from compdd.configs.root_config import RootConfig
+from compdd.docking_configs.root_config import RootConfig
 from compdd.ligands.ligands_prep import ligands_prep
 from compdd.vina._vina_prep_rec import vina_receptors_prep
 from compdd.utils.matchmixer import matchmixer

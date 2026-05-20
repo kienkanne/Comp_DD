@@ -1,7 +1,7 @@
 from pathlib import Path
 import tempfile
 
-from compdd.configs.config_helpers import match_references_to_receptors, parse_selection_csv
+from compdd.docking_configs.config_helpers import match_references_to_receptors, parse_selection_csv
 
 
 def test_match_references_to_receptors(tmp_path):

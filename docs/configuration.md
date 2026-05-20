@@ -2,17 +2,20 @@
 
 CompDD now uses two Pydantic-backed YAML configs:
 
-- Root config: loaded with `load_config(path)` from `src/compdd/configs/root_config.py` (unified docking config). The loader calls `validate_and_normalize_receptors()` which parses per-receptor selection CSVs and matches references at config-load time, building receptor bundles and attaching them to `cfg.receptors.bundles`.
+- Root config: loaded with `load_config(path)` from `src/compdd/docking_configs/root_config.py` (unified docking config). The loader calls `validate_and_normalize_receptors()` which parses per-receptor selection CSVs and matches references at config-load time, building receptor bundles and attaching them to `cfg.receptors.bundles`.
 - Ligand config: loaded internally by the pipeline based on the program selected from the CLI.
 
-Run commands use a single unified config YAML file, and validation commands reuse the same config with test-set data:
+Run commands use a single unified config YAML file. Validation and retrieval commands reuse the same unified config approach:
 
 ```bash
 compdd run_vina --config sample_configs/sample_docking.yaml
 compdd run_dock6 --config sample_configs/sample_docking.yaml
 compdd validate_run_vina --config sample_configs/sample_docking.yaml
 compdd validate_run_dock6 --config sample_configs/sample_docking.yaml
+compdd retrieve --config sample_configs/structure_retrieval.yaml
 ```
+
+The `retrieve` command uses a dedicated YAML config to download and clean mmCIF receptor assemblies and SDF ligands from the RCSB API.
 
 ## Docking Config
 

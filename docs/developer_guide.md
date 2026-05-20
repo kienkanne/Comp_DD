@@ -25,7 +25,7 @@ Check `artifacts/` and `results/` for produced files during development.
 
 As of 1.3.2, receptor configuration is fully normalized at config-load time:
 
-1. `load_config()` calls `validate_and_normalize_receptors()` in `src/compdd/configs/config_helpers.py`.
+1. `load_config()` calls `validate_and_normalize_receptors()` in `src/compdd/docking_configs/config_helpers.py`.
 2. This function:
    - Extracts all PDB files from the configured paths/directories.
    - Parses per-receptor selection CSVs (if provided) to map receptor names → selection strings.
@@ -64,7 +64,7 @@ This design ensures that all selection CSV parsing and reference matching happen
 
 ## Validation Development
 
-Version 1.4.0 introduces the new validation module. The validation workflow is implemented in `src/compdd/validation_coreset` and includes:
+Version 1.4.0 introduced the validation module, and version 1.4.1 adds retrieval support and additional validation flexibility. The validation workflow is implemented in `src/compdd/validation_coreset` and includes:
 
 - `validation_config.py` for loading a validation dataset and overwriting receptor/ligand inputs.
 - `rmsd.py` for computing per-pose RMSDs for Vina (`.pdbqt`) and DOCK6 (`.mol2`).

@@ -1,4 +1,4 @@
-from compdd.configs.root_config import load_docking_config
+from compdd.docking_configs.root_config import load_docking_config
 
 
 def test_load_docking_config_keeps_ligands_out_of_common(tmp_path):

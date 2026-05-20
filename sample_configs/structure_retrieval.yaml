@@ -1,0 +1,15 @@
+raw_assembly_suffix: "raw_assembly"
+cleaned_suffix: ""
+ligand_suffix: null
+
+remove_waters: True
+kept_residues: ["Zn", "Ca"]
+
+output_dir: "/localscratch/kbui/COMPDD/data/my_receptors_ligands"
+remove_raw_assembly: True
+
+id_list: [
+  "6W63",
+  "6LU7",
+  "7K40"
+]

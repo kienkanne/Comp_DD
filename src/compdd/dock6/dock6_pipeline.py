@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from compdd.configs.root_config import RootConfig
+from compdd.docking_configs.root_config import RootConfig
 from compdd.ligands.ligands_prep import ligands_prep
 from compdd.dock6._dock6_prep_rec import dock6_prep_rec
 from compdd.dock6._dock6_docking import dock6_docking
