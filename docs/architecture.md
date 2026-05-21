@@ -15,13 +15,17 @@ The high-level pipeline sequence is:
 
 ## Package layout
 
-- `compdd.cli` — CLI entrypoint and subcommands ([src/compdd/cli/main.py](src/compdd/cli/main.py#L1-L80)).
-- `compdd.docking_configs` — Pydantic models for docking and ligand configs. `load_config()` validates and normalizes receptor configuration by calling `validate_and_normalize_receptors()`, which parses selection CSVs, matches references, and attaches resolved receptor bundles to `cfg.receptors.bundles`. The loader also attaches `logger`, `manifest`, and `runstate`; the CLI injects the selected docking program.
-- `compdd.vina`, `compdd.dock6` — pipeline orchestrators (`VinaPipeline` and `DOCK6Pipeline`) that call a small set of helpers in `docking_utils`.
-- `compdd.retrieval` — RCSB retrieval support for direct CIF assembly downloads, ligand extraction, and receptor cleanup.
-- `compdd.docking_utils` — step implementations (ligand prep, receptor prep, parsing, summary, copying) such as `_ligands_prep.py`, `_write_summary_csv.py`, and `_copy_to_results.py`.
-- `compdd.executors` — process runners and decorators (`base.py`, `gnu_parallel.py`) that manage working directories and invoke external commands via GNU `parallel`.
-- `compdd.utils` — supporting utilities: `logging_utils`, `manifest`, `runstate` and `main_tracker` for logging, metadata, checkpointing, and stage tracking.
+- `nexus.cli` — CLI entrypoint and command groups ([src/nexus/cli/main.py](src/nexus/cli/main.py)).
+- `nexus.cli.dock` — docking commands for `nexus dock vina` and `nexus dock dock6`.
+- `nexus.cli.validate` — validation commands for `nexus validate vina` and `nexus validate dock6`.
+- `nexus.cli.fetch` — fetch commands for `nexus fetch rcsb`.
+- `nexus.dock` — docking configuration and shared docking helpers.
+- `nexus.dock.vina` — Vina pipeline implementation.
+- `nexus.dock.dock6` — DOCK6 pipeline implementation.
+- `nexus.fetch` — RCSB fetch configuration, pipeline, and CIF assembly support.
+- `nexus.validate` — validation config loader and RMSD analysis.
+- `nexus.core.executors` — process runners and parallel execution wrappers.
+- `nexus.core.trackers` — logging, manifest, and runstate support.
 
 ## Execution model
 
@@ -38,8 +42,8 @@ This keeps orchestration code simple while providing consistent logging, manifes
 
 ## Pipelines
 
-- `VinaPipeline` ([src/compdd/vina/vina_pipeline.py](src/compdd/vina/vina_pipeline.py#L1-L200)) — calls `_ligands_prep`, `_vina_prep_rec`, `_vina_docking`, `_write_summary_csv`, and `_copy_to_results`.
-- `DOCK6Pipeline` ([src/compdd/dock6/dock6_pipeline.py](src/compdd/dock6/dock6_pipeline.py#L1-L200)) — similar flow but uses DOCK6-specific prep and docking helpers.
+- `VinaPipeline` ([src/nexus/dock/vina/pipeline.py](src/nexus/dock/vina/pipeline.py)) — calls `_ligands_prep`, `_vina_prep_rec`, `_vina_docking`, `_write_summary_csv`, and `_copy_to_results`.
+- `DOCK6Pipeline` ([src/nexus/dock/dock6/pipeline.py](src/nexus/dock/dock6/pipeline.py)) — similar flow but uses DOCK6-specific prep and docking helpers.
 
 ## Checkpointing & metadata
 
@@ -53,23 +57,25 @@ This keeps orchestration code simple while providing consistent logging, manifes
 - `poses/` — per-ligand scored pose files
 - `<project_name>_<receptor>_docking_summary.csv` — summary CSV of top poses
 
-Working paths are configured via `common.working_dir` and `common.results_dir`. `load_config()` appends the `project_name` to both paths, so the effective working and results folders are under the configured parents.
+Working paths are configured via `common.working_dir` and `common.results_dir`. The dock config loader appends `project_name` to both paths, so the effective working and results folders are under the configured parents.
 
 ## Extensibility
 
 To add a new backend pipeline:
 
-1. Add a new subpackage `compdd.<backend>` containing a `<backend>_pipeline.py` that follows the pattern in `vina`/`dock6`.
-2. Implement helper functions in `docking_utils` (or new helpers in the backend package) and decorate IO/exec functions with `@main_tracker` and `@base`/`@gnu_parallel` as appropriate.
-3. Add a CLI subparser in `src/compdd/cli/main.py` that constructs and runs the new pipeline.
+1. Add a new subpackage under `src/nexus/dock/` containing a backend pipeline class.
+2. Implement helper functions and decorate IO/exec functions with `@main_tracker` and the appropriate execution wrappers.
+3. Add a new command in `src/nexus/cli/dock.py` and expose it via `src/nexus/cli/main.py`.
 
 ## Useful files
 
-- CLI: [src/compdd/cli/main.py](src/compdd/cli/main.py#L1-L120)
-- Configs: [src/compdd/docking_configs/root_config.py](src/compdd/docking_configs/root_config.py#L1-L220), [src/compdd/docking_configs/config_helpers.py](src/compdd/docking_configs/config_helpers.py#L1-L160)
-- Executors: [src/compdd/executors/base.py](src/compdd/executors/base.py#L1-L120), [src/compdd/executors/gnu_parallel.py](src/compdd/executors/gnu_parallel.py#L1-L240)
-- Helpers: [src/compdd/docking_utils/_ligands_prep.py](src/compdd/docking_utils/_ligands_prep.py#L1-L220)
-- Utilities: [src/compdd/utils/manifest.py](src/compdd/utils/manifest.py#L1-L240), [src/compdd/utils/runstate.py](src/compdd/utils/runstate.py#L1-L240)
+- CLI: [src/nexus/cli/main.py](src/nexus/cli/main.py)
+- Dock config: [src/nexus/dock/dock_config.py](src/nexus/dock/dock_config.py)
+- Docking pipelines: [src/nexus/dock/vina/pipeline.py](src/nexus/dock/vina/pipeline.py), [src/nexus/dock/dock6/pipeline.py](src/nexus/dock/dock6/pipeline.py)
+- Fetch: [src/nexus/fetch/pipeline.py](src/nexus/fetch/pipeline.py), [src/nexus/fetch/rcsb.py](src/nexus/fetch/rcsb.py)
+- Validation: [src/nexus/validate/validate_config.py](src/nexus/validate/validate_config.py), [src/nexus/validate/rmsd.py](src/nexus/validate/rmsd.py)
+- Executors: [src/nexus/core/executors/base.py](src/nexus/core/executors/base.py), [src/nexus/core/executors/gnu_parallel.py](src/nexus/core/executors/gnu_parallel.py)
+- Trackers: [src/nexus/core/trackers/manifest.py](src/nexus/core/trackers/manifest.py), [src/nexus/core/trackers/runstate.py](src/nexus/core/trackers/runstate.py)
 
 ---
 

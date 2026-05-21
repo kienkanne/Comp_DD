@@ -1,6 +1,6 @@
 import shutil
 from pathlib import Path
-from compdd.executors.base import base
+from nexus.core.executors.base import base
 
 
 def _to_path(item):
@@ -11,8 +11,8 @@ def _to_path(item):
     return Path(item)
 
 
-def copy_to_results(cfg, prepped_rec, docking_summary, out_files, others=None):
-    @base(cfg, "copy_to_results()")
+def final_copy(cfg, prepped_rec, docking_summary, out_files, others=None):
+    @base(cfg, "final_copy()")
     def _run():
 
         logger = cfg.common.logger

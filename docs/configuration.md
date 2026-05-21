@@ -1,21 +1,22 @@
 # Configuration Reference
 
-CompDD now uses two Pydantic-backed YAML configs:
+This repository uses Pydantic-backed YAML configuration models with a unified dock config and specialized loaders for validation and fetch.
 
-- Root config: loaded with `load_config(path)` from `src/compdd/docking_configs/root_config.py` (unified docking config). The loader calls `validate_and_normalize_receptors()` which parses per-receptor selection CSVs and matches references at config-load time, building receptor bundles and attaching them to `cfg.receptors.bundles`.
-- Ligand config: loaded internally by the pipeline based on the program selected from the CLI.
+- Root docking config: loaded with `load_dock_config(path)` from `src/nexus/dock/dock_config.py`.
+- Validation config: loaded with `load_validate_config(path)` from `src/nexus/validate/validate_config.py`.
+- Fetch config: loaded with `load_fetch_config(path)` from `src/nexus/fetch/fetch_config.py`.
 
-Run commands use a single unified config YAML file. Validation and retrieval commands reuse the same unified config approach:
+Run commands use a single unified config YAML file for docking and validation. Fetch uses a dedicated fetch config:
 
 ```bash
-compdd run_vina --config sample_configs/sample_docking.yaml
-compdd run_dock6 --config sample_configs/sample_docking.yaml
-compdd validate_run_vina --config sample_configs/sample_docking.yaml
-compdd validate_run_dock6 --config sample_configs/sample_docking.yaml
-compdd retrieve --config sample_configs/structure_retrieval.yaml
+nexus dock vina -c sample_configs/sample_docking.yaml
+nexus dock dock6 -c sample_configs/sample_docking.yaml
+nexus validate vina -c sample_configs/sample_docking.yaml
+nexus validate dock6 -c sample_configs/sample_docking.yaml
+nexus fetch rcsb -c sample_configs/structure_retrieval.yaml
 ```
 
-The `retrieve` command uses a dedicated YAML config to download and clean mmCIF receptor assemblies and SDF ligands from the RCSB API.
+The `fetch` command downloads and cleans mmCIF receptor assemblies and SDF ligands from the RCSB API.
 
 ## Docking Config
 
@@ -28,14 +29,14 @@ The `retrieve` command uses a dedicated YAML config to download and clean mmCIF 
 
 ### Receptor Configuration (resolved at config-load time)
 
-- `receptors.pdbs` — path to a single PDB file, a directory, or a list of paths.
-- `receptors.pocket_option` — `selection` (use PyMOL selection string or CSV mapping) or `reference` (use reference pocket files).
+- `receptors.pdbs` — path to a single PDB/CIF file, a directory, or a list of paths.
+- `receptors.pocket_option` — `selection` (use a PyMOL selection string or CSV mapping) or `reference` (use reference pocket files).
 - `receptors.selection` — PyMOL selection string used for all receptors, or path to a per-receptor selection CSV file.
 - `receptors.reference` — single reference pocket file, directory of references, or path; matched to receptors by base name.
-- `receptors.reference_suffix` — file suffix used when matching references (default: `_pocket.pdb`).
+- `receptors.reference_suffix` — file suffix used when matching references (default: `_pocket.cif`).
 
 At config-load time, `validate_and_normalize_receptors()` normalizes these fields:
-- Extracts all PDB files from the provided paths/directories.
+- Extracts all receptor files from the provided paths/directories.
 - If `pocket_option: selection` and a CSV file is provided, parses it to map receptor names to selection strings.
 - If `pocket_option: reference` and multiple references are provided, matches them to receptors by base name.
 - Builds `ReceptorConfigBundle` objects containing the resolved selection string or reference path for each receptor.
@@ -52,6 +53,7 @@ The config loader attaches runtime-only objects to `cfg.common`: `logger`, `mani
 
 - `source: smiles` prepares ligands from `smiles_csv`.
 - `source: files` reads prepared ligands from `ligands_dir`.
+- `source: existing` uses already-prepared ligands.
 - `prepared_suffix` is interpreted as `<ligand_name>_<prepared_suffix>.<ext>`.
 - `prepare_tool: obabel` uses Open Babel and, for Vina, MGLTools.
 - `prepare_tool: meeko` uses RDKit/Meeko to produce PDBQT and converts to MOL2 with Open Babel for DOCK6.
@@ -60,10 +62,9 @@ The config loader attaches runtime-only objects to `cfg.common`: `logger`, `mani
 
 See `sample_configs/sample_docking.yaml` and `sample_configs/sample_ligands.yaml` for practical examples.
 
-
 ## Validation Config
 
-Validation mode reuses the same unified config file, but the validation loader overwrites receptor and ligand inputs when `cfg.validation.data` is set.
+Validation mode reuses the same unified docking config file, but the validation loader overwrites receptor and ligand inputs when `validation.data` is set.
 
 - `validation.data` — path to a validation dataset root.
 
@@ -73,10 +74,10 @@ The validation loader expects a recursive data tree containing:
 - reference pockets as `*_pocket.pdb`
 - ligand definitions as `*_ligand.sdf`
 
-For example, the recommended structure under `/localscratch/kbui/coreset` is:
+For example, the recommended structure under `/path/to/coreset` is:
 
 ```text
-/localscratch/kbui/coreset/
+/path/to/coreset/
   entry1/
     entry1_protein.pdb
     entry1_pocket.pdb

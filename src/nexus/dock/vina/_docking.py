@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from compdd.ligands._ligands_common import _strip_prepared_suffix
-from compdd.executors.gnu_parallel import gnu_parallel
-from compdd.utils.main_tracker import main_tracker
+from nexus.dock.ligands._ligands_common import _strip_prepared_suffix
+from nexus.core.executors.gnu_parallel import gnu_parallel
+from nexus.core.trackers.main_tracker import main_tracker
 
 
 def _to_path(item):
@@ -21,10 +21,10 @@ def _vina_config_path(item):
     raise ValueError("Unable to extract Vina config path from receptor bundle")
 
 
-def _build_vina_docking_commands(cfg, pairs):
-    vina = cfg.libs.vina
-    suffix = cfg.common.prepared_suffix
-    mode = getattr(cfg.common, "mode", "mix")
+def _build_vina_docking_commands(dcfg, pairs):
+    vina = dcfg.libs.vina
+    suffix = dcfg.common.prepared_suffix
+    mode = getattr(dcfg.common, "mode", "mix")
 
     out_files = []
     cmds = []
@@ -52,7 +52,7 @@ def _build_vina_docking_commands(cfg, pairs):
     return out_files, cmds
 
 
-def vina_docking(cfg, prepped_ligs_or_pairs, prepped_rec=None, vina_config=None):
+def vina_docking(dcfg, prepped_ligs_or_pairs, prepped_rec=None, vina_config=None):
     if prepped_rec is not None:
         pairs = [(prepped_rec, prepped_lig) for prepped_lig in prepped_ligs_or_pairs]
     else:
@@ -60,11 +60,11 @@ def vina_docking(cfg, prepped_ligs_or_pairs, prepped_rec=None, vina_config=None)
 
     out_files = []
 
-    @main_tracker(cfg, "Batch docking with Vina")
-    @gnu_parallel(cfg, "vina_docking()")
+    @main_tracker(dcfg, "Batch docking with Vina")
+    @gnu_parallel(dcfg, "vina_docking()")
     def _run():
         nonlocal out_files
-        out_files, cmds = _build_vina_docking_commands(cfg, pairs)
+        out_files, cmds = _build_vina_docking_commands(dcfg, pairs)
         return cmds
 
     _run()

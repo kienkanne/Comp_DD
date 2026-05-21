@@ -4,15 +4,15 @@ This document explains the per-run data flow from inputs to final outputs.
 
 1. Inputs
 
-   - Receptor PDB file (`common.receptor`)
-   - Docking config YAML that points to executables, receptor input, and common parameters
-   - Ligand config YAML that either points to a `smiles,name` CSV or a directory of prepared ligands
+   - Receptor files or directories configured under `receptors`.
+   - Docking config YAML that points to executables, receptor input, and common parameters.
+   - Ligand input configured under `ligands` in the same unified config file.
 
 2. Configuration loading
 
-   - `load_config(path)` builds a `RootConfig` and:
+   - `load_dock_config(path)` builds a `DockConfig` and:
      - Calls `validate_and_normalize_receptors()` to:
-       - Parse per-receptor selection CSVs (if `pocket_option: selection` and CSV file is provided).
+       - Parse per-receptor selection CSVs (if `pocket_option: selection` and a CSV file is provided).
        - Match reference pocket files to receptors by base name (if `pocket_option: reference` and multiple references are provided).
        - Build `ReceptorConfigBundle` objects with resolved selection/reference for each receptor.
        - Attach bundles to `cfg.receptors.bundles`.
@@ -21,14 +21,14 @@ This document explains the per-run data flow from inputs to final outputs.
        - `logger` (file + stdout)
        - `manifest` (writes `manifest.json`)
        - `runstate` (writes `state.json` for checkpoints)
-   - The pipeline (e.g., `VinaPipeline`) uses receptor bundles from `cfg.receptors.bundles` directly when calling prep functions.
+   - The pipeline uses receptor bundles from `cfg.receptors.bundles` directly when calling prep functions.
 
 3. Pipeline orchestration
 
-   - CLI triggers one of the pipeline classes (e.g., `VinaPipeline`, `DOCK6Pipeline`) or validation workflows (`validate_run_vina`, `validate_run_dock6`).
+   - CLI triggers one of the docking commands (`nexus dock vina`, `nexus dock dock6`) or validation commands (`nexus validate vina`, `nexus validate dock6`).
    - Each pipeline executes a fixed sequence of stages:
      - Resolve or prepare ligands.
-     - Prepare receptors (using pre-built bundles from `cfg.receptors.bundles` that already contain resolved selections/references).
+     - Prepare receptors (using pre-built bundles from `cfg.receptors.bundles`).
      - Docking.
      - Write summary CSV.
      - Copy outputs.
@@ -36,20 +36,20 @@ This document explains the per-run data flow from inputs to final outputs.
 
 4. Parallel execution
 
-   - Per-ligand external steps are executed via `compdd.executors.gnu_parallel` which builds command lists and invokes GNU `parallel` with `common.n_jobs`.
+   - Per-ligand external steps are executed via `nexus.core.executors.gnu_parallel`, which builds command lists and invokes GNU `parallel` with `common.n_jobs`.
 
 5. Outputs
 
-   - The working directory contains intermediate files and the `run.log`, `manifest.json`, and `state.json`.
-   - The results directory mirrors selected outputs and contains a `poses/` folder and the `<receptor>_docking_summary.csv`.
+   - The working directory contains intermediate files and `run.log`, `manifest.json`, and `state.json`.
+   - The results directory mirrors selected outputs and contains a `poses/` folder and the `<project_name>_<receptor>_docking_summary.csv`.
 
 6. Checkpointing and resume
 
-   - `main_tracker` and `State` allow stages to be checkpointed; `State.get_output()` can be used by later stages to resume from saved outputs.
+   - `main_tracker` and `State` allow stages to be checkpointed; state can be inspected to resume completed outputs.
 
 7. Example files
 
-   - `run.log` — combined console/file log produced by `setup_logger`.
+   - `run.log` — combined console/file log.
    - `manifest.json` — stage timings and final status.
    - `state.json` — per-stage checkpoint outputs.
 

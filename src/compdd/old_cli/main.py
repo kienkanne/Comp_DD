@@ -1,6 +1,6 @@
 import argparse
 from pathlib import Path
-from nexus._DOCKING.docking_configs.root_config import load_config
+from nexus.docking.docking_configs.root_config import load_config
 
 
 def add_config_arg(parser: argparse.ArgumentParser):

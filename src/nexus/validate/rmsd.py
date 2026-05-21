@@ -108,22 +108,24 @@ def _parse_dock6_pose_rmsds(prep_path: Path, scored_path: Path, max_poses: int):
 
     return rmsds
 
+from nexus.dock.dock_config import DockConfig
 
-def compute_validation_rmsds(cfg):
+def compute_validation_rmsds(vcfg: DockConfig):
     """Compute RMSDs for prepared crystal vs scored outputs and write per-receptor CSVs.
 
     Writes files named `<project>_<receptor>_rmsd.csv` into the results directory.
     """
-    max_poses = cfg.common.max_poses
-    wd = Path(cfg.common.working_dir)
-    rd = Path(cfg.common.results_dir)
-    project = cfg.common.project_name
-    suffix = cfg.common.prepared_suffix
-    program = getattr(cfg.common, "program", "vina")
+    print (vcfg)
+    max_poses = vcfg.common.max_poses
+    wd = Path(vcfg.common.working_dir)
+    rd = Path(vcfg.common.results_dir)
+    project = vcfg.common.project_name
+    suffix = vcfg.common.prepared_suffix
+    program = getattr(vcfg.common, "program", "vina")
 
-    bundles = getattr(cfg.receptors, "bundles", None)
+    bundles = getattr(vcfg.receptors, "bundles", None)
     if not bundles:
-        raise ValueError("No receptor bundles found on cfg.receptors.bundles")
+        raise ValueError("No receptor bundles found on vcfg.receptors.bundles")
 
     for b in bundles:
         name = b.name

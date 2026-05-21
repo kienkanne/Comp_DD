@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.5.0
+- Added the new `nexus` CLI entrypoint and command grouping: `nexus dock`, `nexus validate`, `nexus fetch` (replacing `compdd retrieve`), and `nexus md` (wip).
+- Renamed the top-level package namespace from `compdd` to `nexus` and restructured source code into `src/nexus/` with separate modules for CLI, docking, validation, fetch, executors, and trackers.
+- Deprecated the legacy `compdd` package path and updated all documentation and reference examples to the new `nexus` syntax.
+- Preserved legacy behavior where possible while making the new module separation and loader names explicit.
+- Added `nexus fetch rcsb`, `nexus validate vina`, and `nexus validate dock6` command support.
+
 ## 1.4.1
 - Added new `compdd retrieve` CLI support for direct RCSB retrieval using the RCSB API.
 - Retrieval now supports `cif` input files in addition to `pdb` for modern workflows.

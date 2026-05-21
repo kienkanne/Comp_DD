@@ -1,8 +1,8 @@
 from pathlib import Path
 from types import SimpleNamespace
 
-from compdd.vina._vina_docking import _build_vina_docking_commands
-from compdd.vina._vina_prep_rec import VinaReceptorBundle
+from nexus.dock.vina._docking import _build_vina_docking_commands
+from nexus.dock.vina._prep_rec import VinaReceptorBundle
 
 
 def test_vina_docking_builds_commands_with_receptor_bundle():

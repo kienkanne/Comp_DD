@@ -1,30 +1,30 @@
 # Validation Guide
 
-This repository now supports dedicated validation workflows for Vina and DOCK6.
+This repository supports dedicated validation workflows for Vina and DOCK6.
 
 ## Commands
 
-Use the same unified config YAML file for validation as for docking:
+Use the same unified docking config YAML file for validation:
 
 ```bash
-compdd validate_run_vina --config sample_configs/sample_docking.yaml
-compdd validate_run_dock6 --config sample_configs/sample_docking.yaml
+nexus validate vina -c sample_configs/sample_docking.yaml
+nexus validate dock6 -c sample_configs/sample_docking.yaml
 ```
 
 ## Validation dataset structure
 
 The validation loader expects a root directory containing recursive validation entries. Each entry should include:
 
-- `*_protein.pdb` or `*_protein.cif` — receptor protein structure
-- `*_pocket.pdb` or `*_pocket.cif` — reference pocket structure
+- `*_protein.pdb` — receptor protein structure
+- `*_pocket.pdb` — reference pocket structure
 - `*_ligand.sdf` — validation ligand set
 
 Validation suffixes are configurable via `validation.protein_suffix`, `validation.pocket_suffix`, and `validation.ligand_suffix`.
 
-Recommended layout for a coreset root such as `/localscratch/kbui/coreset`:
+Recommended layout for a coreset root such as `/path/to/coreset`:
 
 ```text
-/localscratch/kbui/coreset/
+/path/to/coreset/
   entry1/
     entry1_protein.pdb
     entry1_pocket.pdb
@@ -43,7 +43,7 @@ Add or update the `validation` section in the unified config:
 
 ```yaml
 validation:
-  data: "/localscratch/kbui/coreset"
+  data: "/path/to/coreset"
 ```
 
 When `validation.data` is set, the validation loader automatically overrides the receptor and ligand inputs from the main config. It also forces `common.mode` to `match`.
@@ -52,13 +52,13 @@ When `validation.data` is set, the validation loader automatically overrides the
 
 Validation mode performs a full docking workflow on the test dataset and then computes RMSDs for the scored poses.
 
-- `validate_run_vina` uses the Vina docking backend and parses output poses from `.pdbqt` files.
-- `validate_run_dock6` uses the DOCK6 backend and parses output poses from `.mol2` files.
+- `nexus validate vina` uses the Vina docking backend and parses output poses from `.pdbqt` files.
+- `nexus validate dock6` uses the DOCK6 backend and parses output poses from `.mol2` files.
 - RMSD results are written as per-receptor CSV summaries.
 
 ## Output locations
 
-The validation run writes its normal pipeline outputs to the configured `common.working_dir` and `common.results_dir`, including:
+The validation run writes normal pipeline outputs to the configured `common.working_dir` and `common.results_dir`, including:
 
 - intermediate files in the working directory
 - final selected output files copied to the results directory
@@ -69,7 +69,7 @@ The validation run writes its normal pipeline outputs to the configured `common.
 
 1. Prepare a coreset root matching the expected dataset structure.
 2. Use the same unified config file that works for docking.
-3. Run `compdd validate_run_vina` or `compdd validate_run_dock6`.
+3. Run `nexus validate vina` or `nexus validate dock6`.
 4. Inspect the resulting scoring summaries and RMSD CSVs in `results/`.
 
 ## Notes

@@ -4,7 +4,7 @@ import gemmi
 from rcsbapi.data import DataQuery
 from rcsbapi.model import ModelQuery
 
-from compdd.retrieval.retrieval_config import RetrievalConfig
+from nexus.fetch.fetch_config import FetchConfig
 
 STANDARD_AMINO_ACIDS = {
     "ALA", "ARG", "ASN", "ASP", "CYS", "GLN", "GLU", "GLY", "HIS", "ILE", 
@@ -47,18 +47,18 @@ def get_ligands_in_structure(id):
     return ligand_ids
 
 
-def retrieve_structure(rcfg: RetrievalConfig):
-    raw_assembly_suffix = rcfg.raw_assembly_suffix
-    cleaned_suffix = rcfg.cleaned_suffix
-    ligand_suffix = rcfg.ligand_suffix
+def fetch_rcsb(fcfg: FetchConfig):
+    raw_assembly_suffix = fcfg.raw_assembly_suffix
+    cleaned_suffix = fcfg.cleaned_suffix
+    ligand_suffix = fcfg.ligand_suffix
 
-    remove_waters = rcfg.remove_waters
-    kept_residues = rcfg.kept_residues
+    remove_waters = fcfg.remove_waters
+    kept_residues = fcfg.kept_residues
 
-    output_dir = rcfg.output_dir
-    remove_raw_assembly = rcfg.remove_raw_assembly
+    output_dir = fcfg.output_dir
+    remove_raw_assembly = fcfg.remove_raw_assembly
 
-    id_list = rcfg.id_list
+    id_list = fcfg.id_list
 
     os.makedirs(output_dir, exist_ok=True)
 

@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Current package version: `1.4.1`.
+Current package version: `1.5.0`.
 
 This repository runs end-to-end molecular docking workflows from a unified YAML config file. It currently supports:
 
@@ -52,21 +52,21 @@ dock_home: "$HOME/Apps/dock6/"
 Use the CLI with a single unified config YAML file:
 
 ```bash
-compdd run_vina --config sample_configs/sample_docking.yaml
-compdd run_dock6 --config sample_configs/sample_docking.yaml
+nexus dock vina -c sample_configs/sample_docking.yaml
+nexus dock dock6 -c sample_configs/sample_docking.yaml
 ```
 
 Run validation workflows with the same config:
 
 ```bash
-compdd validate_run_vina --config sample_configs/sample_docking.yaml
-compdd validate_run_dock6 --config sample_configs/sample_docking.yaml
+nexus validate vina -c sample_configs/sample_docking.yaml
+nexus validate dock6 -c sample_configs/sample_docking.yaml
 ```
 
-Retrieve receptor assemblies and ligand SDFs directly from RCSB with the new `retrieve` command:
+Retrieve receptor assemblies and ligand SDFs directly from RCSB with the fetch command:
 
 ```bash
-compdd retrieve --config sample_configs/structure_retrieval.yaml
+nexus fetch rcsb -c sample_configs/structure_retrieval.yaml
 ```
 
 The retrieval module downloads biological assemblies in mmCIF format, cleans waters and unwanted ligands, and writes cleaned `.cif` receptor outputs.
@@ -110,8 +110,8 @@ Scratch directory, results directory, and batch settings.
 ```yaml
 common:
   project_name: Mpro_vina_docking
-  working_dir: "/localscratch/kbui/COMPDD/artifacts"
-  results_dir: "/localscratch/kbui/COMPDD/results"
+  working_dir: "/path/to/nexus/artifacts"
+  results_dir: "/path/to/nexus/results"
   prepared_suffix: "prepped"
 
   padding: 4.0
@@ -135,9 +135,9 @@ Receptor input and pocket definition (resolved at config-load time).
 receptors:
   source: "cif"
 
-  cifs: "/localscratch/kbui/COMPDD/data/cleaned_mpro_receptors2"
-  pdbs: "/localscratch/kbui/COMPDD/data"
-  existing_dir: "/localscratch/kbui/COMPDD/data/6W63.cif"
+  cifs: "/path/to/nexus/data/cleaned_mpro_receptors2"
+  pdbs: "/path/to/nexus/data"
+  existing_dir: "/path/to/nexus/data/6W63.cif"
 
   pocket_option: "selection"
   reference: null
@@ -245,8 +245,8 @@ dock6:
 The repository now supports dedicated validation workflows via:
 
 ```bash
-compdd validate_run_vina --config sample_configs/sample_docking.yaml
-compdd validate_run_dock6 --config sample_configs/sample_docking.yaml
+nexus validate vina -c sample_configs/sample_docking.yaml
+nexus validate dock6 -c sample_configs/sample_docking.yaml
 ```
 
 Validation specific settings.

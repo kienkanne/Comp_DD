@@ -2,7 +2,7 @@ from pathlib import Path
 import tempfile
 import os
 
-from compdd.utils.extract_files import extract_files
+from nexus.dock.utils.extract_files import extract_files
 
 
 def test_extract_files_directory_and_file(tmp_path):
@@ -23,12 +23,8 @@ def test_extract_files_directory_and_file(tmp_path):
     assert single == [f1]
 
 
-def test_extract_files_rejects_list_input(tmp_path):
+def test_extract_files_accepts_list_input(tmp_path):
     f1 = tmp_path / "a.sdf"
     f1.write_text("x")
-    try:
-        extract_files([f1], ".sdf")
-        raised = False
-    except TypeError:
-        raised = True
-    assert raised
+    result = extract_files([f1], ".sdf")
+    assert result == [f1]

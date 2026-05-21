@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from pathlib import Path
 from string import Template
-from nexus._CORE.executors.shell import shell
-from nexus._CORE.executors.base import base
-from nexus._CORE.utils.main_tracker import main_tracker
+from nexus.core.executors.shell import shell
+from nexus.core.executors.base import base
+from nexus.core.trackers.main_tracker import main_tracker
 
 
 @dataclass(frozen=True)
@@ -13,7 +13,7 @@ class VinaReceptorBundle:
     name: str
 
 
-def _prep_rec(cfg, receptor_bundle):
+def _prep_rec(dcfg, receptor_bundle):
     if hasattr(receptor_bundle, "receptor"):
         receptor = receptor_bundle.receptor
         bundle = receptor_bundle
@@ -21,13 +21,13 @@ def _prep_rec(cfg, receptor_bundle):
         receptor = receptor_bundle
         bundle = None
     name = Path(receptor).stem
-    suffix = cfg.common.prepared_suffix
+    suffix = dcfg.common.prepared_suffix
     cleaned_receptor_pdb = f"{name}_{suffix}.pdb"
     prepped_receptor_pdbqt = f"{name}_{suffix}.pdbqt"
 
-    @shell(cfg)
+    @shell(dcfg)
     def clean_rec():
-        chimerax = cfg.libs.chimerax
+        chimerax = dcfg.libs.chimerax
 
         with open(Path(__file__).resolve().parents[0] / "templates" / "clean_rec_template.com") as f:
             vina_charge_rec_template = f.read()     
@@ -41,9 +41,9 @@ def _prep_rec(cfg, receptor_bundle):
     clean_rec()
 
 
-    @shell(cfg)
+    @shell(dcfg)
     def meeko_prep_rec():
-        padding = cfg.common.padding
+        padding = dcfg.common.padding
         import pymol2
 
         if bundle is not None and bundle.reference_path is not None:
@@ -80,10 +80,10 @@ def _prep_rec(cfg, receptor_bundle):
         return (cmd, None)
     meeko_prep_rec()
 
-    @base(cfg, "add_configs()")
+    @base(dcfg, "add_configs()")
     def add_configs():
-        exhaustiveness = cfg.vina.exhaustiveness
-        num_modes = cfg.vina.num_modes
+        exhaustiveness = dcfg.vina.exhaustiveness
+        num_modes = dcfg.vina.num_modes
         extra_configs = {
                     "exhaustiveness": exhaustiveness,
                     "num_modes": num_modes,
@@ -101,20 +101,20 @@ def _prep_rec(cfg, receptor_bundle):
     )
 
 
-from nexus._CORE.executors.python_parallel import python_parallel
-from nexus._CORE.utils.main_tracker import main_tracker
+from nexus.core.executors.python_parallel import python_parallel
+from nexus.core.trackers.main_tracker import main_tracker
 from functools import partial
 
 
-def vina_receptors_prep(cfg):
-    @main_tracker(cfg, "Prepare receptor for Vina")
-    @python_parallel(cfg, "prep_rec()", skip=True)
+def vina_prep_rec(dcfg):
+    @main_tracker(dcfg, "Prepare receptor for Vina")
+    @python_parallel(dcfg, "prep_rec()", skip=True)
     def _run():
         tasks = []
-        bundles = getattr(cfg.receptors, "bundles", None)
+        bundles = getattr(dcfg.receptors, "bundles", None)
         if bundles:
             for b in bundles:
-                tasks.append(partial(_prep_rec, cfg, b))
+                tasks.append(partial(_prep_rec, dcfg, b))
         else:
             raise ValueError()
         return tasks

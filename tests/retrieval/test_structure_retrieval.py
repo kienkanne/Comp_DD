@@ -24,8 +24,8 @@ sys.modules["rcsbapi.model"] = fake_rcsbapi_model
 
 sys.modules["rcsbapi"] = fake_rcsbapi
 
-from compdd.retrieval.retrieval_config import RetrievalConfig
-import compdd.retrieval.structure_retrieval as structure_retrieval
+from nexus.fetch.fetch_config import FetchConfig
+import nexus.fetch.rcsb as rcsb
 
 
 class FakeDoc:
@@ -94,15 +94,15 @@ class FakeModelQuery:
 
 
 def test_get_ligands_in_structure_filters_ignored_entities(monkeypatch):
-    monkeypatch.setattr(structure_retrieval, "DataQuery", FakeDataQuery)
+    monkeypatch.setattr(rcsb, "DataQuery", FakeDataQuery)
 
-    ligand_ids = structure_retrieval.get_ligands_in_structure("1ABC")
+    ligand_ids = rcsb.get_ligands_in_structure("1ABC")
 
     assert ligand_ids == ["LIG"]
 
 
 def test_retrieve_structure_writes_cleaned_cif_and_removes_raw(tmp_path, monkeypatch):
-    cfg = RetrievalConfig(
+    cfg = FetchConfig(
         raw_assembly_suffix="raw_assembly",
         cleaned_suffix="cleaned",
         ligand_suffix=None,
@@ -113,12 +113,12 @@ def test_retrieve_structure_writes_cleaned_cif_and_removes_raw(tmp_path, monkeyp
         id_list=["1ABC"],
     )
 
-    monkeypatch.setattr(structure_retrieval, "DataQuery", FakeDataQuery)
-    monkeypatch.setattr(structure_retrieval, "ModelQuery", FakeModelQuery)
-    monkeypatch.setattr(structure_retrieval.gemmi.cif, "read_file", lambda path: FakeDoc())
-    monkeypatch.setattr(structure_retrieval.gemmi, "make_structure_from_block", lambda block: FakeStructure([FakeModel([FakeChain([FakeResidue("HOH"), FakeResidue("ZN"), FakeResidue("ALA")])])]))
+    monkeypatch.setattr(rcsb, "DataQuery", FakeDataQuery)
+    monkeypatch.setattr(rcsb, "ModelQuery", FakeModelQuery)
+    monkeypatch.setattr(rcsb.gemmi.cif, "read_file", lambda path: FakeDoc())
+    monkeypatch.setattr(rcsb.gemmi, "make_structure_from_block", lambda block: FakeStructure([FakeModel([FakeChain([FakeResidue("HOH"), FakeResidue("ZN"), FakeResidue("ALA")])])]))
 
-    structure_retrieval.retrieve_structure(cfg)
+    rcsb.fetch_rcsb(cfg)
 
     expected_cleaned = tmp_path / "1ABC_cleaned.cif"
     assert expected_cleaned.exists()
@@ -127,10 +127,10 @@ def test_retrieve_structure_writes_cleaned_cif_and_removes_raw(tmp_path, monkeyp
 
 
 def test_retrieve_structure_raises_if_id_list_missing(tmp_path):
-    cfg = RetrievalConfig(
+    cfg = FetchConfig(
         output_dir=tmp_path,
         id_list=None,
     )
 
     with pytest.raises(TypeError):
-        structure_retrieval.retrieve_structure(cfg)
+        rcsb.fetch_rcsb(cfg)

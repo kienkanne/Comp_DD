@@ -90,14 +90,14 @@ def load_config(path):
     cfg = _find_files(cfg)
 
     # Validate and normalize receptor-related configuration (selection/reference semantics)
-    from compdd.docking_configs.config_helpers import validate_and_normalize_receptors
+    from nexus._DOCKING.docking_configs.config_helpers import validate_and_normalize_receptors
     validate_and_normalize_receptors(cfg, cfg.receptors.reference_suffix)
 
     return cfg
 
 
 def _find_files(cfg: RootConfig):
-    from compdd.utils.extract_files import extract_files
+    from nexus._CORE.utils.extract_files import extract_files
     if cfg.receptors.source == "cif":
         cfg.receptors.cifs = extract_files(cfg.receptors.cifs, ".cif")
     elif cfg.receptors.source == "pdb":
@@ -113,9 +113,9 @@ def _find_files(cfg: RootConfig):
 
 
 def _setup_dirs(cfg: RootConfig):
-    from compdd.utils.logging_utils import setup_logger
-    from compdd.utils.manifest import Manifest
-    from compdd.utils.runstate import State
+    from nexus._CORE.utils.logging_utils import setup_logger
+    from nexus._CORE.utils.manifest import Manifest
+    from nexus._CORE.utils.runstate import State
 
     for subcfg_name in RootConfig.model_fields:
         subcfg = getattr(cfg, subcfg_name)

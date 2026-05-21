@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from compdd.retrieval.retrieval_config import load_retrieval_config, RetrievalConfig
+from nexus.fetch.fetch_config import load_fetch_config, FetchConfig
 
 
 def test_load_retrieval_config_defaults(tmp_path):
@@ -16,9 +16,9 @@ def test_load_retrieval_config_defaults(tmp_path):
         "id_list: [P123, Q456]\n"
     )
 
-    cfg = load_retrieval_config(config_path)
+    cfg = load_fetch_config(config_path)
 
-    assert isinstance(cfg, RetrievalConfig)
+    assert isinstance(cfg, FetchConfig)
     assert cfg.raw_assembly_suffix == "raw_assembly"
     assert cfg.cleaned_suffix == "cleaned"
     assert cfg.ligand_suffix == "ligand"

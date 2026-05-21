@@ -1,7 +1,6 @@
 from pathlib import Path
 
-from compdd.validation_coreset.validation_config import load_validation_config
-from compdd.docking_configs.root_config import RootConfig
+from nexus.validate.validate_config import load_validate_config
 
 
 def test_load_validation_config_sets_match_mode_and_uses_data(tmp_path):
@@ -35,7 +34,7 @@ def test_load_validation_config_sets_match_mode_and_uses_data(tmp_path):
         "dock6: {}\n"
     )
 
-    cfg = load_validation_config(config_path)
+    cfg = load_validate_config(config_path)
 
     assert cfg.common.mode == "match"
     assert cfg.receptors.source == "pdb"

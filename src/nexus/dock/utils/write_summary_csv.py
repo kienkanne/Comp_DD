@@ -1,8 +1,8 @@
 import csv
 import math
 from pathlib import Path
-from compdd.executors.base import base
-from compdd.utils.main_tracker import main_tracker
+from nexus.core.executors.base import base
+from nexus.core.trackers.main_tracker import main_tracker
 
 
 def parse_scores(output, max_poses, program):
@@ -40,7 +40,7 @@ def write_summary_csv(cfg, out_files, prepped_recs=None):
         mode = getattr(cfg.common, "mode", "mix")
 
         def _receptor_name_from_item(item):
-            from compdd.ligands._ligands_common import _strip_prepared_suffix
+            from nexus.dock.ligands._ligands_common import _strip_prepared_suffix
             if hasattr(item, "name"):
                 return item.name
             # item might be a path or tuple(bundle, config)

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-from compdd.utils.matchmixer import matchmixer
+from nexus.dock.utils.matchmixer import matchmixer
 
 
 @dataclass(frozen=True)

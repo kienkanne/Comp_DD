@@ -1,8 +1,8 @@
 from pathlib import Path
 from types import SimpleNamespace
 
-from compdd.dock6._dock6_docking import _build_dock6_docking_commands
-from compdd.dock6._dock6_prep_rec import Dock6ReceptorBundle
+from nexus.dock.dock6._docking import _build_dock6_docking_commands
+from nexus.dock.dock6._prep_rec import Dock6ReceptorBundle
 
 
 def test_dock6_docking_builds_commands_with_receptor_bundle(tmp_path, monkeypatch):
