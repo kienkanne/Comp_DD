@@ -1,14 +1,15 @@
-# Computational tools for drug discovery
+# NexusMol: Computational tools for drug discovery
 
 ## Introduction
 
 Current package version: `1.5.0`.
 
-This repository runs end-to-end molecular docking workflows from a unified YAML config file. It currently supports:
+This repository runs end-to-end computational workflows for drug discovery using YAML config files. It currently supports:
 
 - AutoDock Vina
 - DOCK6
 - Validation workflows for Vina and DOCK6
+- Receptors and ligands fetching from RCSB.org
 
 The pipeline prepares the receptor, resolves or prepares ligands, docks ligands in parallel with GNU parallel, copies selected outputs to a results folder, and writes a docking summary CSV sorted by the best pose score.
 
