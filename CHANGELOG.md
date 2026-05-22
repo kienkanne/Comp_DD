@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.1
+- Moved ChimeraX receptor prepration to be integrated with the rcsb fetching pipeline.
+- Docking pipelines now require cleaned pdb/cif inputs.
+- Selection string syntax is now ChimeraX based. PyMOL is no longer required.
+
 ## 1.5.0
 - Added the new `nexus` CLI entrypoint and command grouping: `nexus dock`, `nexus validate`, `nexus fetch` (replacing `compdd retrieve`), and `nexus md` (wip).
 - Renamed the top-level package namespace from `compdd` to `nexus` and restructured source code into `src/nexus/` with separate modules for CLI, docking, validation, fetch, executors, and trackers.

@@ -1,9 +1,10 @@
 from dataclasses import dataclass
 from pathlib import Path
-from string import Template
+import os
 from nexus.core.executors.shell import shell
 from nexus.core.executors.base import base
 from nexus.core.trackers.main_tracker import main_tracker
+from nexus.dock.dock_config import DockConfig
 
 
 @dataclass(frozen=True)
@@ -13,7 +14,7 @@ class VinaReceptorBundle:
     name: str
 
 
-def _prep_rec(dcfg, receptor_bundle):
+def _prep_rec(dcfg: DockConfig, receptor_bundle: VinaReceptorBundle):
     if hasattr(receptor_bundle, "receptor"):
         receptor = receptor_bundle.receptor
         bundle = receptor_bundle
@@ -23,27 +24,42 @@ def _prep_rec(dcfg, receptor_bundle):
     name = Path(receptor).stem
     suffix = dcfg.common.prepared_suffix
     prepped_receptor_pdbqt = f"{name}_{suffix}.pdbqt"
+    pocket = f"{name}_pocket.pdb"
 
+    @shell(dcfg)
+    def generate_site():
+        chimerax = dcfg.libs.chimerax
+
+        if bundle is not None and bundle.reference_path is not None:
+            input_file = bundle.reference_path
+            delete_selection = "clear"
+
+        elif bundle is not None and bundle.selection_string is not None:
+            input_file = receptor
+            delete_selection = f"~{bundle.selection_string}"
+
+        stdin = [
+            f"open {input_file}",
+            f"select {delete_selection}",
+            "delete sel",
+            f"save {pocket}"
+        ]
+
+        stdin = "\n".join(stdin)
+
+        return ([chimerax, "--nogui"], stdin)
+    generate_site()
+
+    wd = dcfg.common.working_dir
+    if not os.path.exists(wd / pocket):
+        raise FileNotFoundError(f"{wd / pocket} was not created. Check selection string or reference.")
+
+    if os.path.getsize(wd / pocket) == 0:
+        raise IOError(f"{wd / pocket} is empty. Check selection string or reference.")
 
     @shell(dcfg)
     def meeko_prep_rec():
         padding = dcfg.common.padding
-        import pymol2
-
-        if bundle is not None and bundle.reference_path is not None:
-            input_file = bundle.reference_path
-            selection = "all"
-
-        elif bundle is not None and bundle.selection_string is not None:
-            input_file = receptor
-            selection = bundle.selection_string
-
-        with pymol2.PyMOL() as pymol:
-            pymol.start()
-            pymol.cmd.load(input_file, "target")
-            pymol.cmd.select("to_delete", f"target and not ({selection})")
-            pymol.cmd.remove("to_delete")
-            pymol.cmd.save(f"{name}_pocket.pdb", "target")
 
         cmd = [
                 "mk_prepare_receptor.py",

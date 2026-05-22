@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from pathlib import Path
+import os
 from string import Template
 from nexus.core.executors.shell import shell
-from nexus.core.executors.base import base
-
+from nexus.dock.dock_config import DockConfig
 
 @dataclass(frozen=True)
 class Dock6ReceptorBundle:
@@ -12,7 +12,7 @@ class Dock6ReceptorBundle:
     name: str
 
 
-def _prep_rec(dcfg, receptor_bundle):
+def _prep_rec(dcfg: DockConfig, receptor_bundle: Dock6ReceptorBundle):
     # receptor_bundle may be either a Path (legacy) or a ReceptorConfigBundle-like object
     if hasattr(receptor_bundle, "receptor"):
         receptor = receptor_bundle.receptor
@@ -25,36 +25,46 @@ def _prep_rec(dcfg, receptor_bundle):
     suffix = dcfg.common.prepared_suffix
     prepped_receptor_mol2 = f"{name}_{suffix}.mol2"
     prepped_receptor_noH_mol2 = f"{name}_{suffix}_noH.mol2"
-    prepped_receptor_noH_pdb = f"{name}_{suffix}_noH.pdb"
+    pocket = f"{name}_pocket.mol2"
 
-    @base(dcfg, "generate_site()")
+    @shell(dcfg)
     def generate_site():
+        chimerax = dcfg.libs.chimerax
+  
+        stdin = [
+            f"open {receptor}",
+            f"save {prepped_receptor_mol2}",
+            f"delete H",
+            f"save {prepped_receptor_noH_mol2}",
+            "close"
+        ]
 
-        import pymol2
         if bundle is not None and bundle.reference_path is not None:
             input_file = bundle.reference_path
-            selection = "all"
+            delete_selection = "clear"
 
         elif bundle is not None and bundle.selection_string is not None:
-            input_file = prepped_receptor_noH_pdb
-            selection = bundle.selection_string
+            input_file = prepped_receptor_noH_mol2
+            delete_selection = f"~{bundle.selection_string}"
 
-        with pymol2.PyMOL() as pymol:
-            pymol.start()
-            pymol.cmd.load(receptor, "receptor")
-            pymol.cmd.save(prepped_receptor_mol2, "receptor")
-            pymol.cmd.remove("receptor and hydro")
-            pymol.cmd.save(prepped_receptor_noH_mol2, "receptor")
-            pymol.cmd.save(prepped_receptor_noH_pdb, "receptor")
+        stdin.extend([
+            f"open {input_file}",
+            f"select {delete_selection}",
+            "delete sel",
+            f"save {pocket}"
+        ])
 
-            pymol.cmd.reinitialize()
-            pymol.cmd.load(input_file, "target")
-            pymol.cmd.select("to_delete", f"target and not ({selection})")
-            pymol.cmd.remove("to_delete")
-            pymol.cmd.save(f"{name}_pocket.mol2", "target")
-        return None
+        stdin = "\n".join(stdin)
+
+        return ([chimerax, "--nogui"], stdin)
     generate_site()
 
+    wd = dcfg.common.working_dir
+    if not os.path.exists(wd / pocket):
+        raise FileNotFoundError(f"{wd / pocket} was not created. Check selection string or reference.")
+
+    if os.path.getsize(wd / pocket) == 0:
+        raise IOError(f"{wd / pocket} is empty. Check selection string or reference.")
 
     @shell(dcfg)
     def writedms():
