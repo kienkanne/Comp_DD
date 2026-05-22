@@ -22,23 +22,7 @@ def _prep_rec(dcfg, receptor_bundle):
         bundle = None
     name = Path(receptor).stem
     suffix = dcfg.common.prepared_suffix
-    cleaned_receptor_pdb = f"{name}_{suffix}.pdb"
     prepped_receptor_pdbqt = f"{name}_{suffix}.pdbqt"
-
-    @shell(dcfg)
-    def clean_rec():
-        chimerax = dcfg.libs.chimerax
-
-        with open(Path(__file__).resolve().parents[0] / "templates" / "clean_rec_template.com") as f:
-            vina_charge_rec_template = f.read()     
-
-        stdin = Template(vina_charge_rec_template).substitute(
-            receptor=receptor,
-            cleaned_receptor_pdb=cleaned_receptor_pdb,
-        )
-
-        return ([chimerax, "--nogui"], stdin)
-    clean_rec()
 
 
     @shell(dcfg)
@@ -51,7 +35,7 @@ def _prep_rec(dcfg, receptor_bundle):
             selection = "all"
 
         elif bundle is not None and bundle.selection_string is not None:
-            input_file = cleaned_receptor_pdb
+            input_file = receptor
             selection = bundle.selection_string
 
         with pymol2.PyMOL() as pymol:
@@ -64,7 +48,7 @@ def _prep_rec(dcfg, receptor_bundle):
         cmd = [
                 "mk_prepare_receptor.py",
                 "-i",
-                cleaned_receptor_pdb,
+                receptor,
                 "-o",
                 f"{name}_{suffix}",
                 "-a",

@@ -19,10 +19,10 @@ common:
   max_poses: 16
 
 receptors:
-  source: "cif" # or "pdb" or "existing"
+  source: "pdb" # or "pdb" or "existing"
 
   cifs: "/localscratch/kbui/NexusMol/data/cleaned_mpro_receptors2"
-  pdbs: "/localscratch/kbui/NexusMol/data"
+  pdbs: "/localscratch/kbui/NexusMol/data/my_receptors_ligands"
   existing_dir: "/localscratch/kbui/NexusMol/data/6W63.cif"
 
   pocket_option: "selection" # or "reference"
@@ -42,7 +42,7 @@ ligands:
   sdfs: /localscratch/kbui/NexusMol/data/all_ligands.sdf
 
   # used if source == "existing"
-  existing_dir: /localscratch/kbui/NexusMol/data/vina_meeko_prepped
+  existing_dir: /localscratch/kbui/NexusMol/data/dock6_meeko_prepped
 
 vina:
   exhaustiveness: 64

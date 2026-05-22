@@ -1,15 +1,20 @@
+chimerax: "/usr/local/chimerax/bin/ChimeraX"
+
+format: "pdb"
 raw_assembly_suffix: "raw_assembly"
-cleaned_suffix: ""
+stripped_suffix: "stripped"
+fixed_suffix: "fixed"
 ligand_suffix: null
+
+remove_raw_assembly: False
+remove_stripped: False
 
 remove_waters: True
 kept_residues: ["Zn", "Ca"]
 
-output_dir: "/localscratch/kbui/COMPDD/data/my_receptors_ligands"
-remove_raw_assembly: True
+output_dir: "/localscratch/kbui/NexusMol/data/my_receptors_ligands"
 
 id_list: [
   "6W63",
-  "6LU7",
-  "7K40"
+  "7K40",
 ]

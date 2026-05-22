@@ -25,7 +25,7 @@ sys.modules["rcsbapi.model"] = fake_rcsbapi_model
 sys.modules["rcsbapi"] = fake_rcsbapi
 
 from nexus.fetch.fetch_config import FetchConfig
-import nexus.fetch.rcsb as rcsb
+import nexus.fetch.rcsb_fetch as rcsb_fetch
 
 
 class FakeDoc:
@@ -94,9 +94,9 @@ class FakeModelQuery:
 
 
 def test_get_ligands_in_structure_filters_ignored_entities(monkeypatch):
-    monkeypatch.setattr(rcsb, "DataQuery", FakeDataQuery)
+    monkeypatch.setattr(rcsb_fetch, "DataQuery", FakeDataQuery)
 
-    ligand_ids = rcsb.get_ligands_in_structure("1ABC")
+    ligand_ids = rcsb_fetch.get_ligands_in_structure("1ABC")
 
     assert ligand_ids == ["LIG"]
 
@@ -113,12 +113,12 @@ def test_retrieve_structure_writes_cleaned_cif_and_removes_raw(tmp_path, monkeyp
         id_list=["1ABC"],
     )
 
-    monkeypatch.setattr(rcsb, "DataQuery", FakeDataQuery)
-    monkeypatch.setattr(rcsb, "ModelQuery", FakeModelQuery)
-    monkeypatch.setattr(rcsb.gemmi.cif, "read_file", lambda path: FakeDoc())
-    monkeypatch.setattr(rcsb.gemmi, "make_structure_from_block", lambda block: FakeStructure([FakeModel([FakeChain([FakeResidue("HOH"), FakeResidue("ZN"), FakeResidue("ALA")])])]))
+    monkeypatch.setattr(rcsb_fetch, "DataQuery", FakeDataQuery)
+    monkeypatch.setattr(rcsb_fetch, "ModelQuery", FakeModelQuery)
+    monkeypatch.setattr(rcsb_fetch.gemmi.cif, "read_file", lambda path: FakeDoc())
+    monkeypatch.setattr(rcsb_fetch.gemmi, "make_structure_from_block", lambda block: FakeStructure([FakeModel([FakeChain([FakeResidue("HOH"), FakeResidue("ZN"), FakeResidue("ALA")])])]))
 
-    rcsb.fetch_rcsb(cfg)
+    rcsb_fetch.fetch_rcsb(cfg)
 
     expected_cleaned = tmp_path / "1ABC_cleaned.cif"
     assert expected_cleaned.exists()
@@ -133,4 +133,4 @@ def test_retrieve_structure_raises_if_id_list_missing(tmp_path):
     )
 
     with pytest.raises(TypeError):
-        rcsb.fetch_rcsb(cfg)
+        rcsb_fetch.fetch_rcsb(cfg)

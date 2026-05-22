@@ -12,8 +12,13 @@ def shell(cfg):
 
                 cmd, stdin = func(*args, **kwargs)
                 cmd = [os.path.expandvars(i) for i in cmd]
-                logger = cfg.common.logger
-                logger.info(f"Running: {' '.join([str(arg) for arg in cmd])}")
+                try:
+                    logger = cfg.common.logger
+                    logger.info(f"Running: {' '.join([str(arg) for arg in cmd])}")
+                except Exception as e:
+                    print(f"Logger not found in cfg.common: {e}")
+                    print(f"Running: {' '.join([str(arg) for arg in cmd])}")
+
 
                 result = subprocess.run(
                     cmd,

@@ -27,33 +27,9 @@ def _prep_rec(dcfg, receptor_bundle):
     prepped_receptor_noH_mol2 = f"{name}_{suffix}_noH.mol2"
     prepped_receptor_noH_pdb = f"{name}_{suffix}_noH.pdb"
 
-    @shell(dcfg)
-    def charge_rec():
-        chimerax = dcfg.libs.chimerax
-
-        with open(Path(__file__).resolve().parents[0] / "templates" / "dock6_charge_rec_template.com") as f:
-            dock6_charge_rec_template = f.read()     
-        """
-        open $receptor
-        dockprep
-        save ${prepped_receptor_mol2}
-        delete H
-        save ${prepped_receptor_noH_mol2}
-        save ${prepped_receptor_noH_pdb}
-        """
-        stdin = Template(dock6_charge_rec_template).substitute(
-            receptor=receptor,
-            prepped_receptor_mol2=prepped_receptor_mol2,
-            prepped_receptor_noH_mol2=prepped_receptor_noH_mol2,
-            prepped_receptor_noH_pdb=prepped_receptor_noH_pdb,
-        )
-
-        return ([chimerax, "--nogui"], stdin)
-    charge_rec()
-
-
     @base(dcfg, "generate_site()")
     def generate_site():
+
         import pymol2
         if bundle is not None and bundle.reference_path is not None:
             input_file = bundle.reference_path
@@ -65,6 +41,13 @@ def _prep_rec(dcfg, receptor_bundle):
 
         with pymol2.PyMOL() as pymol:
             pymol.start()
+            pymol.cmd.load(receptor, "receptor")
+            pymol.cmd.save(prepped_receptor_mol2, "receptor")
+            pymol.cmd.remove("receptor and hydro")
+            pymol.cmd.save(prepped_receptor_noH_mol2, "receptor")
+            pymol.cmd.save(prepped_receptor_noH_pdb, "receptor")
+
+            pymol.cmd.reinitialize()
             pymol.cmd.load(input_file, "target")
             pymol.cmd.select("to_delete", f"target and not ({selection})")
             pymol.cmd.remove("to_delete")
