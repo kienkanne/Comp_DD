@@ -1,35 +1,28 @@
 import subprocess
 from pathlib import Path
 import re
-from nexus.prep.prep_config import PrepConfig
 from string import Template
 
 
-def chimerax_fix(pcfg: PrepConfig):
-    input_file = pcfg.input_file
-    chimerax = pcfg.chimerax
-    cleaned_suffix = pcfg.cleaned_suffix
-    output_dir = pcfg.output_dir
-    output_format = pcfg.output_format
-    log_file = pcfg.log_file
+def chimerax_rec_prep(input_path: Path, 
+                   output_path: Path,
+                   log_path,
+                   dry: bool,
+                   chimerax: Path):
 
-    with open(Path(__file__).resolve().parents[0] / "_chimerax_fix_template.py") as f:
-        chimerax_fix_template = f.read()     
+    with open(Path(__file__).resolve().parents[0] / "_clean_template.py") as f:
+        clean_template = f.read()     
 
-    if cleaned_suffix == "":
-        cleaned_path = output_dir / f"{input_file.stem}.{output_format}"
-    else:
-        cleaned_path = output_dir / f"{input_file.stem}_{cleaned_suffix}.{output_format}"
-
-    input = Template(chimerax_fix_template).substitute(
-        input_file=input_file      ,
-        cleaned_path=cleaned_path,
+    clean_input = Template(clean_template).substitute(
+        input_path=input_path,
+        output_path=output_path,
+        dry=str(dry)
     )
 
-    clean_file = output_dir / f"{input_file.stem}_cleaner.py"
+    clean_file = output_path.parent / f"cleaner_{input_path.stem}.py"
 
     with open(clean_file, "w") as f:
-        f.write(input)
+        f.write(clean_input)
 
     result = subprocess.run([chimerax, "--nogui", clean_file], 
                             text=True, 
@@ -59,16 +52,16 @@ def chimerax_fix(pcfg: PrepConfig):
                     flagged_residues.append((res_id, amber_name))
 
     ## 5. Output Results
-    log_file.info(f"✅ Saved cleaned biological assembly receptor to {output_format.upper()} -> {cleaned_path}")
+    log_path.info(f"✅ Saved cleaned biological assembly receptor to -> {output_path}")
     
     if chains_info:
-        log_file.info(f"ℹ️  Chains information:")
+        log_path.info(f"ℹ️  Chains information:")
         for first_res, last_res in chains_info:
-            log_file.info(f"   - Start: {first_res}     End: {last_res}")
+            log_path.info(f"   - Start: {first_res}     End: {last_res}")
 
     if flagged_residues:
-        log_file.info("\n⚠️  ChimeraX assigned non-standard protonation states:")
+        log_path.info("\n⚠️  ChimeraX assigned non-standard protonation states:")
         for res_id, name in flagged_residues:
-            log_file.info(f"   - {res_id} was assigned {name}")
+            log_path.info(f"   - {res_id} was assigned {name}")
 
-    return cleaned_path
+    return None

@@ -2,7 +2,7 @@ from pathlib import Path
 import tempfile
 import os
 
-from nexus.dock.utils.extract_files import extract_files
+from nexus.core.extract_files import extract_files
 
 
 def test_extract_files_directory_and_file(tmp_path):

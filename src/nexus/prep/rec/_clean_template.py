@@ -3,10 +3,10 @@ from chimerax.core.commands import run
 # Define your legal chain IDs (A-Z, a-z, etc.)
 LEGAL_CHAIN_IDS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 
-def _run(session, input_file, cleaned_path):
+def _run(session, input_path, output_path):
     # 1. Open the file in ChimeraX
     # (Works for both .cif and .pdb automatically)
-    models = run(session, f"open {input_file}")
+    models = run(session, f"open {input_path}")
     model = models[0] # Get the opened structure object
     
     # 2. Smartly delete the ligand using ChimeraX's internal logic
@@ -26,7 +26,7 @@ def _run(session, input_file, cleaned_path):
         
     
     # 4. Run DockPrep on the modified, cleaned structure
-    run(session, "dockprep")
+    run(session, "dockprep delSolvent $dry")
     run(session, "dssp")
 
     # 5. Extract info for parsing
@@ -34,9 +34,9 @@ def _run(session, input_file, cleaned_path):
     run (session, "info polymers")
     
     # 6. Save the final prepared structure
-    run(session, f"save {cleaned_path}")
+    run(session, f"save {output_path}")
 
     run(session, "quit")
 
 
-_run(session, "$input_file", "$cleaned_path")
+_run(session, "$input_path", "$output_path")

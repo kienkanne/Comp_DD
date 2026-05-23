@@ -1,32 +1,49 @@
-from pydantic import BaseModel, model_validator
-from typing import Optional, Literal
+from pydantic import BaseModel
+from typing import Optional
 from pathlib import Path
+
+class CommonConfig(BaseModel):
+    input: Optional[Path] = None
+    output: Optional[Path] = None
+    suffix: Optional[str] = None
+
+    chimerax: Optional[Path] = "/usr/local/chimerax/bin/ChimeraX"
+
+class RecConfig(BaseModel):
+    dry: Optional[bool] = False
+
+class MutateConfig(BaseModel):
+    mutations: Optional[str] = None
+
+class LigConfig(BaseModel):
+    pass
 
 
 class PrepConfig(BaseModel):
-    chimerax: Optional[Path] = Path("/usr/local/chimerax/bin/ChimeraX")
-    input_file: Optional[Path] = None
-    output_format: Optional[Literal["pdb", "cif"]] = "pdb"
-    cleaned_suffix: Optional[str] = "cleaned"
-    log_file: Optional[Path] = None  # Default to None, computed later if missing
-    output_dir: Optional[Path] = None
+    common: CommonConfig = CommonConfig()
+    rec: RecConfig = RecConfig()
+    mutate: MutateConfig = MutateConfig()
+    lig: LigConfig = LigConfig()
 
-    @model_validator(mode="after")
-    def set_default_log_file(self) -> "PrepConfig":
-        # Only compute log_file if input_file is provided and log_file wasn't explicitly set
-        if self.input_file and self.log_file is None:
-            # .with_suffix() replaces the extension, e.g., "protein.pdb" -> "protein.log"
-            self.log_file = self.output_dir / f"{self.input_file.stem}.log"
-        return self
-
-
-from nexus.core.trackers.logging_utils import setup_logger
 
 def load_prep_config(path):
     import yaml
     with open(path) as f:
         data = yaml.safe_load(f)
     pcfg = PrepConfig.model_validate(data)
-    pcfg.log_file = setup_logger(pcfg.log_file, time_verbose=False)
-    pcfg.output_dir.mkdir(parents=True, exist_ok=True)
+    
+    if pcfg.common.output is None:
+        pcfg.common.output = pcfg.common.input.parent
+
+    """if pcfg.common.task == "lig":
+        if pcfg.common.input.suffix == "csv":
+            from nexus.dock.ligands._ligands_common import _parse_ligands_csv
+            pcfg.common.input = _parse_ligands_csv(pcfg.common.input)
+        else:
+            pcfg.common.input = extract_files(pcfg.common.input, ".sdf")
+        
+        if pcfg.common.format not in ("vina", "dock6", "amber"):
+            raise ValueError("Output ligand format for program must be 'vina', 'dock6' or 'amber'.")"""
+
+
     return pcfg

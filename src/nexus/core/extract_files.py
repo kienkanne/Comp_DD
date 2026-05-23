@@ -3,7 +3,7 @@ from typing import Union, List
 
 def extract_files(
     input_path: Union[str, Path, List[Union[str, Path]]], 
-    pattern: str, 
+    patterns: List, 
     recursive: bool = False
 ) -> List[Path]:
     """
@@ -36,9 +36,10 @@ def extract_files(
 
     # 3. Process Directory vs File
     if path.is_dir():
-        glob_pattern = f"*{pattern}"
-        # Use rglob for recursive, glob for shallow
-        results = path.rglob(glob_pattern) if recursive else path.glob(glob_pattern)
+        for pattern in patterns:
+            glob_pattern = f"*{pattern}"
+            # Use rglob for recursive, glob for shallow
+            results = path.rglob(glob_pattern) if recursive else path.glob(glob_pattern)
         
         # Filter to ensure we only return files, not matching subdirectories
         return sorted([f for f in results if f.is_file()])

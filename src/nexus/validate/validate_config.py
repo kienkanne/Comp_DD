@@ -1,5 +1,5 @@
 from nexus.dock.dock_config import DockConfig, _setup_dirs, validate_and_normalize_receptors
-from nexus.dock.utils.extract_files import extract_files
+from nexus.core.extract_files import extract_files
 from pathlib import Path
 
 

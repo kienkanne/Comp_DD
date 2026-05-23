@@ -96,7 +96,7 @@ def load_dock_config(path):
 
 
 def _find_files(cfg: DockConfig):
-    from nexus.dock.utils.extract_files import extract_files
+    from nexus.core.extract_files import extract_files
     if cfg.receptors.source == "cif":
         cfg.receptors.cifs = extract_files(cfg.receptors.cifs, ".cif")
     elif cfg.receptors.source == "pdb":
