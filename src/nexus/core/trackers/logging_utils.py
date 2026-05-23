@@ -31,3 +31,12 @@ def setup_logger(log_path: str, level=logging.INFO, time_verbose=True):
     logger.addHandler(sh)
 
     return logger
+
+
+class DummyLogger:
+    """Fallback logger that mimics basic logging behavior using standard prints."""
+    def info(self, message: str):
+        print(f"[INFO] {message}")
+
+    def error(self, message: str):
+        print(f"[ERROR] {message}")

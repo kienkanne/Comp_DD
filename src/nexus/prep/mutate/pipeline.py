@@ -10,21 +10,33 @@ class MutatePipeline(BaseModel):
     def _run(self):
         input = self.pcfg.common.input
         output = self.pcfg.common.output
-        format = self.pcfg.common.format
         suffix = self.pcfg.common.suffix
-
-        input = extract_files(input, ".pdb") + extract_files(input, ".cif")
+        chimerax = self.pcfg.common.chimerax
         
+        if self.pcfg.mutate.mutations is not None:
+            sel_res = self.pcfg.mutate.mutations.split("-")
+            sel = sel_res[0]
+            res = sel_res[1]
+            mutations = {sel: res}
+
+        input = extract_files(input, [".pdb", ".cif"])
         if not input:
             raise ValueError("Invalid input, no pdb of cif file found.")
-        if format not in ("pdb", "cif"):
-            raise ValueError("Output receptor format must be 'pdb' or 'cif'.")
         
+        if suffix is None:
+            suffix = "mutated.pdb"
+        if ".pdb" not in suffix and ".cif" not in suffix:
+            raise ValueError("Output receptor format must be 'pdb' or 'cif'.")
+
         if len(input) > 1:
+            output = output if output is not None else input[0].parent # Make output a directory
             output.mkdir(parents=True, exist_ok=True)
-            output = [output / f"{input_file.stem}_{suffix}.{format}" for input_file in input]
+            for input_path in input:
+                output_path = input_path.parent / f"{input_path.stem}_{suffix}"
+                chimerax_mutate(input_path, output_path, mutations, chimerax)
 
-        mutations: dict = self.pcfg.mutate.mutations ######
+        else:
+            input = input[0]
+            output = output if output is not None else input.parent / f"{input.stem}_{suffix}"
+            chimerax_mutate(input, output, mutations, chimerax)
 
-        for input_path, output_path in zip(input, output):
-            chimerax_mutate(input_path, output_path)

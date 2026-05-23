@@ -22,7 +22,7 @@ class RecPipeline(BaseModel):
         
         if suffix is None:
             suffix = "cleaned.pdb"
-        if not any(ext in suffix for ext in ("pdb", "cif")):
+        if ".pdb" not in suffix and ".cif" not in suffix:
             raise ValueError("Output receptor format must be 'pdb' or 'cif'.")
 
         if len(input) > 1:

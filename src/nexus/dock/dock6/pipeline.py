@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from nexus.dock.dock_config import DockConfig
-from nexus.dock.ligands.ligands_prep import ligands_prep
+from nexus.prep.lig.ligands_prep import ligands_prep
 from nexus.dock.dock6._prep_rec import dock6_prep_rec
 from nexus.dock.dock6._docking import dock6_docking
 from nexus.dock.utils.matchmixer import matchmixer

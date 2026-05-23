@@ -40,7 +40,7 @@ def write_summary_csv(cfg, out_files, prepped_recs=None):
         mode = getattr(cfg.common, "mode", "mix")
 
         def _receptor_name_from_item(item):
-            from nexus.dock.ligands._ligands_common import _strip_prepared_suffix
+            from nexus.dock.utils._strip_prepared_suffix import _strip_prepared_suffix
             if hasattr(item, "name"):
                 return item.name
             # item might be a path or tuple(bundle, config)

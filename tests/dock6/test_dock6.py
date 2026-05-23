@@ -1,4 +1,4 @@
-from nexus.dock.ligands._ligands_common import _prepared_path
+from nexus.prep.lig._ligands_common import _prepared_path
 
 
 def test_prepared_filename_adds_separator_before_suffix():

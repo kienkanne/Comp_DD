@@ -29,6 +29,8 @@ def chimerax_rec_prep(input_path: Path,
                             check=True,
                             capture_output=True)
     
+    clean_file.unlink(missing_ok=True)
+
     special_residues = {'HIE', 'HID', 'HIP', 'GLH', 'ASH', 'LYN', 'CYM'}
     chains_info = []
     flagged_residues = []

@@ -1,4 +1,4 @@
-from nexus.dock.ligands._ligands_common import _strip_prepared_suffix
+from nexus.dock.utils._strip_prepared_suffix import _strip_prepared_suffix
 
 
 def test_strip_prepared_suffix_for_vina_names():

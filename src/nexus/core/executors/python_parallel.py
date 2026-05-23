@@ -15,24 +15,23 @@ def _execute_parallel_task(task):
     return func(*args, **kwargs)
 
 
-def python_parallel(cfg, title=None, skip=False):
+def python_parallel(n_jobs, logger=None, title=None, skip=False):
     def decorator(func):
         def wrapper(*args, **kwargs):
             original_cwd = os.getcwd()
             try:
                 # 1. Setup working directory
-                Path(cfg.common.working_dir).mkdir(parents=True, exist_ok=True)
-                os.chdir(cfg.common.working_dir)
+                """Path(cfg.common.working_dir).mkdir(parents=True, exist_ok=True)
+                os.chdir(cfg.common.working_dir)"""
 
                 # 2. MATCHING GNU_PARALLEL: Generate the list of prepared tasks
                 tasks = func(*args, **kwargs)
 
-                logger = cfg.common.logger
-                n_jobs = int(cfg.common.n_jobs)
+                from nexus.core.trackers.logging_utils import DummyLogger
+                local_logger = logger if logger is not None else DummyLogger()
                 local_title = title if title is not None else ""
-                
-                logger.info(f"Running: Python Parallel {local_title} for {len(tasks)} jobs")
 
+                local_logger.info(f"Running: Python Parallel {local_title} for {len(tasks)} jobs")
                 results = [None] * len(tasks)
                 
                 # 3. Execute the frozen tasks in parallel
@@ -52,17 +51,17 @@ def python_parallel(cfg, title=None, skip=False):
                         except Exception as e:
                             if skip:
                                 # Log it, but don't re-raise. results[index] remains None.
-                                logger.error(f"Task {index} failed with error: {e}. 'skip=True' is active, skipping task.")
+                                local_logger.error(f"Task {index} failed with error: {e}. 'skip=True' is active, skipping task.")
                             else:
                                 # Strict behavior: log and crash the entire pipeline immediately
-                                logger.error(f"Task {index} failed with error: {e}. Crashing pipeline.")
+                                local_logger.error(f"Task {index} failed with error: {e}. Crashing pipeline.")
                                 raise
 
                 # --- Handling the downstream return strategy ---
                 if skip:
                     # Strategy A: Filter out None values so downstream doesn't process broken data
                     filtered_results = [r for r in results if r is not None]
-                    logger.info(f"Parallel execution completed. Kept {len(filtered_results)}/{len(tasks)} successful jobs.")
+                    local_logger.info(f"Parallel execution completed. Kept {len(filtered_results)}/{len(tasks)} successful jobs.")
                     return filtered_results
                 
                 return results

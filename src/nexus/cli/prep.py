@@ -1,55 +1,84 @@
 import typer
-from typing import Optional
+from typing import Optional, Literal
 from pathlib import Path
+from typing_extensions import Annotated
 from nexus.prep.prep_config import load_prep_config, PrepConfig
 
 
-app = typer.Typer(help="Run fetch protein and ligand structures from RCSB pipelines")
+app = typer.Typer(help="Run protein and ligand preparation pipelines")
+
+
+ConfigOpt = Annotated[Optional[Path], typer.Option("-c", "--config", help="Path to config YAML")]
+InputOpt = Annotated[Optional[Path], typer.Option("-i", "--input", help="Input file or folder to search for files")]
+OutputOpt = Annotated[Optional[Path], typer.Option("-o", "--output", help="Output file or folder")]
+SuffixOpt = Annotated[Optional[str], typer.Option("-s", "--suffix", help="Suffix of output files if multiple inputs")]
+
+
+def merge_cli_overrides(pcfg: PrepConfig, common_flags: dict, unique_key: str, unique_flags: dict) -> PrepConfig:
+    """Helper function to handle your Pydantic deep merging"""
+    cli_overrides = {
+        "common": {k: v for k, v in common_flags.items() if v is not None},
+        unique_key: {k: v for k, v in unique_flags.items() if v is not None}
+    }
+    full_data = pcfg.model_dump()
+    for key, sub_dict in cli_overrides.items():
+        full_data[key] = {**full_data.get(key, {}), **sub_dict}
+
+    return PrepConfig.model_validate(full_data)
+
 
 @app.command()
-def rec(config: Optional[Path] = typer.Option(None, "-c", "--config", help="Path to config YAML"),
-          input: Optional[Path] = typer.Option(None, "-i", "--input", help="Input receptor to be prepared"),
-          output: Optional[Path] = typer.Option(None, "-o", "--output", help="Output protein to be prepared"),
-          suffix: Optional[str] = typer.Option(None, "-s", "--suffix", help="Suffix of output protein"),
-          dry: bool = typer.Option(False, "-d", "--dry", help="Remove water from protein")):
+def rec(
+    config: ConfigOpt = None, input: InputOpt = None, output: OutputOpt = None, suffix: SuffixOpt = None,
+    dry: bool = typer.Option(False, "-d", "--dry", help="Remove water from protein")
+):
     """Run the protein cleaning preparation with ChimeraX pipeline."""
+    pcfg = load_prep_config(config) if (config and config.exists()) else PrepConfig()
+    
+    pcfg = merge_cli_overrides(
+        pcfg, 
+        {"input": input, "output": output, "suffix": suffix}, 
+        unique_key="rec", 
+        unique_flags={"dry": dry}
+    )
+
     from nexus.prep.rec.pipeline import RecPipeline
-
-    if config and config.exists():
-        pcfg = load_prep_config(config)
-    else:
-        pcfg = PrepConfig()
-
-    # Config flag is already enough for all inputs
-    # If additional flags are used, they overwrite the config
-    cli_overrides = {
-        "common": {
-            k: v for k, v in {
-                "input": input,
-                "output": output,
-                "suffix": suffix
-            }.items() if v is not None
-        },
-        "rec": {
-            k: v for k, v in {
-                "dry": dry,
-            }.items() if v is not None        
-        }
-    }
-
-    if config and config.exists():
-        pcfg = load_prep_config(config)
-    else:
-        # Safely creates defaults for everything
-        pcfg = PrepConfig() 
-
-    if cli_overrides:
-        # Deep merge using a simple dict unpacking trick
-        full_data = pcfg.model_dump()
-        for key, sub_dict in cli_overrides.items():
-            full_data[key] = {**full_data.get(key, {}), **sub_dict}
-            
-        pcfg = PrepConfig.model_validate(full_data)
-
-    # 5. Run pipeline
     RecPipeline(pcfg=pcfg)._run()
+
+
+@app.command()
+def mutate(
+    config: ConfigOpt = None, input: InputOpt = None, output: OutputOpt = None, suffix: SuffixOpt = None,
+    mutations: Optional[str] = typer.Option(None, "-m", "--mutations", help="Syntax must match '{selection}&:{RES}-{NEW_RES}'")
+):
+    """Change residues identity or protonation state using ChimeraX."""
+    pcfg = load_prep_config(config) if (config and config.exists()) else PrepConfig()
+    
+    pcfg = merge_cli_overrides(
+        pcfg, 
+        {"input": input, "output": output, "suffix": suffix}, 
+        unique_key="mutate", 
+        unique_flags={"mutations": mutations}
+    )
+
+    from nexus.prep.mutate.pipeline import MutatePipeline
+    MutatePipeline(pcfg=pcfg)._run()
+    
+
+@app.command()
+def ligdock(
+    config: ConfigOpt = None, input: InputOpt = None, output: OutputOpt = None, suffix: SuffixOpt = None,
+    ctype: Optional[Literal["GAFF", "AM1-BCC"]] = typer.Option("GAFF", "-t", "--ctype", help="Charge type for ligands")
+):
+    """Change residues identity or protonation state using ChimeraX."""
+    pcfg = load_prep_config(config) if (config and config.exists()) else PrepConfig()
+    
+    pcfg = merge_cli_overrides(
+        pcfg, 
+        {"input": input, "output": output, "suffix": suffix}, 
+        unique_key="ligdock", 
+        unique_flags={"type": ctype}
+    )
+    
+    from nexus.prep.ligdock.pipeline import LigdockPipeline
+    LigdockPipeline(pcfg=pcfg)._run()

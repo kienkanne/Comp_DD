@@ -58,24 +58,6 @@ def _ligand_extension(program):
     raise ValueError(f"Unsupported docking program: {program}")
 
 
-
-def _prepared_path(directory, name, prepared_suffix, extension):
-    def _prepared_filename(name, prepared_suffix, extension):
-        if not extension.startswith("."):
-            extension = f".{extension}"
-        return f"{name}_{prepared_suffix}{extension}"
-    
-    return Path(directory) / _prepared_filename(name, prepared_suffix, extension)
-
-
-def _strip_prepared_suffix(path, prepared_suffix):
-    stem = Path(path).stem
-    marker = f"_{prepared_suffix}"
-    if stem.endswith(marker):
-        return stem[: -len(marker)]
-    return stem
-
-
 def _discover_prepared_ligands(cfg):
     existing_dir = cfg.ligands.existing_dir
     if not existing_dir.is_dir():

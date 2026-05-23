@@ -1,13 +1,15 @@
-from pydantic import BaseModel
-from typing import Optional
+from pydantic import BaseModel, ConfigDict
+from typing import Optional, Literal
 from pathlib import Path
 
 class CommonConfig(BaseModel):
     input: Optional[Path] = None
-    output: Optional[Path] = None
+    output_dir: Optional[Path] = None
     suffix: Optional[str] = None
 
     chimerax: Optional[Path] = "/usr/local/chimerax/bin/ChimeraX"
+
+    model_config = ConfigDict(extra='allow')
 
 class RecConfig(BaseModel):
     dry: Optional[bool] = False
@@ -15,15 +17,16 @@ class RecConfig(BaseModel):
 class MutateConfig(BaseModel):
     mutations: Optional[str] = None
 
-class LigConfig(BaseModel):
-    pass
-
+class LigdockConfig(BaseModel):
+    source: Optional[Literal["smiles", "sdf"]] = "sdf"
+    format: Optional[Literal["pdbqt", "mol2"]] = "pdbqt"
+    type: Optional[Literal["GAFF", "AM1-BCC"]] = "GAFF"
 
 class PrepConfig(BaseModel):
     common: CommonConfig = CommonConfig()
     rec: RecConfig = RecConfig()
     mutate: MutateConfig = MutateConfig()
-    lig: LigConfig = LigConfig()
+    ligdock: LigdockConfig = LigdockConfig()
 
 
 def load_prep_config(path):
@@ -34,16 +37,5 @@ def load_prep_config(path):
     
     if pcfg.common.output is None:
         pcfg.common.output = pcfg.common.input.parent
-
-    """if pcfg.common.task == "lig":
-        if pcfg.common.input.suffix == "csv":
-            from nexus.dock.ligands._ligands_common import _parse_ligands_csv
-            pcfg.common.input = _parse_ligands_csv(pcfg.common.input)
-        else:
-            pcfg.common.input = extract_files(pcfg.common.input, ".sdf")
-        
-        if pcfg.common.format not in ("vina", "dock6", "amber"):
-            raise ValueError("Output ligand format for program must be 'vina', 'dock6' or 'amber'.")"""
-
 
     return pcfg

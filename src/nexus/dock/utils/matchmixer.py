@@ -10,7 +10,7 @@ def _to_path(item):
 
 
 def _name_from_prepped(item, suffix):
-    from nexus.dock.ligands._ligands_common import _strip_prepared_suffix
+    from nexus.dock.utils._strip_prepared_suffix import _strip_prepared_suffix
     return _strip_prepared_suffix(str(_to_path(item)), suffix)
 
 

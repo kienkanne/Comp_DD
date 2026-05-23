@@ -1,6 +1,6 @@
 from pathlib import Path
 from string import Template
-from nexus.dock.ligands._ligands_common import _strip_prepared_suffix
+from nexus.dock.utils._strip_prepared_suffix import _strip_prepared_suffix
 from nexus.core.executors.gnu_parallel import gnu_parallel
 from nexus.core.trackers.main_tracker import main_tracker
 
