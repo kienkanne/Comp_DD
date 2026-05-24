@@ -10,8 +10,8 @@ app = typer.Typer(help="Run protein and ligand preparation pipelines")
 
 ConfigOpt = Annotated[Optional[Path], typer.Option("-c", "--config", help="Path to config YAML")]
 InputOpt = Annotated[Optional[Path], typer.Option("-i", "--input", help="Input file or folder to search for files")]
-OutputOpt = Annotated[Optional[Path], typer.Option("-o", "--output", help="Output file or folder")]
-SuffixOpt = Annotated[Optional[str], typer.Option("-s", "--suffix", help="Suffix of output files if multiple inputs")]
+OutputOpt = Annotated[Optional[Path], typer.Option("-o", "--output_dir", help="Output folder directory")]
+SuffixOpt = Annotated[Optional[str], typer.Option("-s", "--suffix", help="Suffix of output file(s)")]
 
 
 def merge_cli_overrides(pcfg: PrepConfig, common_flags: dict, unique_key: str, unique_flags: dict) -> PrepConfig:
@@ -29,7 +29,7 @@ def merge_cli_overrides(pcfg: PrepConfig, common_flags: dict, unique_key: str, u
 
 @app.command()
 def rec(
-    config: ConfigOpt = None, input: InputOpt = None, output: OutputOpt = None, suffix: SuffixOpt = None,
+    config: ConfigOpt = None, input: InputOpt = None, output_dir: OutputOpt = None, suffix: SuffixOpt = None,
     dry: bool = typer.Option(False, "-d", "--dry", help="Remove water from protein")
 ):
     """Run the protein cleaning preparation with ChimeraX pipeline."""
@@ -37,7 +37,7 @@ def rec(
     
     pcfg = merge_cli_overrides(
         pcfg, 
-        {"input": input, "output": output, "suffix": suffix}, 
+        {"input": input, "output_dir": output_dir, "suffix": suffix}, 
         unique_key="rec", 
         unique_flags={"dry": dry}
     )
@@ -48,7 +48,7 @@ def rec(
 
 @app.command()
 def mutate(
-    config: ConfigOpt = None, input: InputOpt = None, output: OutputOpt = None, suffix: SuffixOpt = None,
+    config: ConfigOpt = None, input: InputOpt = None, output_dir: OutputOpt = None, suffix: SuffixOpt = None,
     mutations: Optional[str] = typer.Option(None, "-m", "--mutations", help="Syntax must match '{selection}&:{RES}-{NEW_RES}'")
 ):
     """Change residues identity or protonation state using ChimeraX."""
@@ -56,7 +56,7 @@ def mutate(
     
     pcfg = merge_cli_overrides(
         pcfg, 
-        {"input": input, "output": output, "suffix": suffix}, 
+        {"input": input, "output_dir": output_dir, "suffix": suffix}, 
         unique_key="mutate", 
         unique_flags={"mutations": mutations}
     )
@@ -67,7 +67,7 @@ def mutate(
 
 @app.command()
 def ligdock(
-    config: ConfigOpt = None, input: InputOpt = None, output: OutputOpt = None, suffix: SuffixOpt = None,
+    config: ConfigOpt = None, input: InputOpt = None, output_dir: OutputOpt = None, suffix: SuffixOpt = None,
     ctype: Optional[Literal["GAFF", "AM1-BCC"]] = typer.Option("GAFF", "-t", "--ctype", help="Charge type for ligands")
 ):
     """Change residues identity or protonation state using ChimeraX."""
@@ -75,7 +75,7 @@ def ligdock(
     
     pcfg = merge_cli_overrides(
         pcfg, 
-        {"input": input, "output": output, "suffix": suffix}, 
+        {"input": input, "output_dir": output_dir, "suffix": suffix}, 
         unique_key="ligdock", 
         unique_flags={"type": ctype}
     )

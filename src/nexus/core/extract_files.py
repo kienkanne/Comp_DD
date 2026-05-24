@@ -3,7 +3,7 @@ from typing import Union, List
 
 def extract_files(
     input_path: Union[str, Path, List[Union[str, Path]]], 
-    patterns: Union[str, List], 
+    patterns: Union[str, List[str]], 
     recursive: bool = False
 ) -> List[Path]:
     """
@@ -35,19 +35,26 @@ def extract_files(
         raise FileNotFoundError(f"Path does not exist: {path}")
 
     # 3. Process Directory vs File
-    # Use rglob for recursive, glob for shallow
     if path.is_dir():
-        if isinstance(patterns, list):
-            for pattern in patterns:
-                glob_pattern = f"*{pattern}"
-                results = path.rglob(glob_pattern) if recursive else path.glob(glob_pattern)
-        elif isinstance(patterns, str):
-            glob_pattern = f"*{pattern}"
-            results = path.rglob(glob_pattern) if recursive else path.glob(glob_pattern)
+        # Clean up patterns: convert single string to a list of one string
+        if isinstance(patterns, str):
+            pattern_list = [patterns]
+        elif isinstance(patterns, list):
+            pattern_list = patterns
         else:
-            raise ValueError(f"Invalid patterns: {patterns}")
+            raise TypeError(f"Invalid patterns type: {type(patterns)}. Must be str or list.")
         
-        # Filter to ensure we only return files, not matching subdirectories
-        return sorted([f for f in results if f.is_file()])
+        # Aggregate matches from all patterns without overwriting
+        all_results = []
+        for pat in pattern_list:
+            glob_pattern = f"*{pat}"
+            # Select generator based on recursion requirement
+            matched_generator = path.rglob(glob_pattern) if recursive else path.glob(glob_pattern)
+            
+            # Filter for files immediately to avoid carrying directories forward
+            all_results.extend([f for f in matched_generator if f.is_file()])
+            
+        return sorted(list(set(all_results))) # set() prevents duplicates if patterns overlap
+        
     else:
         return [path]

@@ -21,14 +21,16 @@ class LigdockPipeline(BaseModel):
 
         else:
             self.pcfg.ligdock.source = "sdf"
-            self.pcfg.common.input = extract_files(self.pcfg.common.input, [".sdf"])
+            self.pcfg.common.input = extract_files(self.pcfg.common.input, ".sdf", recursive=True)
             if not self.pcfg.common.input:
                 raise ValueError("Invalid input, no sdf file found.")
-
+        print (self.pcfg.common.output_dir)
         if self.pcfg.common.output_dir is None:
             if isinstance(self.pcfg.common.input, Path):
                 self.pcfg.common.output_dir = self.pcfg.common.input.parent
-            elif isinstance(self.pcfg.common.input, List):   
-                self.pcfg.common.output_dir = self.pcfg.common.input[0].parent        
+            elif isinstance(self.pcfg.common.input, list):   
+                self.pcfg.common.output_dir = self.pcfg.common.input[0].parent
+
+        self.pcfg.common.output_dir.mkdir(parents=True, exist_ok=True)     
 
         return ligands_prep(self.pcfg)

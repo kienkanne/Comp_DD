@@ -40,3 +40,9 @@ class DummyLogger:
 
     def error(self, message: str):
         print(f"[ERROR] {message}")
+
+    def debug(self, message: str):
+        print(f"[DEBUG] {message}")
+
+    def warning(self, message: str):
+        print(f"[WARNING] {message}")

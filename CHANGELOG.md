@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.2
+- Separated ligands preparation from dock pipeline to prep pipeline via `nexus prep ligdock`.
+- Remove dependencies of gnu_parallel and python_parallel wrappers on config object.
+- Path variables must now be absolute paths, as wrappers don't change to working directory anymore.
+- Added `nexus prep mutate` to allow for changing protonation states or side chains of receptors manually.
+
 ## 1.5.1
 - Moved ChimeraX receptor prepration to be integrated with the rcsb fetching pipeline.
 - Docking pipelines now require cleaned pdb/cif inputs.

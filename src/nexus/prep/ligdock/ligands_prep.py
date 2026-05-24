@@ -3,7 +3,6 @@ from pathlib import Path
 
 from nexus.core.executors.python_parallel import python_parallel
 from nexus.core.executors.gnu_parallel import gnu_parallel
-from nexus.core.trackers.main_tracker import main_tracker
 
 from nexus.prep.ligdock._ligands_common import _parse_ligands_csv, _discover_prepared_ligands
 from nexus.prep.prep_config import PrepConfig
@@ -43,8 +42,7 @@ def ligands_prep(pcfg: PrepConfig):
 
 
         if Path(suffix).suffix == ".pdbqt":
-            @python_parallel(n_jobs=16, title=
-            "meeko_charge_parallel()", skip=True)
+            @python_parallel(n_jobs=16, title="meeko_charge_parallel()", skip=True)
             def _meeko_charge_parallel(mol_with_h_list, output_list):
                 from nexus.prep.ligdock._meeko_charge import _meeko_charge
                 tasks = []
@@ -55,29 +53,29 @@ def ligands_prep(pcfg: PrepConfig):
                         output_path
                     ))
                 return tasks
-            print (suffix)
-            print (names)
             output_list = [output_dir / f"{name}{suffix}" for name in names]
             prepared_ligs = _meeko_charge_parallel(mol_with_h_list, output_list)
         
         
         if Path(suffix).suffix == ".mol2":
             prepared_ligs = []
-
-            @gnu_parallel(pcfg, "obabel_charge_parallel()")
+            tmp_sdf_list = []
+            @gnu_parallel(16, title="obabel_charge_parallel()")
             def _obabel_charge_parallel(mol_with_h_list, names):
                 from rdkit import Chem
                 cmds = []
                 
                 for mol_with_h, name in zip(mol_with_h_list, names):
-                    output_nocharge_sdf_path = output_dir / f"{name}_nocharge.sdf"
-                    writer = Chem.SDWriter(output_nocharge_sdf_path)
+                    tmp_sdf_path = output_dir / f"{name}_nocharge.sdf"
+                    tmp_sdf_list.append(tmp_sdf_path)
+                    
+                    writer = Chem.SDWriter(tmp_sdf_path)
                     writer.write(mol_with_h)
 
                     output_mol2_path = output_dir / f"{name}{suffix}"
                     cmds.append([
                         "obabel",
-                        output_nocharge_sdf_path,
+                        tmp_sdf_path,
                         "-O", output_mol2_path,
                         "--ff", "mmff94",
                     ])
@@ -85,6 +83,8 @@ def ligands_prep(pcfg: PrepConfig):
                 return cmds
             
             _obabel_charge_parallel(mol_with_h_list, names)
+            for tmp_sdf_path in tmp_sdf_list:
+                Path(tmp_sdf_path).unlink(missing_ok=True)
 
         return prepared_ligs
     return _run()
