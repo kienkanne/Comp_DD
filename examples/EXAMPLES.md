@@ -1,6 +1,6 @@
 # Examples
 
-This folder contains some example input files, commands, and their results
+This folder contains some example input files, commands, and their results.
 
 ## Fetching and receptors preparation
 
@@ -19,6 +19,8 @@ Based on the output from `nexus prep rec`, we adjust the protonation state of th
 nexus prep mutate -i cleaned_receptors/6W63_cleaned.pdb -o mutated_receptors/ -s "_mutated.pdb" -m ":145-CYM"
 nexus prep mutate -i cleaned_receptors/7K40_cleaned.pdb -o mutated_receptors/ -s "_mutated.pdb" -m ":64,80-HIE" -m ":41-HIP" -m ":145-CYM"
 ```
+
+After this step, our receptor names are quite long, so we might want to simplify their naming and put in a folder for docking, such as [final_receptors](final_receptors/)
 
 ### Ligands preparation for docking
 
