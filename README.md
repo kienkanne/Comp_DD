@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Current package version: `1.5.1`.
+Current package version: `1.5.3`.
 
 This repository runs end-to-end computational workflows for drug discovery using YAML config files. It currently supports:
 
