@@ -246,6 +246,10 @@ carvacrol,-1.917,-1.528,-1.319,...
 
 Rows are sorted by `pose1`, with lower scores first.
 
+## Examples
+
+- [Examples](examples/EXAMPLES.md)
+
 ## More Documentation
 
 - [Changelog](CHANGELOG.md)
