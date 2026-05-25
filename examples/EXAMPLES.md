@@ -4,9 +4,11 @@ This folder contains some example input files, commands, and their results.
 
 ## Fetching and receptors preparation
 
+The `-d` flag is to dry, and you almost always want to use it.
+
 ```bash
 nexus fetch rcsb -i id_list.txt -o fetched_structures/ -l "ligand"
-nexus prep rec -i fetched_structures/ -o cleaned_receptors/ -s "_cleaned.pdb"
+nexus prep rec -i fetched_structures/ -o cleaned_receptors/ -s "_cleaned.pdb" -d
 ```
 
 The output from `nexus prep rec` tells us the non-standard protonation states that ChimeraX assigned, especially histidine.
@@ -39,3 +41,5 @@ Docking uses a config file for input.
 nexus dock vina -c vina_config.yaml
 nexus dock dock6 -c dock6_config.yaml
 ```
+
+See [artifacts](artifacts/) and [results](results/) for the docking outputs.

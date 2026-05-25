@@ -47,9 +47,6 @@ artifacts/
 *.tmp
 *.bak
 
-# Exception for examples only
-!examples/**/*.log
-
 # Testing / coverage
 
 .pytest_cache/
@@ -121,3 +118,9 @@ slurm-*.out
 secrets.yaml
 credentials.json
 tokens.txt
+
+# Exception for examples only
+!examples/**/*.log
+!examples/**/*.out
+!examples/results
+!examples/artifacts

@@ -4,8 +4,8 @@ libs:
 
 common:
   project_name: vina_mpro
-  working_dir: "/localscratch/kbui/NexusMol/examples/docking_artifacts"
-  results_dir: "/localscratch/kbui/NexusMol/examples/docking_results"
+  working_dir: "/localscratch/kbui/NexusMol/examples/artifacts"
+  results_dir: "/localscratch/kbui/NexusMol/examples/results"
 
   padding: 4.0
   n_jobs: 16
