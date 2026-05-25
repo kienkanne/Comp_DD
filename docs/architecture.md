@@ -19,11 +19,15 @@ The high-level pipeline sequence is:
 - `nexus.cli.dock` — docking commands for `nexus dock vina` and `nexus dock dock6`.
 - `nexus.cli.validate` — validation commands for `nexus validate vina` and `nexus validate dock6`.
 - `nexus.cli.fetch` — fetch commands for `nexus fetch rcsb`.
+- `nexus.cli.prep` — preparation commands for `nexus prep rec`, `nexus prep mutate`, `nexus prep ligdock`, and `nexus prep sysmd`.
+- `nexus.cli.md` — MD pipeline commands for `nexus md amber` (and openmm placeholder).
 - `nexus.dock` — docking configuration and shared docking helpers.
 - `nexus.dock.vina` — Vina pipeline implementation.
 - `nexus.dock.dock6` — DOCK6 pipeline implementation.
+- `nexus.prep.sysmd` — solvated system building for MD using AmberTools.
 - `nexus.fetch` — RCSB fetch configuration, pipeline, and CIF assembly support.
 - `nexus.validate` — validation config loader and RMSD analysis.
+- `nexus.md.amber` — Amber MD workflow implementation.
 - `nexus.core.executors` — process runners and parallel execution wrappers.
 - `nexus.core.trackers` — logging, manifest, and runstate support.
 

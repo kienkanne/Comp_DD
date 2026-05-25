@@ -2,17 +2,19 @@
 
 ## Introduction
 
-Current package version: `1.5.3`.
+Current package version: `2.0.0`.
 
 This repository runs end-to-end computational workflows for drug discovery using YAML config files. It currently supports:
 
 - AutoDock Vina
 - DOCK6
+- Molecular dynamics with AmberTools (`nexus md amber`)
+- Solvated system building for MD using `nexus prep sysmd`
 - Validation workflows for Vina and DOCK6
 - Receptors and ligands fetching from RCSB.org
 - Receptors and ligands custom preparation and cleaning
 
-The docking pipelines docks ligands in parallel with GNU parallel, copies selected outputs to a results folder, and writes a docking summary CSV sorted by the best pose score.
+The docking pipelines dock ligands in parallel with GNU parallel, copy selected outputs to a results folder, and write a docking summary CSV sorted by the best pose score.
 
 ## Installation
 
@@ -47,8 +49,10 @@ dock_home: "$HOME/Apps/dock6/"
 Use the CLI with a single unified config YAML file:
 
 ```bash
-nexus dock vina -c sample_configs/sample_docking.yaml
-nexus dock dock6 -c sample_configs/sample_docking.yaml
+nexus dock vina -c build/sample_configs/sample_docking.yaml
+nexus dock dock6 -c build/sample_configs/sample_docking.yaml
+nexus prep sysmd -c examples/sysmd_config.yaml
+nexus md amber -c build/sample_configs/amber_md.yaml
 ```
 
 Retrieve receptor assemblies and ligand SDFs directly from RCSB with the fetch command:
@@ -59,14 +63,14 @@ nexus fetch rcsb -i 6LU7 -i 6W63 -o output_dir/
 
 The fetch module downloads biological assemblies in mmCIF format and writes cleaned `.cif` receptor outputs.
 
-Prepare/clean receptors or mutate/change protonation state of receptors wth the prep command:
+Prepare/clean receptors or mutate/change protonation state of receptors with the prep command:
 
 ```bash
 nexus prep rec -i 6LU7.cif -i 6W63.pdb -o output_dir/
 nexus prep mutate -i 6LU7.cif -o output_dir/ -m "/A:41&:HIS-HIP" -m "/A:145&:CYS-CYM"
 
-nexus prep ligdock -i smiles_list.csv -o output_dir/ -s "prepared.pdbqt"
-nexus prep ligdock -i path_to_sdf_folder/ -o output_dir -s "prepared.mol2"
+nexus prep ligdock -i smiles_list.csv -o output_dir/ -s "_prepared.pdbqt"
+nexus prep ligdock -i path_to_sdf_folder/ -o output_dir -s "_prepared.mol2"
 ```
 
 ## Ligand CSV
@@ -85,7 +89,7 @@ Ligand names are used in output filenames, so keep them short and file-friendly.
 
 ## Docking Config Format
 
-See [sample_configs/sample_docking.yaml](sample_configs/sample_docking.yaml) and [sample_configs/sample_ligands.yaml](sample_configs/sample_ligands.yaml) for working examples.
+See `build/sample_configs/sample_docking.yaml`, `examples/vina_config.yaml`, and `examples/dock6_config.yaml` for working examples.
 
 ### `libs`
 
@@ -175,8 +179,8 @@ ligands:
 ```
 
 - `source`: single file, directory of files, or list of file paths.
-- `suffix`: the pattern to search for if the provided source is a folder.
-- Vina reads `*_<prepared_suffix>.pdbqt`; DOCK6 reads `*_<prepared_suffix>.mol2`.
+- `suffix`: the file suffix used to find prepared ligand files.
+- Vina reads `.pdbqt` ligands, and DOCK6 reads `.mol2` ligands.
 
 ### `vina`
 
@@ -209,8 +213,8 @@ dock6:
 The repository now supports dedicated validation workflows via:
 
 ```bash
-nexus validate vina -c sample_configs/sample_docking.yaml
-nexus validate dock6 -c sample_configs/sample_docking.yaml
+nexus validate vina -c build/sample_configs/sample_docking.yaml
+nexus validate dock6 -c build/sample_configs/sample_docking.yaml
 ```
 
 Validation specific settings.

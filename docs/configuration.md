@@ -6,14 +6,16 @@ This repository uses Pydantic-backed YAML configuration models with a unified do
 - Validation config: loaded with `load_validate_config(path)` from `src/nexus/validate/validate_config.py`.
 - Fetch config: loaded with `load_fetch_config(path)` from `src/nexus/fetch/fetch_config.py`.
 
-Run commands use a single unified config YAML file for docking and validation. Fetch uses a dedicated fetch config:
+Run commands use a single unified config YAML file for docking and validation. Fetch uses a dedicated fetch config, while preparatory MD/system setup uses dedicated sysmd and MD configs:
 
 ```bash
-nexus dock vina -c sample_configs/sample_docking.yaml
-nexus dock dock6 -c sample_configs/sample_docking.yaml
-nexus validate vina -c sample_configs/sample_docking.yaml
-nexus validate dock6 -c sample_configs/sample_docking.yaml
-nexus fetch rcsb -c sample_configs/structure_retrieval.yaml
+nexus dock vina -c build/sample_configs/sample_docking.yaml
+nexus dock dock6 -c build/sample_configs/sample_docking.yaml
+nexus validate vina -c build/sample_configs/sample_docking.yaml
+nexus validate dock6 -c build/sample_configs/sample_docking.yaml
+nexus prep sysmd -c examples/sysmd_config.yaml
+nexus md amber -c build/sample_configs/amber_md.yaml
+nexus fetch rcsb -c build/sample_configs/fetch_rcsb.yaml
 ```
 
 The `fetch` command downloads and cleans mmCIF receptor assemblies and SDF ligands from the RCSB API.
@@ -24,16 +26,15 @@ The `fetch` command downloads and cleans mmCIF receptor assemblies and SDF ligan
 - `common.project_name` — appended to `working_dir` and `results_dir`.
 - `common.working_dir` — parent path for scratch; the loader appends `project_name`.
 - `common.results_dir` — parent path for final results; the loader appends `project_name`.
-- `common.prepared_suffix` — suffix used as `<name>_<prepared_suffix>.<ext>` for prepared receptor files.
 - `common.padding`, `common.n_jobs`, `common.max_poses` — shared runtime options.
 
 ### Receptor Configuration (resolved at config-load time)
 
-- `receptors.pdbs` — path to a single PDB/CIF file, a directory, or a list of paths.
-- `receptors.pocket_option` — `selection` (use a PyMOL selection string or CSV mapping) or `reference` (use reference pocket files).
-- `receptors.selection` — PyMOL selection string used for all receptors, or path to a per-receptor selection CSV file.
+- `receptors.source` — path to a single PDB/CIF file, a directory, or a list of paths.
+- `receptors.pocket_option` — `selection` (use a selection string or CSV mapping) or `reference` (use reference pocket files).
+- `receptors.selection` — selection string used for all receptors, or path to a per-receptor selection CSV file.
 - `receptors.reference` — single reference pocket file, directory of references, or path; matched to receptors by base name.
-- `receptors.reference_suffix` — file suffix used when matching references (default: `_pocket.cif`).
+- `receptors.reference_suffix` — file suffix used when matching references (default: `_pocket.pdb`).
 
 At config-load time, `validate_and_normalize_receptors()` normalizes these fields:
 - Extracts all receptor files from the provided paths/directories.
@@ -51,16 +52,44 @@ The config loader attaches runtime-only objects to `cfg.common`: `logger`, `mani
 
 ## Ligand Config
 
-- `source: smiles` prepares ligands from `smiles_csv`.
-- `source: files` reads prepared ligands from `ligands_dir`.
-- `source: existing` uses already-prepared ligands.
-- `prepared_suffix` is interpreted as `<ligand_name>_<prepared_suffix>.<ext>`.
+- `source: smiles` prepares ligands from a SMILES CSV.
+- `source: files` reads prepared ligands from a directory of files.
+- `source: existing` uses already-prepared ligand files.
+- `suffix` selects prepared ligand files by file suffix.
 - `prepare_tool: obabel` uses Open Babel and, for Vina, MGLTools.
 - `prepare_tool: meeko` uses RDKit/Meeko to produce PDBQT and converts to MOL2 with Open Babel for DOCK6.
-- Vina reads `*_<prepared_suffix>.pdbqt`.
-- DOCK6 reads `*_<prepared_suffix>.mol2`.
+- Vina uses `.pdbqt` prepared ligand files.
+- DOCK6 uses `.mol2` prepared ligand files.
 
-See `sample_configs/sample_docking.yaml` and `sample_configs/sample_ligands.yaml` for practical examples.
+See `build/sample_configs/sample_docking.yaml`, `examples/vina_config.yaml`, and `examples/dock6_config.yaml` for practical examples.
+
+## Prep Config
+
+The `nexus prep` command loads a preparatory config with `load_prep_config(path)`. The `sysmd` pipeline uses this config to build solvated Amber systems for MD.
+
+- `common.input` — receptor input file or folder.
+- `common.output_dir` — output directory for generated system files.
+- `common.working_dir` — scratch directory used during `sysmd` processing.
+- `sysmd.system_name` — base name for the solvated system outputs.
+- `sysmd.ligand` — optional prepared ligand pose file used to build a receptor-ligand complex.
+- `sysmd.pose_num` — pose number to select from the supplied ligand (1-based pose index).
+- `sysmd.force_field` — Amber force field name, e.g. `ff14SB` or `ff19SB`.
+- `sysmd.water_model` — water model name, e.g. `tip3p` or `opc`.
+- `sysmd.box_type` — solvent box type: `Box` or `Oct`.
+- `sysmd.box_size` — box padding size in Angstroms.
+- `sysmd.salt_conc` — salt concentration in molar units.
+
+## MD Config
+
+The `nexus md amber` command loads an MD config with `load_md_config(path)`.
+
+- `common.prmtop` — input Amber topology file.
+- `common.inpcrd` — input Amber coordinate file.
+- `common.mask` — optional atom mask for restraints or analysis.
+- `min`, `heat`, `eq`, `prod` — stage-specific settings for minimization, heating, equilibration, and production.
+- `common.working_dir` / `common.results_dir` — working and results directories for MD outputs.
+
+`nexus md openmm` currently exists as a placeholder command and is not implemented yet.
 
 ## Validation Config
 

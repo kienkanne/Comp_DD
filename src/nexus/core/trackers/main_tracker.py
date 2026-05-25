@@ -1,3 +1,4 @@
+### TODO: Remove main tracker dependence on cfg
 def main_tracker(cfg, stage_name, checkpoint=False):
     def decorator(func):
         def wrapper(*args, **kwargs):

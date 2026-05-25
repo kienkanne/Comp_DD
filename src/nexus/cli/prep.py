@@ -71,7 +71,7 @@ def ligdock(
     config: ConfigOpt = None, input: InputOpt = None, output_dir: OutputOpt = None, suffix: SuffixOpt = None,
     ctype: Optional[Literal["GAFF", "AM1-BCC"]] = typer.Option("GAFF", "-t", "--ctype", help="Charge type for ligands (wip)")
 ):
-    """Change residues identity or protonation state using ChimeraX."""
+    """Prepare ligands for docking from SMILES or SDF input."""
     pcfg = load_prep_config(config) if (config and config.exists()) else PrepConfig()
     
     pcfg = merge_cli_overrides(

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.0
+- Added Amber MD support with `nexus md amber` and sample MD config at `build/sample_configs/amber_md.yaml`.
+- Added solvated system building for MD via `nexus prep sysmd` using AmberTools (`pdb4amber`, `antechamber`, `parmchk2`, `tleap`).
+- Corrected documentation and examples to match current command usage and actual sample config paths.
+- Updated preparation docs to reflect `nexus prep ligdock` and new sysmd config flags.
+- Bumped supported package version from `1.5.3` to `2.0.0`.
+
 ## 1.5.3
 - Fix inconsistencies in the dock pipeline to be compatiable with the new executors, which now is independent of configs.
 - Receptor bundles now include all necessary files for DOCK6.

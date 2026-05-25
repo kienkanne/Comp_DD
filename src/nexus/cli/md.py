@@ -9,6 +9,7 @@ app = typer.Typer(help="Run molecular dynamics pipelines")
 def amber(config: Path = typer.Option(..., "-c", "--config", help="Path to config YAML")):
     """Run the amber MD pipeline."""
     from nexus.md.amber.pipeline import AmberPipeline
+    print (config)
     AmberPipeline(mcfg=load_md_config(config))._run()
 
 

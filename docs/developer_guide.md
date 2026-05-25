@@ -15,8 +15,10 @@ pip install -e .
 2. Run a pipeline locally for quick testing:
 
 ```bash
-nexus dock vina -c sample_configs/sample_docking.yaml
-nexus dock dock6 -c sample_configs/sample_docking.yaml
+nexus dock vina -c build/sample_configs/sample_docking.yaml
+nexus dock dock6 -c build/sample_configs/sample_docking.yaml
+nexus prep sysmd -c examples/sysmd_config.yaml
+nexus md amber -c build/sample_configs/amber_md.yaml
 ```
 
 Check `artifacts/` and `results/` for produced files during development.

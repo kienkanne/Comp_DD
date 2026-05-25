@@ -110,6 +110,7 @@ def parse_dock6_pose_rmsds(prep_path: Path, scored_path: Path, max_poses: int = 
 
 from nexus.dock.dock_config import DockConfig
 
+# Disabled for now because validation is disabled
 def compute_validation_rmsds(vcfg: DockConfig):
     """Compute RMSDs for prepared crystal vs scored outputs and write per-receptor CSVs.
 

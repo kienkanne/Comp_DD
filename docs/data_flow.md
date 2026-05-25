@@ -25,18 +25,15 @@ This document explains the per-run data flow from inputs to final outputs.
 
 3. Pipeline orchestration
 
-   - CLI triggers one of the docking commands (`nexus dock vina`, `nexus dock dock6`) or validation commands (`nexus validate vina`, `nexus validate dock6`).
+   - CLI triggers one of the docking commands (`nexus dock vina`, `nexus dock dock6`), validation commands (`nexus validate vina`, `nexus validate dock6`), prep commands (`nexus prep rec`, `nexus prep mutate`, `nexus prep ligdock`, `nexus prep sysmd`), or MD commands (`nexus md amber`).
    - Each pipeline executes a fixed sequence of stages:
      - Resolve or prepare ligands.
      - Prepare receptors (using pre-built bundles from `cfg.receptors.bundles`).
      - Docking.
      - Write summary CSV.
      - Copy outputs.
-   - Validation workflows additionally compute per-receptor RMSD CSVs for the scored poses.
-
-4. Parallel execution
-
-   - Per-ligand external steps are executed via `nexus.core.executors.gnu_parallel`, which builds command lists and invokes GNU `parallel` with `common.n_jobs`.
+   - `nexus prep sysmd` builds solvated systems for MD.
+   - `nexus md amber` runs Amber minimization, heating, equilibration, and production on a prepared `prmtop`/`inpcrd` pair.
 
 5. Outputs
 

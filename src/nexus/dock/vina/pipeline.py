@@ -18,8 +18,7 @@ class VinaPipeline():
         lig_paths = self.dcfg.ligands.source
         rec_bundles = vina_prep_rec(self.dcfg)
 
-        pairs = matchmixer(rec_bundles, lig_paths, 
-                           "self.dcfg.common.prepared_suffix", self.dcfg.common.mode)
+        pairs = matchmixer(rec_bundles, lig_paths)
         # Disable validate for now
         out_files = vina_docking(self.dcfg, pairs)
         docking_summary = write_summary_csv(self.dcfg, out_files, rec_bundles)

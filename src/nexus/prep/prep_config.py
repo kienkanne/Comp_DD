@@ -55,9 +55,4 @@ def load_prep_config(path):
     import yaml
     with open(path) as f:
         data = yaml.safe_load(f)
-    pcfg = PrepConfig.model_validate(data)
-    
-    print (pcfg.common.working_dir)
-    print (pcfg.common.output_dir)
-
-    return pcfg
+    return PrepConfig.model_validate(data)

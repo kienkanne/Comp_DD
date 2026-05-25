@@ -47,9 +47,15 @@ See [artifacts](artifacts/) and [results](results/) for the docking outputs.
 
 ## Build solvated system for MD
 
-After choosing a docked pose or using a crystal with ligand, we can build a solvated system for molecular dynamics. See the config fiie for details.
+After choosing a docked pose or using a crystal structure with ligand, build a solvated Amber-compatible system using `nexus prep sysmd`. The example config is `examples/sysmd_config.yaml`.
 
 ```bash
 nexus prep sysmd -c sysmd_config.yaml
+```
+
+Once the system files are generated, run Amber MD with:
+
+```bash
+nexus md amber -c amber_md.yaml
 ```
 

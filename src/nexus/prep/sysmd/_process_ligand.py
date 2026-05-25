@@ -6,7 +6,7 @@ def _process_ligand(pcfg: PrepConfig, ligand_pose: Path):
     """
     Antechamber, and parmchk2
     """
-
+    ### TODO: -nc is hardcoded
     ligand_charged = pcfg.common.working_dir / f"{ligand_pose.stem}_charged.mol2"
     antechamber_cmd = ["antechamber", "-i", str(ligand_pose), "-fi", "mol2", 
                        "-o", str(ligand_charged), "-fo", "mol2", 

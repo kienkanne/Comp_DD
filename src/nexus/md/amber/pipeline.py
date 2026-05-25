@@ -6,6 +6,8 @@ from nexus.md.amber._minimize import minimize
 from nexus.md.amber._heat import heat
 from nexus.md.amber._equilibrate import equilibrate
 from nexus.md.amber._produce import produce
+from nexus.md.amber._copy_to_results import copy_to_results
+
 
 class AmberPipeline(BaseModel):
     mcfg: MDConfig
@@ -18,9 +20,9 @@ class AmberPipeline(BaseModel):
         prmtop = self.mcfg.common.prmtop
         inpcrd = self.mcfg.common.inpcrd
 
-        if prmtop is None:
+        if prmtop is None or not prmtop.is_file():
             raise FileNotFoundError(f"Missing prmtop at: {prmtop}")
-        if inpcrd is None:
+        if inpcrd is None or not inpcrd.is_file():
             raise FileNotFoundError(f"Missing prmtop at: {inpcrd}")
         
         last_min_ncrst = minimize(self.mcfg, prmtop, inpcrd)
@@ -31,14 +33,6 @@ class AmberPipeline(BaseModel):
         # Returns trajectory file and out file for each seed to be copied to results_dir
         # Add production chunks, then combine at the end
         # Trajectory file should be removed from artifacts as it's very heavy
-        produce(self.mcfg, prmtop, last_eq_ncrst)
-        print (last_eq_ncrst)
+        outputs = produce(self.mcfg, prmtop, last_eq_ncrst)
 
-
-### test
-from nexus.md.md_config import MDConfig, load_md_config
-
-
-mcfg = load_md_config("/localscratch/kbui/NexusMol/build/sample_configs/amber_md.yaml")
-
-AmberPipeline(mcfg=mcfg)._run()
+        copy_to_results(self.mcfg, outputs)

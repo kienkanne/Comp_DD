@@ -1,14 +1,14 @@
 from pathlib import Path
 
 
-def matchmixer(prepped_recs, prepped_ligs, prepped_suffix, mode="mix"):
+def matchmixer(prepped_recs, prepped_ligs, prepped_suffix="prepared", mode="mix"):
     pairs = []
     if mode == "mix":
         for prepped_rec in prepped_recs:
             for prepped_lig in prepped_ligs:
                 pairs.append((prepped_rec, prepped_lig))
 
-    # Disable validate for now
+    # Disable for now because validation is disabled
     elif mode == "match":
         rec_dict = {prepped_rec: _name_from_prepped(prepped_rec, prepped_suffix) for prepped_rec in prepped_recs}
         lig_dict_inverted = {_name_from_prepped(prepped_lig, prepped_suffix): prepped_lig for prepped_lig in prepped_ligs}

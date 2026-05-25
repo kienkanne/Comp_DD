@@ -7,8 +7,8 @@ This repository supports dedicated validation workflows for Vina and DOCK6.
 Use the same unified docking config YAML file for validation:
 
 ```bash
-nexus validate vina -c sample_configs/sample_docking.yaml
-nexus validate dock6 -c sample_configs/sample_docking.yaml
+nexus validate vina -c build/sample_configs/sample_docking.yaml
+nexus validate dock6 -c build/sample_configs/sample_docking.yaml
 ```
 
 ## Validation dataset structure
@@ -74,6 +74,6 @@ The validation run writes normal pipeline outputs to the configured `common.work
 
 ## Notes
 
-- Validation does not require a separate config file; it reuses the same `sample_configs/sample_docking.yaml`.
+- Validation does not require a separate config file; it reuses `build/sample_configs/sample_docking.yaml`.
 - If your dataset root contains additional files, the loader ignores files that do not match the required suffix patterns.
 - Keeping directories organized by entry makes it easier to map receptors, pockets, and ligands during validation.
