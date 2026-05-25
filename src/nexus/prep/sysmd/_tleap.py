@@ -48,7 +48,7 @@ def build_tleap_cmd(input_dict: dict):
 
 def run_tleap(pcfg: PrepConfig, receptor_renamed: Path, ligand_charged: Path, ligand_frcmod: Path):
     output_dir = pcfg.common.output_dir
-    name = pcfg.sysmd.name
+    name = pcfg.sysmd.system_name
 
     if name is None:
         name = f"{receptor_renamed.stem}_solvated"

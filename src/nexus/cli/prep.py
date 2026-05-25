@@ -83,3 +83,17 @@ def ligdock(
     
     from nexus.prep.ligdock.pipeline import LigdockPipeline
     LigdockPipeline(pcfg=pcfg)._run()
+
+
+@app.command()
+def sysmd(config: ConfigOpt = None):
+    """
+    Build solvated system for molecular dynamics from prepared receptor and docked ligand or ligand from crystal structure using AmberTools.
+    """
+    if (config and config.exists()):
+        pcfg = load_prep_config(config)
+    else:
+        raise FileNotFoundError(f"No config file found at {config}")
+    
+    from nexus.prep.sysmd.pipeline import SysmdPipeline
+    SysmdPipeline(pcfg=pcfg)._run()

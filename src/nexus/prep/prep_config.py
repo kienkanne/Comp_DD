@@ -8,6 +8,7 @@ class CommonConfig(BaseModel):
     suffix: Optional[str] = None
 
     chimerax: Optional[Path] = "/usr/local/chimerax/bin/ChimeraX"
+    working_dir: Optional[Path] = Path.cwd() ### Only used by sysmd
 
     model_config = ConfigDict(extra='allow')
 
@@ -30,9 +31,10 @@ class LigdockConfig(BaseModel):
     type: Optional[Literal["GAFF", "AM1-BCC"]] = "GAFF"
 
 class SysmdConfig(BaseModel):
-    name: Optional[str] = None
-    working_dir: Optional[Path] = Path.cwd()
+    system_name: Optional[str] = None
     ligand: Optional[Path] = None
+    pose_num: Optional[int] = 1
+
     # Technically these are literal, but there are a lot of options
     force_field: Optional[str] = "ff19SB"
     water_model: Optional[str] = "opc"
@@ -40,13 +42,6 @@ class SysmdConfig(BaseModel):
     box_type: Optional[Literal["Box", "Oct"]] = "Oct"
     box_size: Optional[float] = 12.0
     salt_conc: Optional[float] = 0.15    
-
-    @model_validator(mode="after")
-    def default_working_dir(self):
-        if self.working_dir is None:
-            self.working_dir = Path.cwd()
-        self.working_dir.mkdir(parents=True, exist_ok=True)
-        return self
 
 class PrepConfig(BaseModel):
     common: Optional[CommonConfig] = CommonConfig()
@@ -62,7 +57,7 @@ def load_prep_config(path):
         data = yaml.safe_load(f)
     pcfg = PrepConfig.model_validate(data)
     
-    if pcfg.common.output is None:
-        pcfg.common.output = pcfg.common.input.parent
+    print (pcfg.common.working_dir)
+    print (pcfg.common.output_dir)
 
     return pcfg
