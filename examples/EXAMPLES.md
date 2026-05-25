@@ -59,3 +59,11 @@ Once the system files are generated, run Amber MD with:
 nexus md amber -c amber_md.yaml
 ```
 
+Molecular dynamics output can be analysis using the command:
+
+```bash
+nexus md analyze -p your.prmtop -t trajectory.nc -m ":1-198" -n name -o output_dir
+```
+
+Example outputs can be found in `examples/results/2BPW_analysis_output`. 2BPW is a HIV-1 protease-inhibitor complex, and was chosen for this example over DiAlanine because DiAlanine is too small to have meaningful protein analysis.
+

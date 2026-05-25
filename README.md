@@ -36,12 +36,18 @@ Other needed tools that have to be installed:
 - DOCK6: See [https://github.com/docking-org/dock6](https://github.com/docking-org/dock6)
 - ChimeraX: See [https://www.cgl.ucsf.edu/chimerax/download.html](https://www.cgl.ucsf.edu/chimerax/download.html)
 - Chimera: See [https://www.cgl.ucsf.edu/chimera/download.html](https://www.cgl.ucsf.edu/chimera/download.html) 
-
+- AMBER: See [https://ambermd.org/GetAmber.php](https://ambermd.org/GetAmber.php)
 Some librares are needed to be pointed at their installed directories:
 
 ```yaml
 chimerax: "/usr/local/chimerax/bin/ChimeraX"
 dock_home: "$HOME/Apps/dock6/"
+```
+
+AMBER has to be loaded in as a module, for example:
+
+```bash
+module load amber/24
 ```
 
 ## Running
