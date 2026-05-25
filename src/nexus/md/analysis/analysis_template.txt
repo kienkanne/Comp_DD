@@ -1,0 +1,61 @@
+parm $prmtop
+trajin $trajin
+
+autoimage
+strip :Na+,Cl-,WAT
+
+
+# RMS analysis
+rmsd first ${mask}@CA out rmsd_${name}.out
+atomicfluct out rmsf_bb_${name}.dat @CA,C,N byres
+
+
+# Hydrogen bonds analysis
+# --- Protein–Protein hydrogen bonds ---
+hbond ProtProt $mask out PP_hbvtime_${name}.dat avgout PP_avg_${name}.dat
+
+# --- Protein–Water hydrogen bonds ---
+hbond All $mask solventdonor :WAT solventacceptor :WAT@O out All_hbvtime_${name}.dat solvout PW_avg_${name}.dat bridgeout Bridge_avg_${name}.dat
+
+# --- Backbone-only protein hydrogen bonds ---
+hbond BB_Prot ${mask}@C,O,N,H avgout BB_avg_${name}.dat series uuseries BB_series_${name}.dat
+
+# --- Create time-series counts ---
+create PW_hbvtime_${name}.dat All[UV]
+create Bridge_hbvtime_${name}.dat All[Bridge]
+create BB_hbvtime_${name}.dat BB_Prot[UU]
+
+
+# Secondary structure analysis
+secstruct out ss_per_res_${name}.dat sumout summary_ss_${name}.dat totalout total_${name}.out
+
+
+# PCA analysis
+average @N,C,CA crdset trajaverage
+createcrd trajectory
+run
+
+crdaction trajectory rms ref trajaverage @N,C,CA
+crdaction trajectory matrix covar name covmatrix @N,C,CA
+runanalysis diagmatrix covmatrix out evecs.dat vecs 10 name eigenvectors \
+nmwiz nmwizvecs 10 nmwizfile normalmodes.nmd nmwizmask @N,C,CA
+
+crdaction trajectory projection modes eigenvectors beg 1 end 10 \
+@N,C,CA out pca_protein.dat
+
+
+# Clustering
+cluster c1 \
+ kmeans clusters 5 randompoint maxit 500 \
+ rms :1-198@C,N,O,CA,CB \
+ sieve 10 random \
+ out cnumvtime_${name}.dat \
+ summary summary_${name}.dat \
+ info info_${name}.dat \
+ cpopvtime cpopvtime_${name}.agr normframe \
+ repout rep_${name} repfmt pdb \
+ singlerepout singlerep_${name}.nc singlerepfmt netcdf \
+ avgout avg_${name} avgfmt pdb
+
+run
+quit

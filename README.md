@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Current package version: `2.0.0`.
+Current package version: `2.1.0`.
 
 This repository runs end-to-end computational workflows for drug discovery using YAML config files. It currently supports:
 
@@ -53,7 +53,10 @@ nexus dock vina -c build/sample_configs/sample_docking.yaml
 nexus dock dock6 -c build/sample_configs/sample_docking.yaml
 nexus prep sysmd -c examples/sysmd_config.yaml
 nexus md amber -c build/sample_configs/amber_md.yaml
+nexus md analyze -p /path/to/prmtop -t /path/to/trajin -m ":1-198" [-n analysis_name] [-o /path/to/output]
 ```
+
+The `nexus md analyze` command runs the full CPPTRAJ analysis workflow and writes RMSD/RMSF, hydrogen bond, secondary structure, PCA, and clustering outputs, plus a visualization notebook.
 
 Retrieve receptor assemblies and ligand SDFs directly from RCSB with the fetch command:
 

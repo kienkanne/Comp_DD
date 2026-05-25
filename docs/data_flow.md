@@ -25,7 +25,8 @@ This document explains the per-run data flow from inputs to final outputs.
 
 3. Pipeline orchestration
 
-   - CLI triggers one of the docking commands (`nexus dock vina`, `nexus dock dock6`), validation commands (`nexus validate vina`, `nexus validate dock6`), prep commands (`nexus prep rec`, `nexus prep mutate`, `nexus prep ligdock`, `nexus prep sysmd`), or MD commands (`nexus md amber`).
+   - CLI triggers one of the docking commands (`nexus dock vina`, `nexus dock dock6`), validation commands (`nexus validate vina`, `nexus validate dock6`), prep commands (`nexus prep rec`, `nexus prep mutate`, `nexus prep ligdock`, `nexus prep sysmd`), or MD commands (`nexus md amber`, `nexus md analyze`).
+   - `nexus md analyze` runs the full analysis workflow on an existing Amber trajectory and writes RMSD/RMSF, hydrogen bond, secondary structure, PCA, clustering outputs, and a visualization notebook.
    - Each pipeline executes a fixed sequence of stages:
      - Resolve or prepare ligands.
      - Prepare receptors (using pre-built bundles from `cfg.receptors.bundles`).

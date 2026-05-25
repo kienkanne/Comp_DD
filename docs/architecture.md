@@ -20,7 +20,8 @@ The high-level pipeline sequence is:
 - `nexus.cli.validate` — validation commands for `nexus validate vina` and `nexus validate dock6`.
 - `nexus.cli.fetch` — fetch commands for `nexus fetch rcsb`.
 - `nexus.cli.prep` — preparation commands for `nexus prep rec`, `nexus prep mutate`, `nexus prep ligdock`, and `nexus prep sysmd`.
-- `nexus.cli.md` — MD pipeline commands for `nexus md amber` (and openmm placeholder).
+- `nexus.cli.md` — MD pipeline commands for `nexus md amber`, `nexus md analyze`, and the openmm placeholder.
+- `nexus.md.analysis` — full CPPTRAJ analysis module and notebook generation.
 - `nexus.dock` — docking configuration and shared docking helpers.
 - `nexus.dock.vina` — Vina pipeline implementation.
 - `nexus.dock.dock6` — DOCK6 pipeline implementation.

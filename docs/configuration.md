@@ -15,8 +15,11 @@ nexus validate vina -c build/sample_configs/sample_docking.yaml
 nexus validate dock6 -c build/sample_configs/sample_docking.yaml
 nexus prep sysmd -c examples/sysmd_config.yaml
 nexus md amber -c build/sample_configs/amber_md.yaml
+nexus md analyze -p /path/to/prmtop -t /path/to/trajin -m ":1-198" [-n analysis_name] [-o /path/to/output]
 nexus fetch rcsb -c build/sample_configs/fetch_rcsb.yaml
 ```
+
+The `nexus md analyze` command runs the full CPPTRAJ analysis module on an existing Amber trajectory and writes RMSD/RMSF, hydrogen bond, secondary structure, PCA, and clustering outputs, plus a notebook for visualization.
 
 The `fetch` command downloads and cleans mmCIF receptor assemblies and SDF ligands from the RCSB API.
 
@@ -45,23 +48,22 @@ At config-load time, `validate_and_normalize_receptors()` normalizes these field
 
 ### Docking options
 
-- `vina` — `exhaustiveness`, `num_modes`, `cpu`, and `write_box`.
+- `vina` — `exhaustiveness`, `num_modes`, and `cpu`.
 - `dock6` — `max_orientations` and `radius`.
+
+For Vina, `cpu` controls the `--cpu` thread count passed to the Vina executable.
 
 The config loader attaches runtime-only objects to `cfg.common`: `logger`, `manifest`, and `runstate`. The CLI also sets `cfg.common.program` to `vina` or `dock6`. Receptor bundles are attached to `cfg.receptors.bundles` after validation and normalization.
 
-## Ligand Config
+## Ligand docking Preparation
 
-- `source: smiles` prepares ligands from a SMILES CSV.
-- `source: files` reads prepared ligands from a directory of files.
-- `source: existing` uses already-prepared ligand files.
-- `suffix` selects prepared ligand files by file suffix.
-- `prepare_tool: obabel` uses Open Babel and, for Vina, MGLTools.
-- `prepare_tool: meeko` uses RDKit/Meeko to produce PDBQT and converts to MOL2 with Open Babel for DOCK6.
+The `nexus prep ligdock` command prepares ligands for docking
+
+- `-i/--input` — path to a smiles CSV file, a sdf file, a directory with sdf files, or a list of paths.
+- `-s/--suffix` selects prepared ligand files by file suffix when `-i` is a directory
+- `-o/--output_dir` - path to output directory
 - Vina uses `.pdbqt` prepared ligand files.
 - DOCK6 uses `.mol2` prepared ligand files.
-
-See `build/sample_configs/sample_docking.yaml`, `examples/vina_config.yaml`, and `examples/dock6_config.yaml` for practical examples.
 
 ## Prep Config
 
@@ -89,9 +91,27 @@ The `nexus md amber` command loads an MD config with `load_md_config(path)`.
 - `min`, `heat`, `eq`, `prod` — stage-specific settings for minimization, heating, equilibration, and production.
 - `common.working_dir` / `common.results_dir` — working and results directories for MD outputs.
 
+## MD Analysis
+
+The `nexus md analyze` command runs the full CPPTRAJ analysis module from `src/nexus/md/analysis/full_analyze.py`.
+
+- `-p/--prmtop` — Amber topology file.
+- `-t/--trajin` — trajectory file.
+- `-m/--mask` — atom mask used for analysis.
+- `-n/--name` — optional analysis name; defaults to `prmtop.stem`.
+- `-o/--output-dir` — optional output directory; defaults to the current working directory.
+
+The analysis produces:
+
+- RMSD and RMSF summary data.
+- hydrogen bond analysis output.
+- secondary structure analysis output.
+- PCA and clustering data files.
+- a notebook copied to `Visual_<name>.ipynb` for analysis visualization.
+
 `nexus md openmm` currently exists as a placeholder command and is not implemented yet.
 
-## Validation Config
+## Validation Config (Currently disabled)
 
 Validation mode reuses the same unified docking config file, but the validation loader overwrites receptor and ligand inputs when `validation.data` is set.
 

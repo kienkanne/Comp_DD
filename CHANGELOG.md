@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.0
+- Added MD analysis support with `nexus md analyze`.
+- `nexus md analyze` runs the full CPPTRAJ analysis workflow on an existing Amber trajectory.
+- Generated outputs include RMSD/RMSF data, hydrogen bond analysis, secondary structure analysis, PCA, clustering, and a visualization notebook.
+- Added support for `--prmtop`, `--trajin`, `--mask`, optional `--name`, and optional `--output-dir` flags.
+
 ## 2.0.0
 - Added Amber MD support with `nexus md amber` and sample MD config at `build/sample_configs/amber_md.yaml`.
 - Added solvated system building for MD via `nexus prep sysmd` using AmberTools (`pdb4amber`, `antechamber`, `parmchk2`, `tleap`).

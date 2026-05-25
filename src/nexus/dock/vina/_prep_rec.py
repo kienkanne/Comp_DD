@@ -89,6 +89,7 @@ def _prep_rec(dcfg: DockConfig, receptor_bundle: VinaReceptorBundle):
         extra_configs = {
                     "exhaustiveness": exhaustiveness,
                     "num_modes": num_modes,
+                    "cpu": 1
                 }
         with open(vina_config, "a") as config_file:
             config_file.write("\n")
