@@ -170,7 +170,7 @@ from typing import List
 
 def dock6_prep_rec(dcfg) -> List[Dock6ReceptorBundle]:
     @main_tracker(dcfg, "Prepare receptor for DOCK6")
-    @python_parallel(dcfg.common.n_jobs, title="prep_rec()", skip=True)
+    @python_parallel(dcfg.common.n_jobs, logger=dcfg.common.logger, title="prep_rec()", skip=True)
     def _run():
         tasks = []
         bundles = getattr(dcfg.receptors, "bundles", None)

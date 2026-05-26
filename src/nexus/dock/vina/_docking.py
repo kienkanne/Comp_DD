@@ -43,7 +43,7 @@ def vina_docking(dcfg, prepped_ligs_or_pairs, prepped_rec=None, vina_config=None
     out_files = []
 
     @main_tracker(dcfg, "Batch docking with Vina")
-    @gnu_parallel(dcfg.common.n_jobs, title="vina_docking()")
+    @gnu_parallel(dcfg.common.n_jobs, logger=dcfg.common.logger, title="vina_docking()")
     def _run():
         nonlocal out_files
         out_files, cmds = _build_vina_docking_commands(dcfg, pairs)

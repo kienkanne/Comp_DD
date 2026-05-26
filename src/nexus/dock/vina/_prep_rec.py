@@ -112,7 +112,7 @@ from functools import partial
 
 def vina_prep_rec(dcfg):
     @main_tracker(dcfg, "Prepare receptor for Vina")
-    @python_parallel(dcfg.common.n_jobs, title="prep_rec()", skip=True)
+    @python_parallel(dcfg.common.n_jobs, logger=dcfg.common.logger, title="prep_rec()", skip=True)
     def _run():
         tasks = []
         bundles = getattr(dcfg.receptors, "bundles", None)

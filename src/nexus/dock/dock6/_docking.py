@@ -61,7 +61,7 @@ def dock6_docking(dcfg, pairs):
     out_files = []
 
     @main_tracker(dcfg, "Batch docking with DOCK6")
-    @gnu_parallel(dcfg.common.n_jobs, title="dock6_docking()", skip=True)
+    @gnu_parallel(dcfg.common.n_jobs, logger=dcfg.common.logger, title="dock6_docking()", skip=True)
     def _run():
         nonlocal out_files
         out_files, cmds = _build_dock6_docking_commands(dcfg, pairs)
