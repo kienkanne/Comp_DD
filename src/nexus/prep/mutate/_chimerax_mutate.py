@@ -118,9 +118,19 @@ def overwrite_pdb_residues(filename):
         
     with open(filename, 'w') as outfile:
         for line in lines:
+            # 1. Handle coordinate and termination lines with strict column slicing
             if line.startswith(("ATOM", "HETATM", "TER")):
                 res_name = line[17:20].strip()
                 if res_name in res_mapping:
                     standard_name = res_mapping[res_name]
                     line = line[:17] + f"{standard_name:<3}" + line[20:]
+            
+            # 2. Handle metadata lines (SEQRES, HELIX, SHEET, SSBOND, LINK, etc.)
+            else:
+                for amber_res, std_res in res_mapping.items():
+                    if amber_res in line:
+                        # Direct replacement works safely for metadata because standard 
+                        # and AMBER residue names are both exactly 3 characters long.
+                        line = line.replace(amber_res, std_res)
+                        
             outfile.write(line)

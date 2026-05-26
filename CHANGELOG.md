@@ -1,12 +1,14 @@
 # Changelog
 
+## 2.2.1
+- `nexus prep mutate` now only changes the protonation state while keeping standard residue names.
+- Added `metadata` field for docking and MD pipeline, allowing to store metadata that is dumped to a JSON file in results directory. Docking also stores csv file paths for each receptor.
+
 ## 2.2.0
 - Rewrote all documentations.
 - Fixed dock6 bugs on missing output docked poses.
 - Fixed MD final copy missing trajectory data.
 - Moved imports to inside functions, resolving the slow cli loading issue.
-- Added `metadata` field for docking and MD pipeline, allowing to store metadata that is dumped to a JSON file in results directory. Docking also stores csv file paths for each receptor.
-- `nexus prep mutate` now only changes the protonation state while keeping standard residue names.
 - Regenerated example outputs.
 
 ## 2.1.0
