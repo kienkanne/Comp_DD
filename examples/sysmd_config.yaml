@@ -1,5 +1,5 @@
 common:
-  input: /localscratch/kbui/NexusMol/examples/sysmd_input/6W63.pdb
+  input: /localscratch/kbui/NexusMol/examples/6W63.pdb
   working_dir: /localscratch/kbui/NexusMol/examples/artifacts
   output_dir: /localscratch/kbui/NexusMol/examples/results
 
@@ -7,12 +7,12 @@ sysmd:
   system_name: 6W63_mol4_solvated
 
   # Alternatively, we can choose to not include these to build a solvated receptor only with no ligands
-  ligand: /localscratch/kbui/NexusMol/examples/sysmd_input/6W63_mol4_prepared_scored.pdbqt
-  pose_num: 1
+  ligand: /localscratch/kbui/NexusMol/examples/6W63_mol4_prepared_scored.pdbqt
+  pose_num: 1 # Highest-scoring pose
 
-  force_field: "ff14SB"
-  water_model: "tip3p"
+  force_field: "ff19SB" # or "ff14SB" ...
+  water_model: "tip3p" # or "opc" ...
 
-  box_type: "Oct"
+  box_type: "Oct" # or "Box" ...
   box_size: 12.0
   salt_conc: 0.15  

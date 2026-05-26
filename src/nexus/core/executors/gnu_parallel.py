@@ -12,7 +12,9 @@ def gnu_parallel(n_jobs=1, logger=None, title=None, skip=False):
             local_title = title if title is not None else ""
             
             # 1. Use your safe local scratch location to bypass /tmp lockouts
-            scratch_tmp = "/localscratch/kbui/tmp"
+
+            scratch_tmp = tempfile.gettempdir()
+            scratch_tmp = str(Path(scratch_tmp).expanduser())
             
             # Initialize to None so the finally block can safely inspect it
             joblog_path = None 

@@ -36,6 +36,7 @@ def _strip_queries(mol):
 from pathlib import Path
 from rdkit import Chem
 
+### TODO: Currently load_sdf only loads in the first mol if the sdf contains multiple molecules
 def _load_sdf(file_path):
     name = Path(file_path).stem
 

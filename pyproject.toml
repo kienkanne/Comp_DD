@@ -4,8 +4,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nexus"
-version = "2.1.0"
-dependencies = ["rcsb-api"]
+version = "2.2.0"
+dependencies = [
+  "rcsb-api",
+  "typer",
+  "pyyaml",
+  "pydantic",
+]
+
+[tool.setuptools.package-data]
+nexus = ["**/*.txt", "**/*.com", "**/templates/*.py", "**/*.ipynb"]
 
 [project.scripts]
 nexus = "nexus.cli.main:main"
@@ -15,6 +23,3 @@ test = ["pytest>=8.0"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
-
-[tool.setuptools.package-data]
-nexus = ["**/*.txt", "**/*.com", "**/templates/*.py"]

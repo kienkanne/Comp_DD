@@ -59,6 +59,7 @@ atom_model                                                   all
 vdw_defn_file                                                $dock_home/parameters/vdw_AMBER_parm99.defn
 flex_defn_file                                               $dock_home/parameters/flex.defn
 flex_drive_file                                              $dock_home/parameters/flex_drive.tbl
+ligand_outfile_prefix                                        $output_path_prefix
 write_mol_solvation                                          no
 write_orientations                                           no
 num_final_scored_poses                                       16

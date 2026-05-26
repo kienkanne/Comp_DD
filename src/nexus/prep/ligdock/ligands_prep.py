@@ -8,7 +8,6 @@ from nexus.prep.ligdock._parse_csv import _parse_ligands_csv
 from nexus.prep.prep_config import PrepConfig
 
 def ligands_prep(pcfg: PrepConfig):
-    #@main_tracker(pcfg, "Prepare ligands")
     def _run():
         output_dir = pcfg.common.output_dir
         suffix = pcfg.common.suffix

@@ -86,7 +86,7 @@ def final_copy(dcfg, rec_bundles, docking_summary, out_files):
 
             # copy all receptors and configs into details
             for item in rec_bundles:
-                rec_path = rec_bundles.receptor
+                rec_path = item.receptor
                 if rec_path.exists():
                     shutil.copy2(rec_path, details / rec_path.name)
                 # possible config fields

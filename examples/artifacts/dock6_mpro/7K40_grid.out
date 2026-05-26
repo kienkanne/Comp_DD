@@ -11,7 +11,7 @@
 University of California at San Francisco, DOCK 4.0.1
 
 __________________Job_Information_________________
-launch_time                    Mon May 25 00:17:39 2026
+launch_time                    Mon May 25 23:27:44 2026
 host_name                      unknown
 memory_limit                   -1
 working_directory              /localscratch/kbui/NexusMol/examples
@@ -50,10 +50,10 @@ Reading in coordinates of receptor.
 Total charge on 7K40.pdb                :    0.000
 
 Reading in grid box information.
-Box center of mass                      :   10.880  -32.716   20.877
-Box dimensions                          :   35.108   21.399   31.443
-Number of grid points per side [x y z]  :      119       73      106
-Total number of grid points             :   920822
+Box center of mass                      :   10.880  -25.537   18.857
+Box dimensions                          :   35.108   35.758   35.483
+Number of grid points per side [x y z]  :      119      121      120
+Total number of grid points             :  1727880
 
 Generating scoring grids.
 Percent of protein atoms processed      :        0

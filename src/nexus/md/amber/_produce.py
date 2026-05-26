@@ -70,10 +70,11 @@ def produce(mcfg: MDConfig, prmtop: Path, last_eq_ncrst: Path) -> None:
             ncrst = working_dir / f"seed{i}.ncrst"
             _run_pmemd(prod_input, prmtop, ncrst, working_dir, f"prod{i}")
 
+            prod_nc = Path(working_dir) / f"prod{i}.nc"
             prod_ncrst = Path(working_dir) / f"prod{i}.ncrst"
             prod_out = Path(working_dir) / f"prod{i}.out"
 
-            outputs.append((prod_ncrst, prod_out))
+            outputs.append((prod_nc, prod_ncrst, prod_out))
 
             logger = mcfg.common.logger
             logger.info(f"Finished full run with seed {i}")

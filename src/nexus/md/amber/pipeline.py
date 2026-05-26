@@ -6,7 +6,7 @@ from nexus.md.amber._minimize import minimize
 from nexus.md.amber._heat import heat
 from nexus.md.amber._equilibrate import equilibrate
 from nexus.md.amber._produce import produce
-from nexus.md.amber._copy_to_results import copy_to_results
+from nexus.md.amber._final_copy import copy_to_results
 
 
 class AmberPipeline(BaseModel):

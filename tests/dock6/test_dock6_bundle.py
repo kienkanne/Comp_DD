@@ -25,12 +25,18 @@ def test_dock6_docking_builds_commands_with_receptor_bundle(tmp_path, monkeypatc
     receptor = Dock6ReceptorBundle(
         receptor=Path("rec1_prepped.mol2"),
         selected_spheres=Path("rec1_selected_spheres.sph"),
+        grid_prefix=tmp_path / "rec1_grid",
+        pocket=Path("rec1_pocket.mol2"),
         name="rec1",
     )
     ligand = Path("ligA_prepped.mol2")
 
     out_files, cmds = _build_dock6_docking_commands(cfg, [(receptor, ligand)])
 
-    assert out_files == ["rec1_ligA_scored.mol2"]
+    assert out_files == [tmp_path / "rec1_ligA_prepped_scored.mol2"]
     assert str(cfg.libs.dock_home / "bin" / "dock6") == str(cmds[0][0])
-    assert f"flex_rec1_ligA.in" in cmds[0]
+    assert tmp_path / "flex_rec1_ligA_prepped.in" in cmds[0]
+    assert tmp_path / "rec1_ligA_prepped.dock6.out" in cmds[0]
+
+    flex_text = (tmp_path / "flex_rec1_ligA_prepped.in").read_text()
+    assert f"ligand_outfile_prefix                                        {tmp_path / 'rec1_ligA_prepped'}" in flex_text

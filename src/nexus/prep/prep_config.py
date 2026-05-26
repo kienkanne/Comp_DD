@@ -26,10 +26,9 @@ class MutateConfig(BaseModel):
     mutations: Optional[List[str]] = None
 
 class LigdockConfig(BaseModel):
-    source: Optional[Literal["smiles", "csv"]] = "smiles"
     n_jobs: Optional[int] = 1
-    type: Optional[Literal["GAFF", "AM1-BCC"]] = "GAFF"
-
+    model_config = ConfigDict(extra='allow')
+    
 class SysmdConfig(BaseModel):
     system_name: Optional[str] = None
     ligand: Optional[Path] = None

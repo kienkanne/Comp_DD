@@ -22,7 +22,7 @@ class CommonConfig(BaseModel):
 class MinConfig(BaseModel):
     n_min_runs: Optional[int] = 7
     ncyc: Optional[int] = 1000
-    maxcyc: Optional[int] = 1000
+    maxcyc: Optional[int] = 5000
     restraints: Optional[List[float]] = [10.0, 5.0, 2.0, 1.0, 0.5, 0.1, 0.0]
 
 

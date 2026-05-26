@@ -14,13 +14,13 @@ write_growth_tree                                            no
 use_internal_energy                                          yes
 internal_energy_rep_exp                                      12
 internal_energy_cutoff                                       100.0
-ligand_atom_file                                             /localscratch/kbui/NexusMol/examples/dock6_prepared_ligands/aspirin_prepared.mol2
+ligand_atom_file                                             /localscratch/kbui/NexusMol/examples/ligands/dock6/aspirin_prepared.mol2
 limit_max_ligands                                            no
 skip_molecule                                                no
 read_mol_solvation                                           no
 calculate_rmsd                                               yes
 use_rmsd_reference_mol                                       yes
-rmsd_reference_filename                                      /localscratch/kbui/NexusMol/examples/dock6_prepared_ligands/aspirin_prepared.mol2
+rmsd_reference_filename                                      /localscratch/kbui/NexusMol/examples/ligands/dock6/aspirin_prepared.mol2
 use_database_filter                                          no
 orient_ligand                                                yes
 automated_matching                                           yes
@@ -59,7 +59,7 @@ atom_model                                                   all
 vdw_defn_file                                                /localscratch/kbui/Apps/dock6/parameters/vdw_AMBER_parm99.defn
 flex_defn_file                                               /localscratch/kbui/Apps/dock6/parameters/flex.defn
 flex_drive_file                                              /localscratch/kbui/Apps/dock6/parameters/flex_drive.tbl
-ligand_outfile_prefix                                        output
+ligand_outfile_prefix                                        /localscratch/kbui/NexusMol/examples/artifacts/dock6_mpro/6W63_aspirin_prepared
 write_mol_solvation                                          no
 write_orientations                                           no
 num_final_scored_poses                                       16

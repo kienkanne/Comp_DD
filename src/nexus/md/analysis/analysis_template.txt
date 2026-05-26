@@ -47,7 +47,7 @@ crdaction trajectory projection modes eigenvectors beg 1 end 10 \
 # Clustering
 cluster c1 \
  kmeans clusters 5 randompoint maxit 500 \
- rms :1-198@C,N,O,CA,CB \
+ rms ${mask}@C,N,O,CA,CB \
  sieve 10 random \
  out cnumvtime_${name}.dat \
  summary summary_${name}.dat \

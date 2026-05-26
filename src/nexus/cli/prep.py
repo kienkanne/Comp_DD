@@ -1,7 +1,6 @@
 import typer
 from typing import Optional, Literal, Annotated, List
 from pathlib import Path
-from nexus.prep.prep_config import load_prep_config, PrepConfig
 
 
 app = typer.Typer(help="Run protein and ligand preparation pipelines")
@@ -13,7 +12,8 @@ OutputOpt = Annotated[Optional[Path], typer.Option("-o", "--output_dir", help="O
 SuffixOpt = Annotated[Optional[str], typer.Option("-s", "--suffix", help="Suffix of output file(s)")]
 
 
-def merge_cli_overrides(pcfg: PrepConfig, common_flags: dict, unique_key: str, unique_flags: dict) -> PrepConfig:
+def merge_cli_overrides(pcfg, common_flags: dict, unique_key: str, unique_flags: dict):
+    from nexus.prep.prep_config import PrepConfig
     """Helper function to handle your Pydantic deep merging"""
     cli_overrides = {
         "common": {k: v for k, v in common_flags.items() if v is not None},
@@ -33,6 +33,7 @@ def rec(
 ):
     """Run the protein cleaning preparation with ChimeraX pipeline.
     If the input is a folder, all files with '.cif' and '.pdb' are searched to be processed"""
+    from nexus.prep.prep_config import load_prep_config, PrepConfig
     pcfg = load_prep_config(config) if (config and config.exists()) else PrepConfig()
     
     pcfg = merge_cli_overrides(
@@ -53,6 +54,7 @@ def mutate(
 ):
     """Change residues identity or protonation state using ChimeraX.
     If the input is a folder, all files with '.cif' and '.pdb' are searched to be processed"""
+    from nexus.prep.prep_config import load_prep_config, PrepConfig
     pcfg = load_prep_config(config) if (config and config.exists()) else PrepConfig()
 
     pcfg = merge_cli_overrides(
@@ -69,16 +71,17 @@ def mutate(
 @app.command()
 def ligdock(
     config: ConfigOpt = None, input: InputOpt = None, output_dir: OutputOpt = None, suffix: SuffixOpt = None,
-    ctype: Optional[Literal["GAFF", "AM1-BCC"]] = typer.Option("GAFF", "-t", "--ctype", help="Charge type for ligands (wip)")
+    n_jobs: Optional[int] = typer.Option(1, "-n", "--n-jobs", help="Number of ligand preparation jobs to run in paralllel")
 ):
     """Prepare ligands for docking from SMILES or SDF input."""
+    from nexus.prep.prep_config import load_prep_config, PrepConfig
     pcfg = load_prep_config(config) if (config and config.exists()) else PrepConfig()
     
     pcfg = merge_cli_overrides(
         pcfg, 
         {"input": input, "output_dir": output_dir, "suffix": suffix}, 
         unique_key="ligdock", 
-        unique_flags={"type": ctype}
+        unique_flags={"n_jobs": n_jobs}
     )
     
     from nexus.prep.ligdock.pipeline import LigdockPipeline
@@ -90,6 +93,7 @@ def sysmd(config: ConfigOpt = None):
     """
     Build solvated system for molecular dynamics from prepared receptor and docked ligand or ligand from crystal structure using AmberTools.
     """
+    from nexus.prep.prep_config import load_prep_config
     if (config and config.exists()):
         pcfg = load_prep_config(config)
     else:

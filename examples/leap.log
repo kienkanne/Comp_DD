@@ -1,8 +1,8 @@
-log started: Mon May 25 11:22:14 2026
+log started: Mon May 25 22:48:17 2026
 
 Log file: ./leap.log
 >> #
->> # ----- leaprc for loading the ff14SB force field
+>> # ----- leaprc for loading the ff19SB force field
 >> # ----- NOTE: this is designed for PDB format 3!
 >> #
 >> #	load atom type hybridizations
@@ -29,6 +29,7 @@ Log file: ./leap.log
 >> 	{ "OW"  "O" "sp3" }
 >> 	{ "CT"  "C" "sp3" }
 >> 	{ "CX"  "C" "sp3" }
+>> 	{ "XC"  "C" "sp3" }
 >> 	{ "C8"  "C" "sp3" }
 >> 	{ "2C"  "C" "sp3" }
 >> 	{ "3C"  "C" "sp3" }
@@ -81,20 +82,23 @@ Log file: ./leap.log
 >> #
 >> #	Load the main parameter set.
 >> #
->> parm10 = loadamberparams parm10.dat
-Loading parameters: /usr/local/amber24/dat/leap/parm/parm10.dat
+>> set default cmap on
+>> parm19 = loadamberparams parm19.dat
+Loading parameters: /usr/local/amber24/dat/leap/parm/parm19.dat
 Reading title:
-PARM99 + frcmod.ff99SB + frcmod.parmbsc0 + OL3 for RNA
->> frcmod14SB = loadamberparams frcmod.ff14SB
-Loading parameters: /usr/local/amber24/dat/leap/parm/frcmod.ff14SB
+PARM99 + frcmod.ff99SB + frcmod.parmbsc0 + OL3 for RNA + ff19SB
+(UNKNOWN ATOM TYPE: Zn)
+(UNKNOWN ATOM TYPE: EP)
+>> frcmod19SB = loadamberparams frcmod.ff19SB
+Loading parameters: /usr/local/amber24/dat/leap/parm/frcmod.ff19SB
 Reading force field modification type file (frcmod)
 Reading title:
-ff14SB protein backbone and sidechain parameters
+ff19SB AA-specific backbone CMAPs for protein 07/25/2019
 >> #
 >> #	Load main chain and terminating amino acid libraries
 >> #
->> loadOff amino12.lib
-Loading library: /usr/local/amber24/dat/leap/lib/amino12.lib
+>> loadOff amino19.lib
+Loading library: /usr/local/amber24/dat/leap/lib/amino19.lib
 Loading: ALA
 Loading: ARG
 Loading: ASH
@@ -182,7 +186,7 @@ Loading: NVAL
 >> #	Define the PDB name map for the amino acids
 >> #
 >> addPdbResMap {
->>   { 0 "HYP" "HYP" } { 1 "HYP" "CHYP" }
+>>   { 0 "HYP" "NHYP" } { 1 "HYP" "CHYP" }
 >>   { 0 "ALA" "NALA" } { 1 "ALA" "CALA" }
 >>   { 0 "ARG" "NARG" } { 1 "ARG" "CARG" }
 >>   { 0 "ASN" "NASN" } { 1 "ASN" "CASN" }
@@ -426,7 +430,7 @@ Li/Merz ion parameters of divalent to tetravalent ions for TIP3P water model (12
 ----- Source: /usr/local/amber24/dat/leap/cmd/leaprc.gaff2
 ----- Source of /usr/local/amber24/dat/leap/cmd/leaprc.gaff2 done
 >> logFile leap.log
-log started: Mon May 25 11:22:14 2026
+log started: Mon May 25 22:48:17 2026
 
 Log file: ./leap.log
 >> #
@@ -565,7 +569,7 @@ Reading title:
 Remark line goes here
 > LIG = loadmol2 /localscratch/kbui/NexusMol/examples/artifacts/6W63_mol4_solvated/6W63_mol4_prepared_scored_pose_1_with_H_charged.mol2
 Loading Mol2 file: /localscratch/kbui/NexusMol/examples/artifacts/6W63_mol4_solvated/6W63_mol4_prepared_scored_pose_1_with_H_charged.mol2
-Reading MOLECULE named /localscratch/kbui/NexusMol/examples/sysmd_input/6W63_mol4_prepared_scored.pdbqt
+Reading MOLECULE named /localscratch/kbui/NexusMol/examples/6W63_mol4_prepared_scored.pdbqt
 > SYS = combine {REC LIG}
   Sequence: default_name
   Sequence: /localscratch/kbui/NexusMol/exa
@@ -582,14 +586,14 @@ The number of boxes:  x= 7  y= 7  z= 7
 > addIonsRand SYS Na+ 0
 8 Na+ ions required to neutralize.
 Adding 8 counter ions to "SYS". 20070 solvent molecules will remain.
-0: Placed Na+ in SYS at (-19.48, 32.27, 12.02).
-0: Placed Na+ in SYS at (-33.17, 31.71, 19.41).
-0: Placed Na+ in SYS at (-19.13, 13.06, -54.79).
-0: Placed Na+ in SYS at (-18.68, 16.86, -13.19).
-0: Placed Na+ in SYS at (-41.18, 34.28, -14.72).
-0: Placed Na+ in SYS at (-9.17, -54.67, 2.74).
-0: Placed Na+ in SYS at (-27.09, 28.42, 26.74).
-0: Placed Na+ in SYS at (23.24, -29.53, 44.57).
+0: Placed Na+ in SYS at (0.63, 0.82, -48.80).
+0: Placed Na+ in SYS at (32.54, -13.05, -46.41).
+0: Placed Na+ in SYS at (-3.47, 34.62, -28.58).
+0: Placed Na+ in SYS at (-17.82, -50.41, 22.59).
+0: Placed Na+ in SYS at (-43.27, 8.83, 32.63).
+0: Placed Na+ in SYS at (-29.24, -43.29, 22.87).
+0: Placed Na+ in SYS at (41.53, 29.14, 5.36).
+0: Placed Na+ in SYS at (-27.51, 7.52, -53.08).
 > addIonsRand SYS Cl- 0
  0.002997 0 1 0
 0 Cl- ion required to neutralize.
@@ -630,11 +634,11 @@ Marking per-residue atom chain types.
 	Quit
 
 Exiting LEaP: Errors = 0; Warnings = 1; Notes = 0.
-log started: Mon May 25 11:22:15 2026
+log started: Mon May 25 22:48:18 2026
 
 Log file: ./leap.log
 >> #
->> # ----- leaprc for loading the ff14SB force field
+>> # ----- leaprc for loading the ff19SB force field
 >> # ----- NOTE: this is designed for PDB format 3!
 >> #
 >> #	load atom type hybridizations
@@ -661,6 +665,7 @@ Log file: ./leap.log
 >> 	{ "OW"  "O" "sp3" }
 >> 	{ "CT"  "C" "sp3" }
 >> 	{ "CX"  "C" "sp3" }
+>> 	{ "XC"  "C" "sp3" }
 >> 	{ "C8"  "C" "sp3" }
 >> 	{ "2C"  "C" "sp3" }
 >> 	{ "3C"  "C" "sp3" }
@@ -713,20 +718,23 @@ Log file: ./leap.log
 >> #
 >> #	Load the main parameter set.
 >> #
->> parm10 = loadamberparams parm10.dat
-Loading parameters: /usr/local/amber24/dat/leap/parm/parm10.dat
+>> set default cmap on
+>> parm19 = loadamberparams parm19.dat
+Loading parameters: /usr/local/amber24/dat/leap/parm/parm19.dat
 Reading title:
-PARM99 + frcmod.ff99SB + frcmod.parmbsc0 + OL3 for RNA
->> frcmod14SB = loadamberparams frcmod.ff14SB
-Loading parameters: /usr/local/amber24/dat/leap/parm/frcmod.ff14SB
+PARM99 + frcmod.ff99SB + frcmod.parmbsc0 + OL3 for RNA + ff19SB
+(UNKNOWN ATOM TYPE: Zn)
+(UNKNOWN ATOM TYPE: EP)
+>> frcmod19SB = loadamberparams frcmod.ff19SB
+Loading parameters: /usr/local/amber24/dat/leap/parm/frcmod.ff19SB
 Reading force field modification type file (frcmod)
 Reading title:
-ff14SB protein backbone and sidechain parameters
+ff19SB AA-specific backbone CMAPs for protein 07/25/2019
 >> #
 >> #	Load main chain and terminating amino acid libraries
 >> #
->> loadOff amino12.lib
-Loading library: /usr/local/amber24/dat/leap/lib/amino12.lib
+>> loadOff amino19.lib
+Loading library: /usr/local/amber24/dat/leap/lib/amino19.lib
 Loading: ALA
 Loading: ARG
 Loading: ASH
@@ -814,7 +822,7 @@ Loading: NVAL
 >> #	Define the PDB name map for the amino acids
 >> #
 >> addPdbResMap {
->>   { 0 "HYP" "HYP" } { 1 "HYP" "CHYP" }
+>>   { 0 "HYP" "NHYP" } { 1 "HYP" "CHYP" }
 >>   { 0 "ALA" "NALA" } { 1 "ALA" "CALA" }
 >>   { 0 "ARG" "NARG" } { 1 "ARG" "CARG" }
 >>   { 0 "ASN" "NASN" } { 1 "ASN" "CASN" }
@@ -1058,7 +1066,7 @@ Li/Merz ion parameters of divalent to tetravalent ions for TIP3P water model (12
 ----- Source: /usr/local/amber24/dat/leap/cmd/leaprc.gaff2
 ----- Source of /usr/local/amber24/dat/leap/cmd/leaprc.gaff2 done
 >> logFile leap.log
-log started: Mon May 25 11:22:15 2026
+log started: Mon May 25 22:48:18 2026
 
 Log file: ./leap.log
 >> #
@@ -1197,7 +1205,7 @@ Reading title:
 Remark line goes here
 > LIG = loadmol2 /localscratch/kbui/NexusMol/examples/artifacts/6W63_mol4_solvated/6W63_mol4_prepared_scored_pose_1_with_H_charged.mol2
 Loading Mol2 file: /localscratch/kbui/NexusMol/examples/artifacts/6W63_mol4_solvated/6W63_mol4_prepared_scored_pose_1_with_H_charged.mol2
-Reading MOLECULE named /localscratch/kbui/NexusMol/examples/sysmd_input/6W63_mol4_prepared_scored.pdbqt
+Reading MOLECULE named /localscratch/kbui/NexusMol/examples/6W63_mol4_prepared_scored.pdbqt
 > SYS = combine {REC LIG}
   Sequence: default_name
   Sequence: /localscratch/kbui/NexusMol/exa
@@ -1214,163 +1222,163 @@ The number of boxes:  x= 7  y= 7  z= 7
 > addIonsRand SYS Na+ 0
 8 Na+ ions required to neutralize.
 Adding 8 counter ions to "SYS". 20070 solvent molecules will remain.
-0: Placed Na+ in SYS at (-27.13, -11.31, 17.50).
-0: Placed Na+ in SYS at (13.94, 46.06, -20.76).
-0: Placed Na+ in SYS at (31.16, -24.22, -40.92).
-0: Placed Na+ in SYS at (42.46, 1.23, 15.87).
-0: Placed Na+ in SYS at (25.19, -42.77, 21.89).
-0: Placed Na+ in SYS at (-35.76, 15.78, -6.72).
-0: Placed Na+ in SYS at (-5.10, 12.15, 42.57).
-0: Placed Na+ in SYS at (47.12, -24.05, -2.49).
+0: Placed Na+ in SYS at (2.86, -12.21, -36.45).
+0: Placed Na+ in SYS at (48.33, -14.34, -5.08).
+0: Placed Na+ in SYS at (5.01, 7.52, 26.57).
+0: Placed Na+ in SYS at (31.14, -32.18, 15.97).
+0: Placed Na+ in SYS at (-20.22, 7.71, -36.39).
+0: Placed Na+ in SYS at (26.88, -10.52, 44.25).
+0: Placed Na+ in SYS at (0.63, 46.80, 30.85).
+0: Placed Na+ in SYS at (-0.58, -18.15, -11.20).
 > addIonsRand SYS Cl- 0
  0.002997 0 1 0
 0 Cl- ion required to neutralize.
 > addIonsRand SYS Na+ 71
 Adding 71 counter ions to "SYS". 19999 solvent molecules will remain.
-0: Placed Na+ in SYS at (-0.81, 20.56, -20.88).
-0: Placed Na+ in SYS at (-25.02, -20.71, -33.21).
-0: Placed Na+ in SYS at (14.89, 56.95, 13.28).
-0: Placed Na+ in SYS at (18.44, -45.54, -6.72).
-0: Placed Na+ in SYS at (5.01, -38.47, 0.02).
-0: Placed Na+ in SYS at (-22.79, 0.47, -43.72).
-0: Placed Na+ in SYS at (45.32, -4.09, 16.35).
-0: Placed Na+ in SYS at (-18.96, 18.49, -33.54).
-0: Placed Na+ in SYS at (-7.22, 22.67, 39.77).
-0: Placed Na+ in SYS at (28.22, -4.22, 15.41).
-0: Placed Na+ in SYS at (-46.98, 35.62, 20.46).
-0: Placed Na+ in SYS at (9.62, -34.57, 25.02).
-0: Placed Na+ in SYS at (15.40, -7.87, 38.27).
-0: Placed Na+ in SYS at (-33.47, -20.23, 11.15).
-0: Placed Na+ in SYS at (-16.66, 1.16, 44.55).
-0: Placed Na+ in SYS at (-6.04, 38.69, -4.63).
-0: Placed Na+ in SYS at (0.12, 40.05, -3.14).
-0: Placed Na+ in SYS at (-0.56, -2.49, 35.25).
-0: Placed Na+ in SYS at (-7.79, 29.07, 42.33).
-0: Placed Na+ in SYS at (-15.67, -12.77, -33.68).
-0: Placed Na+ in SYS at (32.04, -2.60, -48.87).
-0: Placed Na+ in SYS at (1.70, -37.92, -5.24).
-0: Placed Na+ in SYS at (9.57, -46.26, 11.87).
-0: Placed Na+ in SYS at (-40.36, 30.66, 27.79).
-0: Placed Na+ in SYS at (-31.25, 12.71, -32.25).
-0: Placed Na+ in SYS at (0.07, -51.99, -12.20).
-0: Placed Na+ in SYS at (5.57, -18.76, 45.45).
-0: Placed Na+ in SYS at (-30.85, 29.64, -37.08).
-0: Placed Na+ in SYS at (-11.47, 41.53, 24.91).
-0: Placed Na+ in SYS at (-22.79, 23.46, -3.90).
-0: Placed Na+ in SYS at (-21.59, 39.49, -20.47).
-0: Placed Na+ in SYS at (15.25, -31.56, -23.16).
-0: Placed Na+ in SYS at (-36.58, 25.30, -12.46).
-0: Placed Na+ in SYS at (3.91, 47.55, -10.27).
-0: Placed Na+ in SYS at (12.66, -43.88, -22.08).
-0: Placed Na+ in SYS at (41.51, 27.70, 20.14).
-0: Placed Na+ in SYS at (8.42, -0.08, -50.42).
-0: Placed Na+ in SYS at (-10.69, 10.51, -56.19).
-0: Placed Na+ in SYS at (42.86, 19.36, -21.65).
-0: Placed Na+ in SYS at (24.96, 33.36, -30.23).
-0: Placed Na+ in SYS at (34.50, 10.41, 36.17).
-0: Placed Na+ in SYS at (-36.11, 7.49, -34.49).
-0: Placed Na+ in SYS at (18.78, -34.74, 22.59).
-0: Placed Na+ in SYS at (0.97, 4.22, 52.56).
-0: Placed Na+ in SYS at (-16.11, -49.41, -7.65).
-0: Placed Na+ in SYS at (-17.86, 30.17, 37.97).
-0: Placed Na+ in SYS at (14.14, -3.29, 55.47).
-0: Placed Na+ in SYS at (27.00, 12.44, 9.85).
-0: Placed Na+ in SYS at (-41.12, -23.82, -6.94).
-0: Placed Na+ in SYS at (21.77, 8.83, 32.63).
-0: Placed Na+ in SYS at (-20.64, -33.39, 0.69).
-0: Placed Na+ in SYS at (12.66, 36.99, -17.46).
-0: Placed Na+ in SYS at (1.40, 40.53, -32.63).
-0: Placed Na+ in SYS at (-25.30, -2.70, -45.92).
-0: Placed Na+ in SYS at (16.57, -23.60, -37.08).
-0: Placed Na+ in SYS at (-31.89, -45.17, 4.30).
-0: Placed Na+ in SYS at (-25.61, 33.29, -37.55).
-0: Placed Na+ in SYS at (-31.67, -16.67, -30.93).
-0: Placed Na+ in SYS at (-39.44, -5.06, -29.49).
-0: Placed Na+ in SYS at (36.03, -4.45, -44.49).
-0: Placed Na+ in SYS at (2.69, 45.38, 11.64).
-0: Placed Na+ in SYS at (-45.66, 7.99, 21.54).
-0: Placed Na+ in SYS at (10.24, 19.45, 34.32).
-0: Placed Na+ in SYS at (8.72, 38.08, -2.24).
-0: Placed Na+ in SYS at (20.13, -18.61, -37.89).
-0: Placed Na+ in SYS at (-11.74, -6.43, 2.59).
-0: Placed Na+ in SYS at (0.97, 50.21, -0.54).
-0: Placed Na+ in SYS at (43.21, -12.73, 15.87).
-0: Placed Na+ in SYS at (-19.44, -16.16, 32.88).
-0: Placed Na+ in SYS at (23.50, -5.56, -35.35).
-0: Placed Na+ in SYS at (-2.31, 0.32, 34.81).
+0: Placed Na+ in SYS at (5.20, 27.81, 30.97).
+0: Placed Na+ in SYS at (-27.19, -41.21, 23.12).
+0: Placed Na+ in SYS at (-23.51, 29.14, -21.19).
+0: Placed Na+ in SYS at (-43.99, -4.46, -1.64).
+0: Placed Na+ in SYS at (38.42, -21.54, 24.07).
+0: Placed Na+ in SYS at (-46.97, -13.37, -10.74).
+0: Placed Na+ in SYS at (7.24, -46.16, 31.88).
+0: Placed Na+ in SYS at (-45.56, -24.55, 22.92).
+0: Placed Na+ in SYS at (-33.40, 18.64, 20.06).
+0: Placed Na+ in SYS at (-30.19, 20.08, 6.90).
+0: Placed Na+ in SYS at (-7.07, 37.27, 24.06).
+0: Placed Na+ in SYS at (-8.52, -41.24, -19.65).
+0: Placed Na+ in SYS at (-43.34, -5.39, -33.14).
+0: Placed Na+ in SYS at (-47.66, 3.45, 2.13).
+0: Placed Na+ in SYS at (32.31, -20.29, 29.97).
+0: Placed Na+ in SYS at (36.67, 17.60, 8.27).
+0: Placed Na+ in SYS at (-27.13, -34.31, -22.33).
+0: Placed Na+ in SYS at (-41.12, -0.83, -20.22).
+0: Placed Na+ in SYS at (38.86, 32.23, -15.64).
+0: Placed Na+ in SYS at (-4.34, 47.79, -2.84).
+0: Placed Na+ in SYS at (3.40, -37.34, -38.01).
+0: Placed Na+ in SYS at (-22.95, -0.27, -41.23).
+0: Placed Na+ in SYS at (34.48, -19.42, 16.35).
+0: Placed Na+ in SYS at (43.81, 8.31, -20.31).
+0: Placed Na+ in SYS at (-2.11, 14.67, -39.56).
+0: Placed Na+ in SYS at (-15.93, 39.76, -12.88).
+0: Placed Na+ in SYS at (-2.42, 45.32, 4.47).
+0: Placed Na+ in SYS at (-16.29, 4.02, 44.05).
+0: Placed Na+ in SYS at (-12.68, -48.95, -6.41).
+0: Placed Na+ in SYS at (-17.12, -7.87, 38.27).
+0: Placed Na+ in SYS at (-44.44, 8.73, -25.00).
+0: Placed Na+ in SYS at (29.18, -20.69, -27.84).
+0: Placed Na+ in SYS at (48.00, -16.75, 14.17).
+0: Placed Na+ in SYS at (-15.67, -12.77, 19.43).
+0: Placed Na+ in SYS at (32.58, 37.25, 21.36).
+0: Placed Na+ in SYS at (-23.79, 30.00, 13.54).
+0: Placed Na+ in SYS at (-4.30, -50.21, -11.14).
+0: Placed Na+ in SYS at (13.37, -8.45, -48.02).
+0: Placed Na+ in SYS at (-21.83, -12.73, 42.42).
+0: Placed Na+ in SYS at (-41.18, 11.29, -27.99).
+0: Placed Na+ in SYS at (29.52, 26.88, 19.36).
+0: Placed Na+ in SYS at (-9.57, 43.36, -5.70).
+0: Placed Na+ in SYS at (-46.29, -29.68, 22.75).
+0: Placed Na+ in SYS at (19.74, -22.42, 38.78).
+0: Placed Na+ in SYS at (-20.27, -1.35, -28.00).
+0: Placed Na+ in SYS at (-37.20, -35.90, 0.30).
+0: Placed Na+ in SYS at (27.84, -12.91, -39.53).
+0: Placed Na+ in SYS at (-42.51, -9.01, 8.89).
+0: Placed Na+ in SYS at (-8.27, 42.87, 16.57).
+0: Placed Na+ in SYS at (10.28, 35.84, -4.58).
+0: Placed Na+ in SYS at (-6.01, -52.29, -16.12).
+0: Placed Na+ in SYS at (31.92, 4.12, -45.34).
+0: Placed Na+ in SYS at (42.78, 20.17, 28.62).
+0: Placed Na+ in SYS at (21.03, -5.40, -40.44).
+0: Placed Na+ in SYS at (15.46, -29.05, 4.57).
+0: Placed Na+ in SYS at (10.65, 0.80, 23.54).
+0: Placed Na+ in SYS at (2.23, 40.21, -25.08).
+0: Placed Na+ in SYS at (12.40, 1.13, -35.08).
+0: Placed Na+ in SYS at (-1.09, 47.05, -11.72).
+0: Placed Na+ in SYS at (36.67, -28.38, 8.27).
+0: Placed Na+ in SYS at (-35.29, 0.63, 19.26).
+0: Placed Na+ in SYS at (-25.10, 35.72, 36.49).
+0: Placed Na+ in SYS at (7.45, 21.88, 32.12).
+0: Placed Na+ in SYS at (-33.42, 3.01, 39.60).
+0: Placed Na+ in SYS at (38.86, -36.75, -2.36).
+0: Placed Na+ in SYS at (26.69, -30.81, -39.81).
+0: Placed Na+ in SYS at (36.50, -6.91, 16.10).
+0: Placed Na+ in SYS at (27.91, 44.11, 11.96).
+0: Placed Na+ in SYS at (-24.09, -46.06, 2.68).
+0: Placed Na+ in SYS at (31.73, -27.88, 31.24).
+0: Placed Na+ in SYS at (37.25, 27.88, -19.42).
 > addIonsRand SYS Cl- 71
 Adding 71 counter ions to "SYS". 19928 solvent molecules will remain.
-0: Placed Cl- in SYS at (43.81, -14.69, 19.52).
-0: Placed Cl- in SYS at (-43.57, 33.36, 16.69).
-0: Placed Cl- in SYS at (-15.95, 22.39, 42.57).
-0: Placed Cl- in SYS at (18.21, -25.22, 9.31).
-0: Placed Cl- in SYS at (19.74, 0.57, 25.50).
-0: Placed Cl- in SYS at (32.58, -8.74, 47.91).
-0: Placed Cl- in SYS at (-26.62, 24.44, -2.48).
-0: Placed Cl- in SYS at (32.59, 16.99, -25.47).
-0: Placed Cl- in SYS at (-48.87, -25.88, -3.43).
-0: Placed Cl- in SYS at (-20.03, 29.92, 14.53).
-0: Placed Cl- in SYS at (-38.53, -6.30, -16.12).
-0: Placed Cl- in SYS at (37.84, 4.78, 23.12).
-0: Placed Cl- in SYS at (31.25, -15.60, 11.87).
-0: Placed Cl- in SYS at (-22.16, -33.26, 30.78).
-0: Placed Cl- in SYS at (-19.45, 9.55, 54.57).
-0: Placed Cl- in SYS at (4.37, 34.47, -28.15).
-0: Placed Cl- in SYS at (-44.44, -37.26, 1.56).
-0: Placed Cl- in SYS at (34.50, 16.92, -1.05).
-0: Placed Cl- in SYS at (34.59, 34.27, -0.18).
-0: Placed Cl- in SYS at (29.62, 3.58, -43.79).
-0: Placed Cl- in SYS at (-47.65, -0.56, 24.70).
-0: Placed Cl- in SYS at (-19.69, -36.73, -14.32).
-0: Placed Cl- in SYS at (19.56, -38.56, 24.31).
-0: Placed Cl- in SYS at (-13.74, 34.24, -43.79).
-0: Placed Cl- in SYS at (17.82, 5.17, 40.33).
-0: Placed Cl- in SYS at (-7.07, -31.71, -15.77).
-0: Placed Cl- in SYS at (30.67, -33.62, -6.41).
-0: Placed Cl- in SYS at (41.25, 7.01, 0.27).
-0: Placed Cl- in SYS at (18.79, -10.00, 39.04).
-0: Placed Cl- in SYS at (32.64, -5.94, 49.96).
-0: Placed Cl- in SYS at (-6.32, -48.48, -3.05).
-0: Placed Cl- in SYS at (-19.14, -54.44, -21.47).
-0: Placed Cl- in SYS at (-33.09, -41.15, 2.07).
-0: Placed Cl- in SYS at (-5.27, 36.93, -19.16).
-0: Placed Cl- in SYS at (40.01, -20.71, -6.65).
-0: Placed Cl- in SYS at (-13.11, 35.04, -37.10).
-0: Placed Cl- in SYS at (-6.32, 43.50, 23.50).
-0: Placed Cl- in SYS at (-24.79, 10.22, -43.07).
-0: Placed Cl- in SYS at (-45.43, -14.06, -23.88).
-0: Placed Cl- in SYS at (-35.26, -6.16, -33.56).
-0: Placed Cl- in SYS at (1.82, -1.33, 22.37).
-0: Placed Cl- in SYS at (-10.77, 24.65, -12.20).
-0: Placed Cl- in SYS at (-28.61, -44.42, -10.27).
-0: Placed Cl- in SYS at (45.18, 25.10, -8.80).
-0: Placed Cl- in SYS at (27.15, -23.95, -22.87).
-0: Placed Cl- in SYS at (1.82, 21.66, -44.01).
-0: Placed Cl- in SYS at (30.21, 46.31, -18.29).
-0: Placed Cl- in SYS at (24.68, 32.18, -13.19).
-0: Placed Cl- in SYS at (-5.10, -10.84, -23.81).
-0: Placed Cl- in SYS at (29.63, 28.32, 25.77).
-0: Placed Cl- in SYS at (-4.94, 32.11, -42.31).
-0: Placed Cl- in SYS at (-10.82, 17.61, -19.86).
-0: Placed Cl- in SYS at (-32.43, 24.16, 6.08).
-0: Placed Cl- in SYS at (-4.30, -50.21, -11.14).
-0: Placed Cl- in SYS at (34.86, -36.89, 1.10).
-0: Placed Cl- in SYS at (-42.73, -37.51, 17.58).
-0: Placed Cl- in SYS at (30.16, 36.97, -12.05).
-0: Placed Cl- in SYS at (30.25, 27.37, 29.28).
-0: Placed Cl- in SYS at (4.37, 34.47, -1.60).
-0: Placed Cl- in SYS at (14.24, 23.98, -38.01).
-0: Placed Cl- in SYS at (-40.36, -15.33, -25.31).
-0: Placed Cl- in SYS at (-5.60, 2.22, 58.74).
-0: Placed Cl- in SYS at (7.68, -41.19, -32.55).
-0: Placed Cl- in SYS at (40.86, -31.94, 17.06).
-0: Placed Cl- in SYS at (-47.42, -36.01, 14.09).
-0: Placed Cl- in SYS at (41.31, -19.90, -36.08).
-0: Placed Cl- in SYS at (-7.67, 10.13, 46.69).
-0: Placed Cl- in SYS at (-24.86, -24.25, 0.43).
-0: Placed Cl- in SYS at (-22.24, 12.84, 35.25).
-0: Placed Cl- in SYS at (-40.64, -12.17, 19.56).
-0: Placed Cl- in SYS at (43.50, -4.82, 23.46).
+0: Placed Cl- in SYS at (-46.98, -10.37, -6.09).
+0: Placed Cl- in SYS at (47.12, -1.05, 10.78).
+0: Placed Cl- in SYS at (-12.95, -46.65, -13.01).
+0: Placed Cl- in SYS at (1.50, 37.21, -16.49).
+0: Placed Cl- in SYS at (-22.63, -27.90, -28.67).
+0: Placed Cl- in SYS at (-38.80, -38.53, -14.83).
+0: Placed Cl- in SYS at (-16.85, -44.62, -2.84).
+0: Placed Cl- in SYS at (28.59, -5.03, -50.82).
+0: Placed Cl- in SYS at (-46.26, 11.24, -30.51).
+0: Placed Cl- in SYS at (42.78, -25.82, 2.07).
+0: Placed Cl- in SYS at (-0.43, -45.90, 22.96).
+0: Placed Cl- in SYS at (23.75, -4.05, 13.09).
+0: Placed Cl- in SYS at (-24.83, -3.40, 38.22).
+0: Placed Cl- in SYS at (-43.92, 28.17, -17.85).
+0: Placed Cl- in SYS at (6.34, -36.75, -28.91).
+0: Placed Cl- in SYS at (-45.30, 23.56, -14.32).
+0: Placed Cl- in SYS at (15.35, -40.81, -42.88).
+0: Placed Cl- in SYS at (5.36, -3.90, 27.31).
+0: Placed Cl- in SYS at (-39.96, -29.67, 1.82).
+0: Placed Cl- in SYS at (5.42, 51.41, 13.46).
+0: Placed Cl- in SYS at (11.33, 27.21, 32.89).
+0: Placed Cl- in SYS at (-14.45, 9.63, 55.64).
+0: Placed Cl- in SYS at (-21.83, 10.26, 29.15).
+0: Placed Cl- in SYS at (48.78, -25.23, 13.46).
+0: Placed Cl- in SYS at (18.89, -44.75, 28.63).
+0: Placed Cl- in SYS at (-21.87, 0.80, -29.56).
+0: Placed Cl- in SYS at (2.17, 49.61, 11.83).
+0: Placed Cl- in SYS at (-27.66, -44.67, -7.49).
+0: Placed Cl- in SYS at (-42.32, 4.93, 13.97).
+0: Placed Cl- in SYS at (-47.29, -20.36, 28.83).
+0: Placed Cl- in SYS at (-47.29, 2.63, -11.00).
+0: Placed Cl- in SYS at (32.61, 1.16, -7.20).
+0: Placed Cl- in SYS at (-11.40, -40.81, -31.13).
+0: Placed Cl- in SYS at (-8.17, 2.73, 45.72).
+0: Placed Cl- in SYS at (39.19, -1.46, 23.41).
+0: Placed Cl- in SYS at (25.73, 49.29, 0.00).
+0: Placed Cl- in SYS at (-23.80, -30.90, -15.52).
+0: Placed Cl- in SYS at (7.23, -28.70, 42.36).
+0: Placed Cl- in SYS at (-6.57, 3.37, -42.02).
+0: Placed Cl- in SYS at (-29.42, 30.74, -20.76).
+0: Placed Cl- in SYS at (19.85, -24.51, 18.64).
+0: Placed Cl- in SYS at (-45.43, 31.93, 2.67).
+0: Placed Cl- in SYS at (-27.72, 31.03, 8.65).
+0: Placed Cl- in SYS at (14.33, 18.35, -25.94).
+0: Placed Cl- in SYS at (17.34, -13.52, 50.27).
+0: Placed Cl- in SYS at (-13.58, 24.50, -7.01).
+0: Placed Cl- in SYS at (34.08, 31.79, 18.02).
+0: Placed Cl- in SYS at (17.00, 17.75, 40.12).
+0: Placed Cl- in SYS at (18.21, 20.76, 9.31).
+0: Placed Cl- in SYS at (-44.73, -22.13, -17.53).
+0: Placed Cl- in SYS at (47.35, 29.07, 21.02).
+0: Placed Cl- in SYS at (-31.48, -2.73, 27.24).
+0: Placed Cl- in SYS at (11.04, -40.28, 38.93).
+0: Placed Cl- in SYS at (-8.87, -34.75, -36.75).
+0: Placed Cl- in SYS at (-14.45, 32.62, 15.81).
+0: Placed Cl- in SYS at (-37.25, -4.65, -31.76).
+0: Placed Cl- in SYS at (3.30, 50.36, 15.64).
+0: Placed Cl- in SYS at (34.59, -34.71, -13.46).
+0: Placed Cl- in SYS at (15.64, -22.62, -31.18).
+0: Placed Cl- in SYS at (-49.19, -0.15, -13.26).
+0: Placed Cl- in SYS at (-30.87, 14.59, 41.09).
+0: Placed Cl- in SYS at (-20.91, -4.42, 8.55).
+0: Placed Cl- in SYS at (-43.85, -34.29, -8.38).
+0: Placed Cl- in SYS at (-30.55, -19.42, -10.20).
+0: Placed Cl- in SYS at (10.05, 45.64, 0.39).
+0: Placed Cl- in SYS at (-1.27, 30.38, -14.68).
+0: Placed Cl- in SYS at (15.85, -46.14, -39.81).
+0: Placed Cl- in SYS at (47.21, 18.57, -17.23).
+0: Placed Cl- in SYS at (6.67, -1.46, -56.25).
+0: Placed Cl- in SYS at (-27.55, 39.31, 34.74).
+0: Placed Cl- in SYS at (4.61, -9.28, -32.53).
 > saveamberparm SYS /localscratch/kbui/NexusMol/examples/results/6W63_mol4_solvated/6W63_mol4_solvated.prmtop /localscratch/kbui/NexusMol/examples/results/6W63_mol4_solvated/6W63_mol4_solvated.inpcrd
 Checking Unit.
 Building topology.

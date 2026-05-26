@@ -20,7 +20,7 @@ def build_tleap_cmd(input_dict: dict):
         f"REC = loadpdb {input_dict['receptor_renamed']}"
     ]
 
-    if input_dict['ligand_charged'] is not None:
+    if input_dict['ligand_charged'] is not None and input_dict['ligand_frcmod'] is not None:
         stdin.extend([
             f"loadamberparams {input_dict['ligand_frcmod']}",
             f"LIG = loadmol2 {input_dict['ligand_charged']}",
@@ -43,7 +43,6 @@ def build_tleap_cmd(input_dict: dict):
     ])
     
     stdin = "\n".join(stdin)
-    print (stdin)
     return (["tleap", "-f", "-"], stdin)
 
 def run_tleap(pcfg: PrepConfig, receptor_renamed: Path, ligand_charged: Path, ligand_frcmod: Path):
@@ -66,8 +65,8 @@ def run_tleap(pcfg: PrepConfig, receptor_renamed: Path, ligand_charged: Path, li
         "force_field": force_field,
         "water_model": water_model,
         "receptor_renamed": str(receptor_renamed),
-        "ligand_charged": str(ligand_charged),
-        "ligand_frcmod": str(ligand_frcmod),
+        "ligand_charged": str(ligand_charged) if ligand_charged is not None else None,
+        "ligand_frcmod": str(ligand_frcmod) if ligand_frcmod is not None else None,
         "box_model_solvate": f"solvate{box_type}",
         "water_model_box": f"{water_model.upper()}BOX",
         "box_size":str(box_size),

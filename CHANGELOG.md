@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.2.0
+- Rewrote all documentations.
+- Fixed dock6 bugs on missing output docked poses.
+- Fixed MD final copy missing trajectory data.
+- Moved imports to inside functions, resolving the slow cli loading issue.
+- Regenerated example outputs.
+
 ## 2.1.0
 - Added MD analysis support with `nexus md analyze`.
 - `nexus md analyze` runs the full CPPTRAJ analysis workflow on an existing Amber trajectory.

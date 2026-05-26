@@ -31,7 +31,7 @@ def parse_scores(output, max_poses, program):
 def write_summary_csv(dcfg, out_files, rec_bundles):
 
     @main_tracker(dcfg, "Write summary csv")
-    @base(dcfg)
+    @base(dcfg.common.logger)
     def _run():
         project_name = dcfg.common.project_name
         max_poses = dcfg.common.max_poses

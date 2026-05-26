@@ -43,6 +43,7 @@ def _build_dock6_docking_commands(dcfg, pairs):
             dock_home=dock_home,
             selected_spheres=str(selected_spheres),
             grid_prefix=str(grid_prefix),
+            output_path_prefix=str(working_dir / output_prefix),
             receptor_name=receptor_name,
             max_orientations=max_orientations,
         )
@@ -51,7 +52,7 @@ def _build_dock6_docking_commands(dcfg, pairs):
         with open(flex, "w") as file:
             file.write(input_file)
 
-        cmds.append([dock_home / "bin" / "dock6", "-i", flex, "-o", output_path])
+        cmds.append([dock_home / "bin" / "dock6", "-i", flex])
 
     return out_files, cmds
 
