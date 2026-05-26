@@ -16,8 +16,6 @@ NexusMol currently supports:
 - Running Amber minimization, heating, equilibration, and production workflows.
 - Running a CPPTRAJ-based analysis workflow for existing Amber trajectories.
 
-Validation commands are registered in the CLI, but the current implementation returns immediately and should be considered disabled. `nexus md openmm` is registered but not implemented.
-
 ## Prerequisites
 
 Use the conda environment in this repository as the primary installation path. It installs the Python scientific stack and several command-line tools used by the pipelines.
