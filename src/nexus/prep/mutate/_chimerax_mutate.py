@@ -58,6 +58,10 @@ def chimerax_mutate(pcfg: PrepConfig):
             check=True
         )
 
+        # PDBQT can't read AMBER residue names, so we must revert the naming
+        # This only standardize naming, while maintaining the changed protonation state
+        overwrite_pdb_residues(output_path)
+
         ## 4. Output Results
     ## 4. Parse the Log for Selection Failures
         log_lines = result.stdout.splitlines()
@@ -99,3 +103,24 @@ def chimerax_mutate(pcfg: PrepConfig):
         log_path.info(f"✅ Saved mutated receptor to -> {output_path}")
 
     return None
+
+
+def overwrite_pdb_residues(filename):
+    # Mapping Amber protonation states to standard residue names
+    res_mapping = {
+        "HID": "HIS", "HIE": "HIS", "HIP": "HIS",
+        "CYX": "CYS", "CYM": "CYS",
+        "LYN": "LYS", "ASH": "ASP", "GLH": "GLU",
+    }
+    
+    with open(filename, 'r') as infile:
+        lines = infile.readlines()
+        
+    with open(filename, 'w') as outfile:
+        for line in lines:
+            if line.startswith(("ATOM", "HETATM", "TER")):
+                res_name = line[17:20].strip()
+                if res_name in res_mapping:
+                    standard_name = res_mapping[res_name]
+                    line = line[:17] + f"{standard_name:<3}" + line[20:]
+            outfile.write(line)

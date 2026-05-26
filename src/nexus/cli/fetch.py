@@ -7,15 +7,18 @@ app = typer.Typer(help="Run fetch protein and ligand (noncovalent only) structur
 
 
 def merge_cli_overrides(pcfg, common_flags: dict, unique_key: str = None, unique_flags: dict = None):
-    from nexus.prep.prep_config import PrepConfig
+    from nexus.fetch.fetch_config import FetchConfig
     """Helper function to handle Pydantic deep merging"""
     cli_overrides = {k: v for k, v in common_flags.items() if v is not None}
         
     full_data = pcfg.model_dump()
-    for key, sub_dict in cli_overrides.items():
-        full_data[key] = {**full_data.get(key, {}), **sub_dict}
+    for key, value in cli_overrides.items():
+            if isinstance(value, dict):
+                full_data[key] = {**full_data.get(key, {}), **value}
+            else:
+                full_data[key] = value
 
-    return PrepConfig.model_validate(full_data)
+    return FetchConfig.model_validate(full_data)
 
 
 @app.command()

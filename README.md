@@ -106,7 +106,7 @@ nexus prep mutate \
   -m ":145-CYM"
 ```
 
-Mutation strings use `selection-NEW_RES`, where `selection` is passed to ChimeraX and `NEW_RES` is the residue name to assign.
+Mutation strings use `selection-NEW_RES`, where `selection` is passed to ChimeraX and `NEW_RES` is the residue name to assign. Note that if the protonation state is changed, `NEW_RES` is used only to change the protonation state, while the residue stays standardized. See [examples/REFERENCES.md](examples/REFERENCES.md) for detailed selection syntax and AMBER residue naming conventions.
 
 ### 3. Prepare Ligands
 

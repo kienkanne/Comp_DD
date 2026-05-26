@@ -139,10 +139,10 @@ X77
  29 66  1  0  0  0  0
 M  END
 > <model_server_result.job_id>
-Tl_SOivOiRuoxoBduxndMA
+8BOcB7Fbqi_OoFH7vOfEYQ
 
 > <model_server_result.datetime_utc>
-2026-05-26 02:30:59
+2026-05-26 14:18:38
 
 > <model_server_result.server_version>
 0.9.12
@@ -163,16 +163,16 @@ atom_site
 {"label_comp_id":"X77"}
 
 > <model_server_stats.io_time_ms>
-42
+107
 
 > <model_server_stats.parse_time_ms>
-8
+14
 
 > <model_server_stats.create_model_time_ms>
-4
+71
 
 > <model_server_stats.query_time_ms>
-297
+260
 
 > <model_server_stats.encode_time_ms>
 0
