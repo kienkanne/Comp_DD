@@ -54,6 +54,7 @@ def final_copy(dcfg, rec_bundles, docking_summary, out_files):
                     shutil.copy2(pocket, rec_dir)
 
             # copy docking summary files to respective receptor dirs or to root
+            csv_paths_dict = {} # Used to add to metadata
             if isinstance(docking_summary, (list, tuple)):
                 for csv in docking_summary:
                     for rec in rec_names:
@@ -62,16 +63,13 @@ def final_copy(dcfg, rec_bundles, docking_summary, out_files):
                             dst = results_dir / rec / Path(csv).name
                             if src.exists():
                                 shutil.copy2(src, dst)
+                            csv_paths_dict[rec] = dst
                             break
 
-            # copy run artifacts to root
-            root_files = ["run.log", "manifest.json", "state.json"]
-            for f in root_files:
-                src = working_dir / f
-                dst = results_dir / f
-                if src.exists():
-                    shutil.copy2(src, dst)
+            for name, csv_path in csv_paths_dict.items():
+                setattr(dcfg.metadata, name, str(csv_path))
 
+        ### DISABLED
         else:  # match mode -> single csv and a 'details' folder with everything
             details = results_dir / "details"
             details.mkdir(parents=True, exist_ok=True)
@@ -110,11 +108,28 @@ def final_copy(dcfg, rec_bundles, docking_summary, out_files):
                 dst = results_dir / Path(csv).name
                 if src.exists():
                     shutil.copy2(src, dst)
+            ### DISABLED
 
-            # also copy run artifacts into root
-            for f in ["run.log", "manifest.json", "state.json"]:
-                src = working_dir / f
-                dst = results_dir / f
-                if src.exists():
-                    shutil.copy2(src, dst)
+
+        # Copy to root
+        project_name = dcfg.common.project_name
+        for f in [f"{project_name}_run.log", 
+                    f"{project_name}_manifest.json", 
+                    f"{project_name}_state.json"]:
+            src = working_dir / f
+            dst = results_dir / f
+            if src.exists():
+                shutil.copy2(src, dst)
+
+        # Finally, dump json meta with csv file paths
+
+        metadata_dict = dcfg.metadata.model_dump() 
+        metadata_path = results_dir / f"{project_name}_metadata.json"
+
+        import json
+        if metadata_dict is not None:
+            # Serialize the dictionary to a pretty-printed JSON file
+            with open(metadata_path, "w", encoding="utf-8") as f:
+                json.dump(metadata_dict, f, indent=4)
+    
     _run()

@@ -46,10 +46,10 @@ def equilibrate(mcfg: MDConfig, prmtop: Path, last_heat_ncrst: Path) -> Path:
             )
             if run == 1:
                 ncrst = last_heat_ncrst
-                _run_pmemd(eq_input, prmtop, ncrst, working_dir, f"eq{run}")
+                _run_pmemd(eq_input, prmtop, ncrst, working_dir, f"eq{run}", mcfg.common.logger)
             else:
                 ncrst = working_dir / f"eq{run - 1}.ncrst"
-                _run_pmemd(eq_input, prmtop, ncrst, working_dir, f"eq{run}")
+                _run_pmemd(eq_input, prmtop, ncrst, working_dir, f"eq{run}", mcfg.common.logger)
 
             last_ncrst = working_dir / f"eq{run}.ncrst"
 

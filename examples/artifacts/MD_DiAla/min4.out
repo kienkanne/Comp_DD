@@ -6,7 +6,7 @@
 | PMEMD implementation of SANDER, Release 24
 
 |  Compiled date/time: Wed Aug 21 09:34:12 2024
-| Run on 05/25/2026 at 22:51:36
+| Run on 05/26/2026 at 01:24:22
 
 |   Executable path: pmemd.cuda
 | Working directory: /localscratch/kbui/NexusMol/examples
@@ -44,7 +44,7 @@ Minimization
 /                                                                              
 
 
-Note: ig = -1. Setting random seed to    51750 based on wallclock time in 
+Note: ig = -1. Setting random seed to   903286 based on wallclock time in 
       microseconds.
 | irandom = 1, using AMBER's internal random number generator (default).
  
@@ -687,12 +687,12 @@ ACE
 |
 |     Routine           Sec        %
 |     ------------------------------
-|     Nonbond           0.18   54.06
+|     Nonbond           0.19   54.01
 |     Bond              0.00    0.00
 |     Angle             0.00    0.00
 |     Dihedral          0.00    0.00
 |     Shake             0.00    0.00
-|     Other             0.16   45.94
+|     Other             0.16   45.99
 |     ------------------------------
 |     Total             0.34
 
@@ -711,9 +711,9 @@ ACE
 |     ---------------------------------
 |     NonBonded Calc       0.00    0.00
 |     Exclude Masked       0.00    0.00
-|     Other                0.00    0.73
+|     Other                0.00    0.72
 |     ---------------------------------
-|     Total                0.00    0.73
+|     Total                0.00    0.72
 
 |  PME Reciprocal Force CPU Time:
 |
@@ -732,5 +732,5 @@ ACE
 |  Total CPU time:            0.56 seconds     0.00 hours
 
 |  Setup wall time:           0    seconds
-|  NonSetup wall time:        1    seconds
-|  Total wall time:           1    seconds     0.00 hours
+|  NonSetup wall time:        0    seconds
+|  Total wall time:           0    seconds     0.00 hours

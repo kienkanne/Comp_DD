@@ -1,60 +1,18 @@
-from pathlib import Path
 import sys
-import types
+from pathlib import Path
 
 import pytest
 
-# Provide lightweight stand-ins for optional external dependencies used by the module.
-fake_gemmi = types.ModuleType("gemmi")
-fake_gemmi.cif = types.ModuleType("gemmi.cif")
-fake_gemmi.cif.read_file = lambda path: None
-fake_gemmi.make_structure_from_block = lambda block: None
-sys.modules["gemmi"] = fake_gemmi
-sys.modules["gemmi.cif"] = fake_gemmi.cif
-
-fake_rcsbapi = types.ModuleType("rcsbapi")
-
-fake_rcsbapi_data = types.ModuleType("rcsbapi.data")
-fake_rcsbapi_data.DataQuery = object
-sys.modules["rcsbapi.data"] = fake_rcsbapi_data
-
-fake_rcsbapi_model = types.ModuleType("rcsbapi.model")
-fake_rcsbapi_model.ModelQuery = object
-sys.modules["rcsbapi.model"] = fake_rcsbapi_model
-
-sys.modules["rcsbapi"] = fake_rcsbapi
+if sys.version_info < (3, 10):
+    pytest.skip(
+        "nexus.fetch.fetch_config uses Python 3.10+ union type syntax",
+        allow_module_level=True,
+    )
 
 from nexus.fetch.fetch_config import FetchConfig
+from nexus.fetch.pipeline import FetchPipeline
+import nexus.fetch.pipeline as fetch_pipeline
 import nexus.fetch.rcsb_fetch as rcsb_fetch
-
-
-class FakeDoc:
-    def sole_block(self):
-        return None
-
-
-class FakeResidue:
-    def __init__(self, name):
-        self.name = name
-
-
-class FakeChain(list):
-    pass
-
-
-class FakeModel(list):
-    pass
-
-
-class FakeStructure(list):
-    def remove_waters(self):
-        self.removed_waters = True
-
-    def make_mmcif_document(self):
-        return self
-
-    def write_file(self, path):
-        Path(path).write_text("fake mmcif")
 
 
 class FakeDataQuery:
@@ -62,75 +20,70 @@ class FakeDataQuery:
         self.input_type = input_type
         self.input_ids = input_ids
         self.return_data_list = return_data_list
-        self._response = None
 
     def exec(self):
-        self._response = {
+        return None
+
+    def get_response(self):
+        return {
             "data": {
                 "entries": [
                     {
                         "nonpolymer_entities": [
                             {"pdbx_entity_nonpoly": {"comp_id": "LIG"}},
                             {"pdbx_entity_nonpoly": {"comp_id": "HOH"}},
+                            {"pdbx_entity_nonpoly": {"comp_id": "ZN"}},
+                            {"pdbx_entity_nonpoly": {"comp_id": "ABC"}},
                         ]
                     }
                 ]
             }
         }
 
-    def get_response(self):
-        return self._response
-
 
 class FakeModelQuery:
     def __init__(self, download, file_directory):
+        self.download = download
         self.file_directory = Path(file_directory)
 
     def get_ligand(self, entry_id, label_comp_id, encoding, filename):
-        Path(self.file_directory / filename).write_text("dummy sdf")
+        assert encoding == "sdf"
+        (self.file_directory / filename).write_text(f"{entry_id}:{label_comp_id}")
 
     def get_assembly(self, entry_id, encoding, filename):
-        Path(self.file_directory / filename).write_text("data")
+        assert encoding == "cif"
+        (self.file_directory / filename).write_text(f"{entry_id} assembly")
 
 
 def test_get_ligands_in_structure_filters_ignored_entities(monkeypatch):
     monkeypatch.setattr(rcsb_fetch, "DataQuery", FakeDataQuery)
 
-    ligand_ids = rcsb_fetch.get_ligands_in_structure("1ABC")
-
-    assert ligand_ids == ["LIG"]
+    assert rcsb_fetch.get_ligands_in_structure("1ABC") == ["LIG", "ABC"]
 
 
-def test_retrieve_structure_writes_cleaned_cif_and_removes_raw(tmp_path, monkeypatch):
-    cfg = FetchConfig(
-        raw_assembly_suffix="raw_assembly",
-        cleaned_suffix="cleaned",
-        ligand_suffix=None,
-        remove_waters=True,
-        kept_residues=["ZN"],
-        output_dir=tmp_path,
-        remove_raw_assembly=True,
-        id_list=["1ABC"],
-    )
-
+def test_rcsb_fetch_writes_ligands_and_assembly_to_output_dir(tmp_path, monkeypatch):
     monkeypatch.setattr(rcsb_fetch, "DataQuery", FakeDataQuery)
     monkeypatch.setattr(rcsb_fetch, "ModelQuery", FakeModelQuery)
-    monkeypatch.setattr(rcsb_fetch.gemmi.cif, "read_file", lambda path: FakeDoc())
-    monkeypatch.setattr(rcsb_fetch.gemmi, "make_structure_from_block", lambda block: FakeStructure([FakeModel([FakeChain([FakeResidue("HOH"), FakeResidue("ZN"), FakeResidue("ALA")])])]))
 
-    rcsb_fetch.fetch_rcsb(cfg)
+    rcsb_fetch.rcsb_fetch(FetchConfig(input=["1ABC"], output_dir=tmp_path))
 
-    expected_cleaned = tmp_path / "1ABC_cleaned.cif"
-    assert expected_cleaned.exists()
-    assert expected_cleaned.read_text() == "fake mmcif"
-    assert not (tmp_path / "1ABC_raw_assembly.cif").exists()
+    assert (tmp_path / "1ABC.cif").read_text() == "1ABC assembly"
+    assert (tmp_path / "1ABC_LIG.sdf").read_text() == "1ABC:LIG"
+    assert (tmp_path / "1ABC_ABC.sdf").read_text() == "1ABC:ABC"
+    assert not (tmp_path / "1ABC_HOH.sdf").exists()
 
 
-def test_retrieve_structure_raises_if_id_list_missing(tmp_path):
-    cfg = FetchConfig(
-        output_dir=tmp_path,
-        id_list=None,
-    )
+def test_fetch_pipeline_reads_ids_from_text_file(tmp_path, monkeypatch):
+    ids = tmp_path / "ids.txt"
+    ids.write_text("6W63\n7K40\n")
+    seen = {}
 
-    with pytest.raises(TypeError):
-        rcsb_fetch.fetch_rcsb(cfg)
+    def fake_rcsb_fetch(fcfg):
+        seen["input"] = fcfg.input
+        seen["output_dir"] = fcfg.output_dir
+
+    monkeypatch.setattr(fetch_pipeline, "rcsb_fetch", fake_rcsb_fetch)
+
+    FetchPipeline(FetchConfig(input=[str(ids)], output_dir=tmp_path)).run()
+
+    assert seen == {"input": ["6W63", "7K40"], "output_dir": tmp_path}

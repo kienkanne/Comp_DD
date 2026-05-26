@@ -27,8 +27,10 @@ def copy_to_results(mcfg: MDConfig, outputs):
             if Path(results_dir / prod_nc.name).is_file():
                 Path(prod_nc).unlink(missing_ok=True)
 
-        root_files = ["run.log", "manifest.json", "state.json"]
-        for f in root_files:
+        project_name = mcfg.common.project_name
+        for f in [f"{project_name}_run.log", 
+                    f"{project_name}_manifest.json", 
+                    f"{project_name}_state.json"]:
             src = working_dir / f
             dst = results_dir / f
             if src.exists():

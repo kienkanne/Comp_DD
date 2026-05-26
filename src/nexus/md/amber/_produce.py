@@ -65,10 +65,10 @@ def produce(mcfg: MDConfig, prmtop: Path, last_eq_ncrst: Path) -> None:
         outputs = []
         for i in range(1, num_seeds + 1):
             ncrst = last_eq_ncrst
-            _run_pmemd(rand_input, prmtop, ncrst, working_dir, f"seed{i}")
+            _run_pmemd(rand_input, prmtop, ncrst, working_dir, f"seed{i}", mcfg.common.logger)
 
             ncrst = working_dir / f"seed{i}.ncrst"
-            _run_pmemd(prod_input, prmtop, ncrst, working_dir, f"prod{i}")
+            _run_pmemd(prod_input, prmtop, ncrst, working_dir, f"prod{i}", mcfg.common.logger)
 
             prod_nc = Path(working_dir) / f"prod{i}.nc"
             prod_ncrst = Path(working_dir) / f"prod{i}.ncrst"

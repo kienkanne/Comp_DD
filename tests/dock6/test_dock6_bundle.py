@@ -5,38 +5,55 @@ from nexus.dock.dock6._docking import _build_dock6_docking_commands
 from nexus.dock.dock6._prep_rec import Dock6ReceptorBundle
 
 
-def test_dock6_docking_builds_commands_with_receptor_bundle(tmp_path, monkeypatch):
-    monkeypatch.chdir(tmp_path)
+def create_grid_files(prefix):
+    for suffix in [".in", ".bmp", ".nrg", ".out"]:
+        Path(f"{prefix}{suffix}").write_text("")
 
-    required = [
-        "rec1_grid.in",
-        "rec1_grid.bmp",
-        "rec1_grid.nrg",
-        "rec1_grid.out",
-    ]
-    for name in required:
-        (tmp_path / name).write_text("")
 
+def test_dock6_docking_builds_commands_and_flex_input(tmp_path):
+    grid_prefix = tmp_path / "rec1_grid"
+    create_grid_files(grid_prefix)
     cfg = SimpleNamespace(
-        libs=SimpleNamespace(dock_home=Path("/usr/local/dock6")),
+        libs=SimpleNamespace(dock_home=Path("/opt/dock6")),
         dock6=SimpleNamespace(max_orientations=100),
-        common=SimpleNamespace(prepared_suffix="prepped", working_dir=tmp_path),
+        common=SimpleNamespace(working_dir=tmp_path, mode="mix"),
     )
     receptor = Dock6ReceptorBundle(
-        receptor=Path("rec1_prepped.mol2"),
-        selected_spheres=Path("rec1_selected_spheres.sph"),
-        grid_prefix=tmp_path / "rec1_grid",
-        pocket=Path("rec1_pocket.mol2"),
+        receptor=tmp_path / "rec1_prepared.mol2",
+        selected_spheres=tmp_path / "rec1_ss.sph",
+        grid_prefix=grid_prefix,
+        pocket=tmp_path / "rec1_pocket.mol2",
         name="rec1",
     )
-    ligand = Path("ligA_prepped.mol2")
+    ligand = tmp_path / "ligA_prepared.mol2"
 
     out_files, cmds = _build_dock6_docking_commands(cfg, [(receptor, ligand)])
 
-    assert out_files == [tmp_path / "rec1_ligA_prepped_scored.mol2"]
-    assert str(cfg.libs.dock_home / "bin" / "dock6") == str(cmds[0][0])
-    assert tmp_path / "flex_rec1_ligA_prepped.in" in cmds[0]
-    assert tmp_path / "rec1_ligA_prepped.dock6.out" in cmds[0]
+    flex = tmp_path / "flex_rec1_ligA_prepared.in"
+    assert out_files == [tmp_path / "rec1_ligA_prepared_scored.mol2"]
+    assert cmds == [[Path("/opt/dock6/bin/dock6"), "-i", flex]]
+    assert "ligA_prepared.mol2" in flex.read_text()
+    assert str(tmp_path / "rec1_ligA_prepared") in flex.read_text()
+    assert "max_orientations                                             100" in flex.read_text()
 
-    flex_text = (tmp_path / "flex_rec1_ligA_prepped.in").read_text()
-    assert f"ligand_outfile_prefix                                        {tmp_path / 'rec1_ligA_prepped'}" in flex_text
+
+def test_dock6_docking_raises_when_grid_files_are_missing(tmp_path):
+    cfg = SimpleNamespace(
+        libs=SimpleNamespace(dock_home=Path("/opt/dock6")),
+        dock6=SimpleNamespace(max_orientations=100),
+        common=SimpleNamespace(working_dir=tmp_path, mode="mix"),
+    )
+    receptor = Dock6ReceptorBundle(
+        receptor=tmp_path / "rec1_prepared.mol2",
+        selected_spheres=tmp_path / "rec1_ss.sph",
+        grid_prefix=tmp_path / "missing_grid",
+        pocket=tmp_path / "rec1_pocket.mol2",
+        name="rec1",
+    )
+
+    try:
+        _build_dock6_docking_commands(cfg, [(receptor, tmp_path / "lig.mol2")])
+    except FileNotFoundError as exc:
+        assert "missing_grid.in" in str(exc)
+    else:
+        raise AssertionError("Expected missing grid files to raise FileNotFoundError")

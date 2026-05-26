@@ -6,7 +6,7 @@
 | PMEMD implementation of SANDER, Release 24
 
 |  Compiled date/time: Wed Aug 21 09:34:12 2024
-| Run on 05/25/2026 at 22:51:35
+| Run on 05/26/2026 at 01:24:22
 
 |   Executable path: pmemd.cuda
 | Working directory: /localscratch/kbui/NexusMol/examples
@@ -44,7 +44,7 @@ Minimization
 /                                                                              
 
 
-Note: ig = -1. Setting random seed to   370354 based on wallclock time in 
+Note: ig = -1. Setting random seed to   227409 based on wallclock time in 
       microseconds.
 | irandom = 1, using AMBER's internal random number generator (default).
  
@@ -707,14 +707,14 @@ ACE
 |
 |     Routine           Sec        %
 |     ------------------------------
-|     Nonbond           0.20   54.77
+|     Nonbond           0.19   53.52
 |     Bond              0.00    0.00
 |     Angle             0.00    0.00
 |     Dihedral          0.00    0.00
 |     Shake             0.00    0.00
-|     Other             0.16   45.23
+|     Other             0.16   46.48
 |     ------------------------------
-|     Total             0.36
+|     Total             0.35
 
 |  PME Nonbond Pairlist CPU Time:
 |
@@ -731,9 +731,9 @@ ACE
 |     ---------------------------------
 |     NonBonded Calc       0.00    0.00
 |     Exclude Masked       0.00    0.00
-|     Other                0.00    0.72
+|     Other                0.00    0.73
 |     ---------------------------------
-|     Total                0.00    0.72
+|     Total                0.00    0.73
 
 |  PME Reciprocal Force CPU Time:
 |
@@ -748,9 +748,9 @@ ACE
 |     Total                0.00    0.00
 
 |  Setup CPU time:            0.22 seconds
-|  NonSetup CPU time:         0.36 seconds
-|  Total CPU time:            0.58 seconds     0.00 hours
+|  NonSetup CPU time:         0.35 seconds
+|  Total CPU time:            0.57 seconds     0.00 hours
 
-|  Setup wall time:           1    seconds
-|  NonSetup wall time:        0    seconds
+|  Setup wall time:           0    seconds
+|  NonSetup wall time:        1    seconds
 |  Total wall time:           1    seconds     0.00 hours

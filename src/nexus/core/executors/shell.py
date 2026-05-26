@@ -6,11 +6,11 @@ def shell(logger=None):
     def decorator(func):
         def wrapper(*args, **kwargs):
             try:
-                local_logger = logger if logger is not None else DummyLogger()
-                local_logger.info(f"Running: {' '.join([str(arg) for arg in cmd])}")
-
                 cmd, stdin = func(*args, **kwargs)
                 cmd = [os.path.expandvars(i) for i in cmd]
+
+                local_logger = logger if logger is not None else DummyLogger()
+                local_logger.info(f"Running: {' '.join([str(arg) for arg in cmd])}")
 
                 result = subprocess.run(
                     cmd,

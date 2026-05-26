@@ -1,13 +1,13 @@
 
- NSTEP =   260000   TIME(PS) =     520.000  TEMP(K) =   302.72  PRESS =   314.3
- Etot   =     -7887.1626  EKtot   =      1846.1957  EPtot      =     -9733.3583
- BOND   =         1.9415  ANGLE   =         9.5698  DIHED      =         5.5547
- UB     =         0.0000  IMP     =         0.0000  CMAP       =         0.7620
- 1-4 NB =         2.5865  1-4 EEL =        44.4825  VDWAALS    =      1502.2763
- EELEC  =    -11307.8994  EHBOND  =         0.0000  RESTRAINT  =         7.3677
- EAMBER (non-restraint)  =     -9740.7260
- EKCMT  =       943.4704  VIRIAL  =       731.5156  VOLUME     =     31231.5060
-                                                    Density    =         0.9790
+ NSTEP =   260000   TIME(PS) =     520.000  TEMP(K) =   310.73  PRESS =   185.9
+ Etot   =     -7866.4473  EKtot   =      1895.0465  EPtot      =     -9761.4938
+ BOND   =         2.2743  ANGLE   =        10.2424  DIHED      =         5.2450
+ UB     =         0.0000  IMP     =         0.0000  CMAP       =         0.6541
+ 1-4 NB =         2.6578  1-4 EEL =        44.0704  VDWAALS    =      1479.5371
+ EELEC  =    -11312.9485  EHBOND  =         0.0000  RESTRAINT  =         6.7736
+ EAMBER (non-restraint)  =     -9768.2674
+ EKCMT  =       920.9494  VIRIAL  =       796.4530  VOLUME     =     31014.6231
+                                                    Density    =         0.9858
  NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
 ===============================================================================
  ------------------------------------------------------------------------------
@@ -16,13 +16,13 @@
 | Total steps:    500000 | Completed:    260000 ( 52.0%) | Remaining:    240000
 |
 | Average timings for last  260000 steps:
-|     Elapsed(s) =      59.78 Per Step(ms) =       0.23
-|         ns/day =     751.53   seconds/ns =     114.97
+|     Elapsed(s) =      60.53 Per Step(ms) =       0.23
+|         ns/day =     742.30   seconds/ns =     116.39
 |
 | Average timings for all steps:
-|     Elapsed(s) =      59.78 Per Step(ms) =       0.23
-|         ns/day =     751.53   seconds/ns =     114.97
+|     Elapsed(s) =      60.53 Per Step(ms) =       0.23
+|         ns/day =     742.30   seconds/ns =     116.39
 |
 |
-| Estimated time remaining:      55.2 seconds.
+| Estimated time remaining:      55.9 seconds.
  ------------------------------------------------------------------------------

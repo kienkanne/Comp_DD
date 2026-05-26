@@ -59,8 +59,6 @@ Verify that the package imports:
 python -c "import nexus; print('nexus import ok')"
 ```
 
-`nexus --help` is the intended CLI smoke test, but the current CLI imports the fetch module eagerly and may contact RCSB during import through `rcsb-api`. If help fails with an RCSB schema/network error, see [SECURITY_AND_BUGS.md](SECURITY_AND_BUGS.md).
-
 If you use Amber through an environment module, load it before running `nexus prep sysmd`, `nexus md amber`, or `nexus md analyze`:
 
 ```bash
@@ -87,7 +85,7 @@ The examples below show the intended command flow. The config files in `examples
 nexus fetch rcsb -i 6W63 -i 7K40 -o fetched_structures -l ligand
 ```
 
-`fetch rcsb` accepts one or more PDB IDs, or a text file path where each line is an ID. The command downloads biological assemblies as `.cif` files and non-covalent ligands as `.sdf` files. The exposed `--config` option is not currently applied by the implementation, so use flags for fetch runs.
+`fetch rcsb` accepts one or more PDB IDs, or a text file path where each line is an ID. The command downloads biological assemblies as `.cif` files and non-covalent ligands as `.sdf` files.
 
 ### 2. Prepare Receptors
 

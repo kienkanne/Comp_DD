@@ -49,7 +49,7 @@ def heat(mcfg: MDConfig, prmtop: Path, last_min_ncrst: Path):
             mask=mask,
         )
 
-        _run_pmemd(heat_input, prmtop, last_min_ncrst, working_dir, "heat")
+        _run_pmemd(heat_input, prmtop, last_min_ncrst, working_dir, "heat", mcfg.common.logger)
 
         return working_dir / "heat.ncrst"
     return _run()

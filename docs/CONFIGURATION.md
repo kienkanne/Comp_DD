@@ -220,6 +220,10 @@ ligands:
 vina:
   exhaustiveness: 32
   num_modes: 8
+
+metadata:
+  tool: vina
+  anything: anything
 ```
 
 ### Minimal DOCK6 Config
@@ -251,6 +255,10 @@ ligands:
 dock6:
   max_orientations: 1000
   radius: 10.0
+
+metadata:
+  tool: vina
+  something: something
 ```
 
 ### `libs`
@@ -317,6 +325,10 @@ The code also appends `cpu = 1` to each receptor-specific Vina config, because c
 | `max_orientations` | Integer | `1000` | Used in the DOCK6 flex input template. |
 | `radius` | Float | `10.0` | Sphere selection radius around the generated pocket. |
 
+### `metadata`
+
+You can store any data here in this field, and it will be dumped to a JSON file to results directory as `<common.project_name>_metadata.json`. The csv file paths will also be stored here.
+
 ## Amber MD Config
 
 `nexus md amber` uses `MDConfig` from `src/nexus/md/md_config.py`.
@@ -356,6 +368,10 @@ prod:
   rand_time: 200.0
   prod_time: 2500.0
   prod_freq: 10.0
+
+metadata:
+  tool: amber
+  everything: everything
 ```
 
 ### `common`

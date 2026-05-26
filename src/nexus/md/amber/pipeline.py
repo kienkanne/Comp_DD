@@ -30,9 +30,7 @@ class AmberPipeline(BaseModel):
         last_eq_ncrst = equilibrate(self.mcfg, prmtop, last_heat_ncrst)
         
         ### TODO:
-        # Returns trajectory file and out file for each seed to be copied to results_dir
         # Add production chunks, then combine at the end
-        # Trajectory file should be removed from artifacts as it's very heavy
         outputs = produce(self.mcfg, prmtop, last_eq_ncrst)
 
         copy_to_results(self.mcfg, outputs)

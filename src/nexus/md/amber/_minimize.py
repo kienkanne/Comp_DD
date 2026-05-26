@@ -35,10 +35,10 @@ def minimize(mcfg: MDConfig, prmtop: Path, inpcrd: Path) -> Path:
             )
 
             if run == 1:
-                _run_pmemd(min_input, prmtop, inpcrd, working_dir, f"min{run}")
+                _run_pmemd(min_input, prmtop, inpcrd, working_dir, f"min{run}", mcfg.common.logger)
             else:
                 ncrst = working_dir / f"min{run - 1}.ncrst"
-                _run_pmemd(min_input, prmtop, ncrst, working_dir, f"min{run}")
+                _run_pmemd(min_input, prmtop, ncrst, working_dir, f"min{run}", mcfg.common.logger)
             last_ncrst = working_dir / f"min{run}.ncrst"
 
         return last_ncrst

@@ -47,13 +47,16 @@ class ProdConfig(BaseModel):
     prod_freq: Optional[float] = 10.0
 
 
+class MetadataConfig(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
 class MDConfig(BaseModel):
     common: Optional[CommonConfig] = CommonConfig()
     min: Optional[MinConfig] = MinConfig()
     heat: Optional[HeatConfig] = HeatConfig()
     eq: Optional[EqConfig] = EqConfig()
     prod: Optional[ProdConfig] = ProdConfig()
-
+    metadata: Optional[MetadataConfig] = MetadataConfig()
 
 def load_md_config(path):
     import yaml
@@ -71,14 +74,16 @@ def _setup_dirs(mcfg: MDConfig):
     from nexus.core.trackers.manifest import Manifest
     from nexus.core.trackers.runstate import State
 
-    mcfg.common.working_dir = mcfg.common.working_dir/ mcfg.common.project_name
-    mcfg.common.results_dir = mcfg.common.results_dir / mcfg.common.project_name
+    project_name = mcfg.common.project_name
+
+    mcfg.common.working_dir = mcfg.common.working_dir/ project_name
+    mcfg.common.results_dir = mcfg.common.results_dir / project_name
     
     mcfg.common.working_dir.mkdir(parents=True, exist_ok=True)
     mcfg.common.results_dir.mkdir(parents=True, exist_ok=True)
 
-    setattr(mcfg.common, "logger", setup_logger(mcfg.common.working_dir / "run.log"))
-    setattr(mcfg.common, "manifest", Manifest(mcfg.common.working_dir / "manifest.json"))
-    setattr(mcfg.common, "runstate", State(mcfg.common.working_dir / "state.json") )
+    setattr(mcfg.common, "logger", setup_logger(mcfg.common.working_dir / f"{project_name}_run.log"))
+    setattr(mcfg.common, "manifest", Manifest(mcfg.common.working_dir / f"{project_name}_manifest.json"))
+    setattr(mcfg.common, "runstate", State(mcfg.common.working_dir / f"{project_name}_state.json") )
 
     return mcfg

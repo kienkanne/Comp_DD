@@ -51,12 +51,19 @@ class DOCK6Config(BaseModel):
     radius: Optional[float] = 10.0
 
 
-class ValidationConfig(BaseModel):
+class MetadataConfig(BaseModel):
+    # Allow arbitrary extra fields in YAML that aren't explicitly defined here
+    # Import files will be added, and at the end a json will be dumped to results dir
+    model_config = ConfigDict(extra="allow")
+
+
+"""class ValidationConfig(BaseModel):
     data: Optional[Path] = None
     protein_suffix: Optional[str] = "_protein.pdb"
     pocket_suffix: Optional[str] = "_pocket.pdb"
     ligand_suffix: Optional[str] = "_ligand.sdf"
 
+"""
 
 class DockConfig(BaseModel):
     libs: Optional[LibsConfig] = LibsConfig()
@@ -65,7 +72,8 @@ class DockConfig(BaseModel):
     dock6: Optional[DOCK6Config] = DOCK6Config()
     receptors: Optional[ReceptorsConfig] = ReceptorsConfig()
     ligands: Optional[LigandsConfig] = LigandsConfig()
-    validation: Optional[ValidationConfig] = ValidationConfig()
+    metadata: Optional[MetadataConfig] = MetadataConfig()
+    #validation: Optional[ValidationConfig] = ValidationConfig()
 
 
 def load_dock_config(path):
@@ -130,12 +138,14 @@ def _setup_dirs(dcfg: DockConfig):
                 expanded_path = Path(os.path.expandvars(str(value))).expanduser()
                 setattr(subcfg, field_name, expanded_path) # Don't forget to save it back!
 
-    dcfg.common.working_dir = dcfg.common.working_dir/ dcfg.common.project_name
-    dcfg.common.results_dir = dcfg.common.results_dir / dcfg.common.project_name
+    project_name = dcfg.common.project_name
 
-    setattr(dcfg.common, "logger", setup_logger(dcfg.common.working_dir / "run.log"))
-    setattr(dcfg.common, "manifest", Manifest(dcfg.common.working_dir / "manifest.json"))
-    setattr(dcfg.common, "runstate", State(dcfg.common.working_dir / "state.json") )
+    dcfg.common.working_dir = dcfg.common.working_dir/ project_name
+    dcfg.common.results_dir = dcfg.common.results_dir / project_name
+
+    setattr(dcfg.common, "logger", setup_logger(dcfg.common.working_dir / f"{project_name}_run.log"))
+    setattr(dcfg.common, "manifest", Manifest(dcfg.common.working_dir / f"{project_name}_manifest.json"))
+    setattr(dcfg.common, "runstate", State(dcfg.common.working_dir / f"{project_name}_state.json") )
 
     return dcfg
 
