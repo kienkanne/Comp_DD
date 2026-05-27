@@ -45,6 +45,12 @@ Workflow-specific external software:
 
 ## Installation
 
+Go to your desired folder to install the repository:
+
+```bash
+git clone https://github.com/kienkanne/NexusMol
+```
+
 From the repository root:
 
 ```bash
