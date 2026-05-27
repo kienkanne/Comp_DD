@@ -13,5 +13,6 @@ dependencies:
   - rdkit
   - pydantic
   - pytest
+  - pip
   - pip:
     - rcsb-api

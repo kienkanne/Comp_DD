@@ -2,7 +2,6 @@ from openmm import LangevinMiddleIntegrator, MonteCarloBarostat
 from openmm.app import AmberInpcrdFile, AmberPrmtopFile, HBonds, PME, Simulation
 from openmm.unit import atmosphere, kelvin, nanometer, picosecond
 
-from pathlib import Path
 import re
 
 from nexus.md.md_config import MDConfig
@@ -11,16 +10,17 @@ def setup(mcfg: MDConfig):
     prmtop = AmberPrmtopFile(mcfg.common.prmtop)
     inpcrd = AmberInpcrdFile(mcfg.common.inpcrd)
 
-    dt = mcfg.common.dt # already in picoseconds
-    temp = mcfg.common.temp
-    cut = mcfg.common.cut / 10 # Convert angstroms to nanometers
+    dt = mcfg.common.dt * picosecond
+    temp = mcfg.common.temp * kelvin
+    cut = mcfg.common.cut * nanometer / 10 # Convert angstroms to nanometers
+
     mask = mcfg.common.mask
 
     system = prmtop.createSystem(
         nonbondedMethod=PME,
-        nonbondedCutoff=cut*nanometer,
-        constraints=HBonds,
-        rigidWater=True
+        nonbondedCutoff=cut,
+        constraints=HBonds,            # ntc=2 (constraint), ntf=2(SHAKE)
+        rigidWater=True               
                                  )
     
     mask_pattern = r":(\d+)-(\d+)"
@@ -32,6 +32,7 @@ def setup(mcfg: MDConfig):
     else:
         raise ValueError(f"Invalid mask: {mask}")
 
+    # Add restraints for minimization, heating, and equilibration
     add_positional_restraints(topology=prmtop.topology,
                               positions=inpcrd.positions,
                               system=system,
@@ -39,35 +40,32 @@ def setup(mcfg: MDConfig):
                               stop_residue_i=stop_residue_i,
                               k_kcal_per_mol_a2=10)
     
+    # Add barostat (start NPT from heating)
+    # TODO: Pressure settings are hardcoded for now
+    pressure = 1 * atmosphere
+    barostat_interval: int = 25
+    system.addForce(MonteCarloBarostat(pressure, temp, barostat_interval))
+
     # Set high friction (5 ps^-1) initially for safe heating stage
     # Set back to (1 ps^-1) for equilibration and production later on
-    integrator = LangevinMiddleIntegrator(temp*kelvin, 5.0/picosecond, dt*picosecond)
-    print (prmtop.topology.getPeriodicBoxVectors())
+    gamma = 5.0 / picosecond
+    integrator = LangevinMiddleIntegrator(temp, gamma, dt)
+
     simulation = Simulation(topology=prmtop.topology,
                             system=system,
                             integrator=integrator)
-    
     simulation.context.setPositions(inpcrd.getPositions())
 
+    # AMBER restart files may contain periodic box vectors; copy them into the
+    # Context so PME and pressure coupling use the intended unit cell.
+    if inpcrd.boxVectors is not None:
+        simulation.context.setPeriodicBoxVectors(*inpcrd.boxVectors)
 
-    num_forces = system.getNumForces()
-    print(f"There are {num_forces} force terms in this system.")
+    return simulation
 
-    # Loop through to find a specific force object by its class name
-    for i in range(num_forces):
-        force = system.getForce(i)
-        print(f"Index {i}: {type(force).__name__}")
-
-
-
-
-"""Positional restraint helpers for staged OpenMM preparation protocols."""
 
 from openmm import CustomExternalForce
-from openmm.unit import kilojoule_per_mole, nanometer
-
-
-RESTRAINT_PARAMETER_NAME = "positional_restraint_k"
+from openmm.unit import kilojoule_per_mole
 
 
 def kcal_per_mol_a2_to_openmm(k_kcal_per_mol_a2):
@@ -96,7 +94,7 @@ def add_positional_restraints(
     restraint.addPerParticleParameter("y0")
     restraint.addPerParticleParameter("z0")
     # The global force constant lets protocols update restraint strength cheaply.
-    restraint.addGlobalParameter(RESTRAINT_PARAMETER_NAME, k)
+    restraint.addGlobalParameter("positional_restraint_k", k)
 
     for atom, position in zip(topology.atoms(), positions):
         amber_index = int(atom.residue.id)
@@ -112,9 +110,4 @@ def set_positional_restraint_strength(simulation, k_kcal_per_mol_a2):
     """Update the existing restraint force constant in the active Context."""
 
     k = kcal_per_mol_a2_to_openmm(k_kcal_per_mol_a2)
-    simulation.context.setParameter(RESTRAINT_PARAMETER_NAME, k)
-
-
-from nexus.md.md_config import load_md_config
-
-setup(load_md_config("/localscratch/kbui/NexusMol/examples/amber_md.yaml"))
+    simulation.context.setParameter("positional_restraint_k", k)

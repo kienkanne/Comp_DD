@@ -21,15 +21,15 @@ class CommonConfig(BaseModel):
 
 class MinConfig(BaseModel):
     n_min_runs: Optional[int] = 7
-    ncyc: Optional[int] = 1000
+    ncyc: Optional[int] = 1000      # OpenMM doesn't use ncyc
     maxcyc: Optional[int] = 5000
     restraints: Optional[List[float]] = [10.0, 5.0, 2.0, 1.0, 0.5, 0.1, 0.0]
 
 
 class HeatConfig(BaseModel):
     mid_temp: Optional[float] = 100.0
-    time1: Optional[float] = 100.0
-    time2: Optional[float] = 500.0
+    time_mid_temp: Optional[float] = 100.0
+    time_temp: Optional[float] = 500.0
     total_time: Optional[float] = 2000.0
     restraint: Optional[float] = 10.0
 

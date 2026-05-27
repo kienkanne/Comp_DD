@@ -22,8 +22,8 @@ def heat(mcfg: MDConfig, prmtop: Path, last_min_ncrst: Path):
         temp = mcfg.common.temp
 
         mid_temp = mcfg.heat.mid_temp
-        time_mid_temp = mcfg.heat.time1
-        time_temp = mcfg.heat.time2
+        time_mid_temp = mcfg.heat.time_mid_temp
+        time_temp = mcfg.heat.time_temp
         total_time = mcfg.heat.total_time
         restraint = mcfg.heat.restraint
 
