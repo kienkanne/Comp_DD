@@ -10,5 +10,9 @@
   "Write summary csv": {
     "status": "done",
     "output": null
+  },
+  "Final copy to results": {
+    "status": "done",
+    "output": null
   }
 }

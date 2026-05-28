@@ -12,11 +12,12 @@ def amber(config: Path = typer.Option(..., "-c", "--config", help="Path to confi
     AmberPipeline(mcfg=load_md_config(config))._run()
 
 
-'''@app.command()
+@app.command()
 def openmm(config: Path = typer.Option(..., "-c", "--config", help="Path to config YAML")):
     """Run the openmm MD pipeline."""
-    print ("Work in progress ...")
-    pass'''
+    from nexus.md.openmm.pipeline import OpenMMPipeline
+    from nexus.md.md_config import load_md_config
+    OpenMMPipeline(mcfg=load_md_config(config))._run()
 
 
 @app.command()

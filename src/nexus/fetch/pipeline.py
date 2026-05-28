@@ -7,7 +7,7 @@ from pathlib import Path
 class FetchPipeline:
     fcfg: FetchConfig
 
-    def run(self):
+    def _run(self):
         if Path(self.fcfg.input[0]).is_file():
             with open(self.fcfg.input[0], "r") as f:
                 self.fcfg.input = f.read().splitlines()

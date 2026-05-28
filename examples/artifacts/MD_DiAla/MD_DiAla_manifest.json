@@ -1,23 +1,15 @@
 {
-  "created_utc": "2026-05-26T05:24:20.842817+00:00",
+  "created_utc": "2026-05-28T22:35:22.764399+00:00",
   "host": "irene2",
-  "platform": "Linux-6.12.0-124.31.1.el10_1.x86_64-x86_64-with-glibc2.39",
+  "platform": "Linux-6.12.0-124.56.1.el10_1.x86_64-x86_64-with-glibc2.39",
   "python_version": "3.11.15",
-  "status": "success",
+  "status": "running",
   "stages": {
     "Minimization": "done",
-    "Heating": "done",
-    "Equilibration": "done",
-    "Production": "done",
-    "Copying to results": "done"
+    "Heating": "running"
   },
   "timings_sec": {
-    "Minimization": 5.076,
-    "Heating": 118.533,
-    "Equilibration": 87.138,
-    "Production": 144.209,
-    "Copying to results": 0.002
+    "Minimization": 0.617
   },
-  "total_wall_time": "354.960",
-  "finished_utc": "2026-05-26T05:30:15.803067+00:00"
+  "total_wall_time": null
 }

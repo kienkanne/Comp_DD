@@ -11,10 +11,9 @@ def _process_ligand(pcfg: PrepConfig, ligand_pose: Path):
     antechamber_cmd = ["antechamber", "-i", str(ligand_pose), "-fi", "mol2", 
                        "-o", str(ligand_charged), "-fo", "mol2", 
                        "-c", "bcc", "-nc", "0", "-pf", "yes"]   
-    @shell()
-    def _a_run():
-        return (antechamber_cmd, None)
-    _a_run()
+
+    with shell(antechamber_cmd):
+        pass
 
     # clean up
     sqm_files = ["sqm.in", "sqm.out", "sqm.pdb"]
@@ -25,9 +24,7 @@ def _process_ligand(pcfg: PrepConfig, ligand_pose: Path):
     
     parmchk2_cmd = ["parmchk2", "-i", str(ligand_charged), "-f", "mol2","-o", str(ligand_frcmod)]
 
-    @shell()
-    def _p_run():
-        return (parmchk2_cmd, None)
-    _p_run()    
+    with shell(parmchk2_cmd):
+        pass
 
     return ligand_charged, ligand_frcmod

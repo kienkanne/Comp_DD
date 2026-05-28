@@ -3,10 +3,7 @@
     "status": "done",
     "output": null
   },
-  "Heating": {
-    "status": "done",
-    "output": null
-  },
+  "Heating": "running",
   "Equilibration": {
     "status": "done",
     "output": null

@@ -6,7 +6,7 @@
 | PMEMD implementation of SANDER, Release 24
 
 |  Compiled date/time: Wed Aug 21 09:34:12 2024
-| Run on 05/26/2026 at 01:24:25
+| Run on 05/28/2026 at 18:12:10
 
 |   Executable path: pmemd.cuda
 | Working directory: /localscratch/kbui/NexusMol/examples
@@ -44,7 +44,7 @@ Minimization
 /                                                                              
 
 
-Note: ig = -1. Setting random seed to   258424 based on wallclock time in 
+Note: ig = -1. Setting random seed to    73945 based on wallclock time in 
       microseconds.
 | irandom = 1, using AMBER's internal random number generator (default).
  
@@ -100,7 +100,7 @@ Note: ig = -1. Setting random seed to   258424 based on wallclock time in
 |   CUDA Capable Devices Detected:      1
 |           CUDA Device ID in use:      0
 |                CUDA Device Name: NVIDIA GeForce RTX 4090
-|     CUDA Device Global Mem Size:  24071 MB
+|     CUDA Device Global Mem Size:  24079 MB
 | CUDA Device Num Multiprocessors:    128
 |           CUDA Device Core Freq:   2.62 GHz
 |
@@ -644,12 +644,12 @@ ACE
 |
 |     Routine           Sec        %
 |     ------------------------------
-|     Nonbond           0.18   53.14
+|     Nonbond           0.18   53.60
 |     Bond              0.00    0.00
 |     Angle             0.00    0.00
 |     Dihedral          0.00    0.00
 |     Shake             0.00    0.00
-|     Other             0.16   46.86
+|     Other             0.15   46.40
 |     ------------------------------
 |     Total             0.33
 
@@ -668,9 +668,9 @@ ACE
 |     ---------------------------------
 |     NonBonded Calc       0.00    0.00
 |     Exclude Masked       0.00    0.00
-|     Other                0.00    0.74
+|     Other                0.00    0.76
 |     ---------------------------------
-|     Total                0.00    0.74
+|     Total                0.00    0.76
 
 |  PME Reciprocal Force CPU Time:
 |
@@ -684,10 +684,10 @@ ACE
 |     ---------------------------------
 |     Total                0.00    0.00
 
-|  Setup CPU time:            0.22 seconds
+|  Setup CPU time:            0.19 seconds
 |  NonSetup CPU time:         0.33 seconds
-|  Total CPU time:            0.56 seconds     0.00 hours
+|  Total CPU time:            0.52 seconds     0.00 hours
 
-|  Setup wall time:           1    seconds
-|  NonSetup wall time:        0    seconds
+|  Setup wall time:           0    seconds
+|  NonSetup wall time:        1    seconds
 |  Total wall time:           1    seconds     0.00 hours

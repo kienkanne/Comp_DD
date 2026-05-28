@@ -84,6 +84,6 @@ def test_fetch_pipeline_reads_ids_from_text_file(tmp_path, monkeypatch):
 
     monkeypatch.setattr(fetch_pipeline, "rcsb_fetch", fake_rcsb_fetch)
 
-    FetchPipeline(FetchConfig(input=[str(ids)], output_dir=tmp_path)).run()
+    FetchPipeline(FetchConfig(input=[str(ids)], output_dir=tmp_path))._run()
 
     assert seen == {"input": ["6W63", "7K40"], "output_dir": tmp_path}

@@ -13,7 +13,13 @@ def full_analyze(prmtop: Path, trajin: Path, mask: str, name: str, output_dir: P
     with open(Path(__file__).resolve().parents[0] / "analysis_template.txt") as f:
         analysis_template = f.read()
 
-    cpptraj_input = Template(analysis_template).substitute(prmtop=prmtop, trajin=trajin, mask=mask, name=name)
+    absolute_prmtop = Path(prmtop).resolve()
+    absolute_trajin = Path(trajin).resolve()
+
+    cpptraj_input = Template(analysis_template).substitute(prmtop=absolute_prmtop, 
+                                                           trajin=absolute_trajin, 
+                                                           mask=mask, 
+                                                           name=name)
 
     _run_cpptraj(cpptraj_input, output_dir=output_dir, name=name)
 

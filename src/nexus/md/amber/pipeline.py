@@ -6,7 +6,7 @@ from nexus.md.amber._minimize import minimize
 from nexus.md.amber._heat import heat
 from nexus.md.amber._equilibrate import equilibrate
 from nexus.md.amber._produce import produce
-from nexus.md.amber._final_copy import copy_to_results
+from nexus.md._final_copy import final_copy
 
 
 class AmberPipeline(BaseModel):
@@ -28,9 +28,7 @@ class AmberPipeline(BaseModel):
         last_min_ncrst = minimize(self.mcfg, prmtop, inpcrd)
         last_heat_ncrst = heat(self.mcfg, prmtop, last_min_ncrst)
         last_eq_ncrst = equilibrate(self.mcfg, prmtop, last_heat_ncrst)
-        
-        ### TODO:
-        # Add production chunks, then combine at the end
+
         outputs = produce(self.mcfg, prmtop, last_eq_ncrst)
 
-        copy_to_results(self.mcfg, outputs)
+        final_copy(self.mcfg, outputs)

@@ -1,7 +1,7 @@
 from openmm import LangevinMiddleIntegrator, MonteCarloBarostat
 from openmm.app import AmberInpcrdFile, AmberPrmtopFile, HBonds, PME, Simulation
 from openmm.unit import atmosphere, kelvin, nanometer, picosecond
-
+from openmm import Platform
 import re
 
 from nexus.md.md_config import MDConfig
@@ -49,11 +49,18 @@ def setup(mcfg: MDConfig):
     # Set high friction (5 ps^-1) initially for safe heating stage
     # Set back to (1 ps^-1) for equilibration and production later on
     gamma = 5.0 / picosecond
-    integrator = LangevinMiddleIntegrator(temp, gamma, dt)
+    # Initial temperature set to 0, gradually changed by heating step to temp
+    integrator = LangevinMiddleIntegrator(0, gamma, dt)
+
+    # Default to using GPU with mixed precision
+    platform = Platform.getPlatformByName("CUDA")
+    properties = {'Precision': 'mixed'}
 
     simulation = Simulation(topology=prmtop.topology,
                             system=system,
-                            integrator=integrator)
+                            integrator=integrator,
+                            platform=platform,
+                            platformProperties=properties)
     simulation.context.setPositions(inpcrd.getPositions())
 
     # AMBER restart files may contain periodic box vectors; copy them into the

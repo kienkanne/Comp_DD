@@ -65,15 +65,21 @@ def load_md_config(path):
     mcfg = MDConfig.model_validate(mcfg)
     ### TODO: Simplify setup function and remove dependencies
     mcfg = _setup_dirs(mcfg)
+    from nexus.core.trackers.main_tracker import setup_context
+    setup_context(mcfg.common.working_dir, mcfg.common.project_name)
 
     return mcfg
     
 
 def _setup_dirs(mcfg: MDConfig):
-    from nexus.core.trackers.logging_utils import setup_logger
-    from nexus.core.trackers.manifest import Manifest
-    from nexus.core.trackers.runstate import State
+    prmtop = mcfg.common.prmtop
+    inpcrd = mcfg.common.inpcrd
 
+    if prmtop is None or not prmtop.is_file():
+        raise FileNotFoundError(f"Missing prmtop at: {prmtop}")
+    if inpcrd is None or not inpcrd.is_file():
+        raise FileNotFoundError(f"Missing prmtop at: {inpcrd}")
+    
     project_name = mcfg.common.project_name
 
     mcfg.common.working_dir = mcfg.common.working_dir/ project_name
@@ -81,9 +87,5 @@ def _setup_dirs(mcfg: MDConfig):
     
     mcfg.common.working_dir.mkdir(parents=True, exist_ok=True)
     mcfg.common.results_dir.mkdir(parents=True, exist_ok=True)
-
-    setattr(mcfg.common, "logger", setup_logger(mcfg.common.working_dir / f"{project_name}_run.log"))
-    setattr(mcfg.common, "manifest", Manifest(mcfg.common.working_dir / f"{project_name}_manifest.json"))
-    setattr(mcfg.common, "runstate", State(mcfg.common.working_dir / f"{project_name}_state.json") )
 
     return mcfg

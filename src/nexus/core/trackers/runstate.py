@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 
-class State:
+class RunState:
     """
     Simple checkpoint state for resume support.
     """

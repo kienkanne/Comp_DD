@@ -38,4 +38,4 @@ def rcsb(config: Optional[Path] = typer.Option(None, "-c", "--config", help = "P
 	)
     
     from nexus.fetch.pipeline import FetchPipeline
-    FetchPipeline(fcfg=fcfg).run()
+    FetchPipeline(fcfg=fcfg)._run()

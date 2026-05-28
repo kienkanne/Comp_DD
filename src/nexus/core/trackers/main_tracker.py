@@ -1,10 +1,15 @@
-### TODO: Remove main tracker dependence on cfg
-def main_tracker(cfg, stage_name, checkpoint=False):
+from pydantic import BaseModel
+from typing import Any, Optional
+
+
+def main_tracker(stage_name, checkpoint=False):
     def decorator(func):
         def wrapper(*args, **kwargs):
-            logger = cfg.common.logger
-            manifest = cfg.common.manifest
-            runstate = cfg.common.runstate   
+            ctx = PipelineContext.get_ctx()
+
+            logger = ctx.logger
+            manifest = ctx.manifest
+            runstate = ctx.runstate   
 
             if checkpoint and runstate.is_done(stage_name):
                 logger.info(f"STAGE: {stage_name} already done, skipping")
@@ -31,3 +36,35 @@ def main_tracker(cfg, stage_name, checkpoint=False):
             return result
         return wrapper
     return decorator
+
+class PipelineContext(BaseModel):
+    logger: Optional[Any] = None
+    manifest: Optional[Any] = None
+    runstate: Optional[Any] = None
+
+    # internal class variable to store instance
+    # hint is user read only
+    _active_context: "Optional[PipelineContext]" = None
+
+    @classmethod
+    def set_ctx(cls, ctx: "PipelineContext"):
+        cls._active_context = ctx
+
+    @classmethod
+    def get_ctx(cls):
+        if cls._active_context is None:
+            raise RuntimeError("No currently active context")
+        return cls._active_context
+
+
+from nexus.core.trackers.logging_utils import setup_logger
+from nexus.core.trackers.manifest import Manifest
+from nexus.core.trackers.runstate import RunState
+
+
+def setup_context(working_dir, project_name):
+    PipelineContext.set_ctx(PipelineContext(
+        logger = setup_logger(working_dir / f"{project_name}_run.log"),
+        manifest = Manifest(working_dir / f"{project_name}_manifest.json"),
+        runstate = RunState(working_dir / f"{project_name}_state.json")
+    ))

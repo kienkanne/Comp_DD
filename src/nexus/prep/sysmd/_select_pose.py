@@ -13,19 +13,15 @@ def _select_pose(pcfg: PrepConfig):
 
     m_cmd = ["obabel", str(ligand), "-O", f"{ligand_name}_pose_.mol2", "-m"]
     
-    @shell()
-    def _m_run():
-        return (m_cmd, None)
-    _m_run()
+    with shell(m_cmd):
+        pass
     
     ligand_pose = f"{ligand_name}_pose_{pose_num}.mol2"
     with_h = f"{ligand_name}_pose_{pose_num}_with_H.mol2"
 
     h_cmd = ["obabel", ligand_pose, "-O", with_h, "-h"]
 
-    @shell()
-    def _h_run():
-        return (h_cmd, None)
-    _h_run()
+    with shell(h_cmd):
+        pass
 
     return Path(with_h)

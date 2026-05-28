@@ -1,10 +1,16 @@
 from nexus.core.trackers.logging_utils import DummyLogger
+from nexus.core.trackers.main_tracker import PipelineContext
+### TODO: REMOVE
 
+def base(title=None):
+    """
+    Warning: From update 2.3.0, 'base' is depreciated.
+    """
 
-def base(logger=None, title=None):
     def decorator(func):
         def wrapper(*args, **kwargs):
-            local_logger = logger if logger is not None else DummyLogger()
+            ctx = PipelineContext.get_ctx()
+            local_logger = ctx.logger if ctx.logger is not None else DummyLogger()
             local_title = title if title is not None else ""
 
             if title is not None:

@@ -88,6 +88,9 @@ def load_dock_config(path):
     # Validate and normalize receptor-related configuration (selection/reference semantics)
     validate_and_normalize_receptors(dcfg, dcfg.receptors.reference_suffix)
 
+    from nexus.core.trackers.main_tracker import setup_context
+    setup_context(dcfg.common.working_dir, dcfg.common.project_name)
+
     return dcfg
 
 
@@ -113,10 +116,6 @@ def _find_files(dcfg: DockConfig):
 
 
 def _setup_dirs(dcfg: DockConfig):
-    from nexus.core.trackers.logging_utils import setup_logger
-    from nexus.core.trackers.manifest import Manifest
-    from nexus.core.trackers.runstate import State
-
     for subcfg_name in DockConfig.model_fields:
         subcfg = getattr(dcfg, subcfg_name)
         
@@ -136,16 +135,12 @@ def _setup_dirs(dcfg: DockConfig):
             value = getattr(subcfg, field_name)
             if isinstance(value, Path):
                 expanded_path = Path(os.path.expandvars(str(value))).expanduser()
-                setattr(subcfg, field_name, expanded_path) # Don't forget to save it back!
+                setattr(subcfg, field_name, expanded_path)
 
     project_name = dcfg.common.project_name
 
     dcfg.common.working_dir = dcfg.common.working_dir/ project_name
     dcfg.common.results_dir = dcfg.common.results_dir / project_name
-
-    setattr(dcfg.common, "logger", setup_logger(dcfg.common.working_dir / f"{project_name}_run.log"))
-    setattr(dcfg.common, "manifest", Manifest(dcfg.common.working_dir / f"{project_name}_manifest.json"))
-    setattr(dcfg.common, "runstate", State(dcfg.common.working_dir / f"{project_name}_state.json") )
 
     return dcfg
 

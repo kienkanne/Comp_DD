@@ -1,6 +1,6 @@
 import pytest
 
-from nexus.prep.ligdock._parse_csv import _parse_ligands_csv
+from nexus.prep.ligdock._smiles_to_mols import _parse_ligands_csv
 
 
 def test_parse_ligands_csv_sanitizes_names(tmp_path):

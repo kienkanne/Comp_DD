@@ -122,7 +122,5 @@ tokens.txt
 # Exception for examples only
 !examples/**/*.log
 !examples/**/*.out
-!examples/**/*.nc
-!examples/**/*.ncrst
 !examples/results
 !examples/artifacts

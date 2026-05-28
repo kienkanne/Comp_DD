@@ -11,7 +11,7 @@ def parse_volume(tleap_output):
         raise ValueError("Volume not found in tleap output")
     return float(match.group(1))
 
-@shell()
+
 def build_tleap_cmd(input_dict: dict):
     stdin = [
         f"source leaprc.protein.{input_dict['force_field']}",
@@ -43,7 +43,13 @@ def build_tleap_cmd(input_dict: dict):
     ])
     
     stdin = "\n".join(stdin)
-    return (["tleap", "-f", "-"], stdin)
+    cmd = ["tleap", "-f", "-"]
+
+    with shell(cmd, stdin) as stdout:
+        pass
+    
+    return stdout
+
 
 def run_tleap(pcfg: PrepConfig, receptor_renamed: Path, ligand_charged: Path, ligand_frcmod: Path):
     output_dir = pcfg.common.output_dir

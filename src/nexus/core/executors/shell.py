@@ -1,37 +1,40 @@
 import subprocess
 import os
 from nexus.core.trackers.logging_utils import DummyLogger
+from nexus.core.trackers.main_tracker import PipelineContext
+from contextlib import contextmanager
 
-def shell(logger=None):
-    def decorator(func):
-        def wrapper(*args, **kwargs):
-            try:
-                cmd, stdin = func(*args, **kwargs)
-                cmd = [os.path.expandvars(i) for i in cmd]
 
-                local_logger = logger if logger is not None else DummyLogger()
-                local_logger.info(f"Running: {' '.join([str(arg) for arg in cmd])}")
+@contextmanager
+def shell(cmd, stdin=None, title=""):
+    try:
+        cmd = [os.path.expandvars(i) for i in cmd]
 
-                result = subprocess.run(
-                    cmd,
-                    capture_output=True,
-                    text=True,
-                    input=stdin
-                )
-                
-                # logger stdout/stderr for debugging
-                if result.stdout:
-                    local_logger.debug(f"STDOUT: {result.stdout}")
-                if result.stderr:
-                    local_logger.warning(f"STDERR: {result.stderr}")
+        ctx = PipelineContext.get_ctx()
+        try:
+            logger = ctx.logger if ctx.logger is not None else DummyLogger()
+        except:
+            logger = DummyLogger()
+            
+        logger.info(f"Running: {title}; cmd: {' '.join([str(arg) for arg in cmd])}")
 
-                result.check_returncode()
-                return result.stdout
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            input=stdin
+        )
+        
+        # logger stdout/stderr for debugging
+        if result.stdout:
+            logger.debug(f"STDOUT: {result.stdout}")
+        if result.stderr:
+            logger.warning(f"STDERR: {result.stderr}")
 
-            except subprocess.CalledProcessError as e:
-                local_logger.error(f"Command failed with exit code {e.returncode}")
-                local_logger.error(f"Error output: {e.stderr}")
-                raise
+        result.check_returncode()
+        yield result.stdout
 
-        return wrapper
-    return decorator
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Command failed with exit code {e.returncode}")
+        logger.error(f"Error output: {e.stderr}")
+        raise
