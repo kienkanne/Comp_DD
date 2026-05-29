@@ -229,7 +229,6 @@ docs/
 - [Configuration Reference](CONFIGURATION.md)
 - [Developer Guide](DEVELOPER_GUIDE.md)
 - [Data Flow](DATA_FLOW.md)
-- [Security and Bug Analysis](SECURITY_AND_BUGS.md)
 - [Changelog](CHANGELOG.md)
 
 ## Development and Tests
