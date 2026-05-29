@@ -6,12 +6,13 @@ dependencies:
   - python=3.11
   - typer
   - pyyaml
+  - pydantic
   - openbabel
   - vina
   - meeko
   - rdkit
-  - pydantic
-  - pytest
+  - openmm
+  - cuda=12.0
   - pip
   - pip:
     - rcsb-api

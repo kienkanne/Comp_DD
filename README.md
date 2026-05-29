@@ -1,6 +1,6 @@
 # NexusMol
 
-NexusMol is a command-line toolkit for structure-based drug discovery workflows. It brings common preparation, docking, molecular dynamics, and analysis steps behind one Python CLI while delegating scientific heavy lifting to established tools such as ChimeraX, RDKit, Meeko, AutoDock Vina, DOCK6, Open Babel, and Amber.
+NexusMol is a command-line toolkit for structure-based drug discovery workflows. It brings common preparation, docking, molecular dynamics, and analysis steps behind one Python CLI while delegating scientific heavy lifting to established tools such as ChimeraX, RDKit, Meeko, AutoDock Vina, DOCK6, Open Babel, AMBER, and OpenMM.
 
 Current package version: `2.3.0`.
 
@@ -12,9 +12,9 @@ NexusMol currently supports:
 - Cleaning receptors and changing residue names or protonation states with ChimeraX.
 - Preparing ligands from SMILES CSV files or SDF files for Vina (`.pdbqt`) or DOCK6 (`.mol2`).
 - Running AutoDock Vina and DOCK6 docking batches in parallel.
-- Building solvated Amber systems from prepared receptors and docked ligand poses.
-- Running Amber minimization, heating, equilibration, and production workflows.
-- Running a CPPTRAJ-based analysis workflow for existing Amber trajectories.
+- Building solvated AMBER systems from prepared receptors and docked ligand poses.
+- Running AMBER and OpenMM minimization, heating, equilibration, and production workflows.
+- Running a CPPTRAJ-based analysis workflow for existing trajectories.
 
 ## Prerequisites
 
@@ -40,6 +40,7 @@ Workflow-specific external software:
 | Vina docking | AutoDock Vina, Meeko receptor preparation tools, ChimeraX. |
 | DOCK6 docking | DOCK6 installation, legacy UCSF Chimera, ChimeraX. |
 | System building and Amber MD | AmberTools/Amber on `PATH`, `AMBERHOME` set, and `pmemd.cuda` available for MD runs. |
+| OpenMM MD | OpenMM library, CUDA |
 | MD analysis | AmberTools `cpptraj` and `AMBERHOME` set. |
 
 ## Installation
@@ -171,7 +172,13 @@ nexus prep sysmd -c sysmd_config.yaml
 Run Amber MD:
 
 ```bash
-nexus md amber -c amber_md.yaml
+nexus md amber -c amber_config.yaml
+```
+
+Or run OpenMM MD:
+
+```bash
+nexus md openmm -c openmm_config.yaml
 ```
 
 Analyze an existing trajectory:
@@ -207,7 +214,7 @@ src/nexus/
     trackers/           Logging, manifest, and state helpers
   dock/                 Docking configs, Vina, DOCK6, and shared utilities
   fetch/                RCSB fetch config and pipeline
-  md/                   Amber MD and CPPTRAJ analysis workflows
+  md/                   Amber MD, OpenMM MD, and CPPTRAJ analysis workflows
   prep/                 Receptor, mutation, ligand, and sysmd preparation
 examples/
   EXAMPLES.md           Example command walkthrough
