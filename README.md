@@ -225,10 +225,12 @@ docs/
 
 ## Documentation
 
-- [Architecture](ARCHITECTURE.md)
-- [Configuration Reference](CONFIGURATION.md)
-- [Developer Guide](DEVELOPER_GUIDE.md)
-- [Data Flow](DATA_FLOW.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Configuration Reference](docs/CONFIGURATION.md)
+- [Developer Guide](docs/DEVELOPER_GUIDE.md)
+- [Data Flow](docs/DATA_FLOW.md)
+- [Examples](examples/EXAMPLES.md)
+- [References](examples/REFERENCES.md)
 - [Changelog](CHANGELOG.md)
 
 ## Development and Tests
@@ -243,4 +245,4 @@ pytest
 
 Many integration paths require external scientific tools and real structure inputs. For fast local iteration, start with CLI help checks, config loading, and small ligand/receptor fixtures before launching full docking or MD jobs.
 
-Contribution setup, branch naming, debugging tips, and extension guidance live in [DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md).
+Contribution setup, branch naming, debugging tips, and extension guidance live in [DEVELOPER_GUIDE.md](docs/DEVELOPER_GUIDE.md).
