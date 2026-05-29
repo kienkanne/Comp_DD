@@ -61,3 +61,6 @@ class RunState:
     def is_done(self, stage: str) -> bool:
         entry = self.state.get(stage, {})
         return (entry.get("status") == "done") if isinstance(entry, dict) else (entry == "done")
+
+    def get_path(self):
+        return self.path

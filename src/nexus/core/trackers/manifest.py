@@ -76,4 +76,6 @@ class Manifest:
             json.dump(self.data, f, indent=2)
         temp_path.replace(self.path)
 
+    def get_path(self):
+        return self.path
     

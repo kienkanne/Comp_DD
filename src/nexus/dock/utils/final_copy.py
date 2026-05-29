@@ -1,16 +1,10 @@
 import shutil
 from pathlib import Path
-from nexus.core.trackers.main_tracker import main_tracker, PipelineContext
+from nexus.core.trackers.main_tracker import main_tracker, final_copy_trackers
 
 
 @main_tracker("Final copy to results")
 def final_copy(dcfg, rec_bundles, docking_summary, out_files):
-    ctx = PipelineContext.get_ctx()
-    logger = ctx.logger
-    manifest = ctx.manifest
-    manifest.finalize(success=True)
-    logger.info("Pipeline completed")
-
     working_dir = dcfg.common.working_dir
     results_dir = dcfg.common.results_dir
 
@@ -110,20 +104,11 @@ def final_copy(dcfg, rec_bundles, docking_summary, out_files):
         ### DISABLED
 
 
-    # Copy to root
-    project_name = dcfg.common.project_name
-    for f in [f"{project_name}_run.log", 
-                f"{project_name}_manifest.json", 
-                f"{project_name}_state.json"]:
-        src = working_dir / f
-        dst = results_dir / f
-        if src.exists():
-            shutil.copy2(src, dst)
+    final_copy_trackers(results_dir)
 
     # Finally, dump json meta with csv file paths
-
     metadata_dict = dcfg.metadata.model_dump() 
-    metadata_path = results_dir / f"{project_name}_metadata.json"
+    metadata_path = results_dir / f"{dcfg.common.project_name}_metadata.json"
 
     import json
     if metadata_dict is not None:

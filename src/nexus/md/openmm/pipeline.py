@@ -7,7 +7,7 @@ from nexus.md.openmm._minimize import minimize
 from nexus.md.openmm._heat import heat
 from nexus.md.openmm._equilibrate import equilibrate
 from nexus.md.openmm._produce import produce
-from nexus.md._final_copy import final_copy
+from nexus.md.final_copy import final_copy
 
 
 class OpenMMPipeline(BaseModel):

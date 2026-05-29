@@ -58,10 +58,11 @@ After choosing a docked pose or using a crystal structure with ligand, build a s
 nexus prep sysmd -c sysmd_config.yaml
 ```
 
-Once the system files are generated, a full molecular dynamics pipeline can be run, including minimization, heating, equilibration, and production. Results can be found in `results/MD_DiAla` 
+Once the system files are generated, a full molecular dynamics pipeline can be run, including minimization, heating, equilibration, and production. Results can be found in `results/AMBER_DiAla` and `results/OpenMM_DiAla`. Currently, there is no difference between `amber_config.yaml` and `openmm_config.yaml`, with the exception of the `project_name` field; both share the same parameters.
 
 ```bash
-nexus md amber -c amber_md.yaml
+nexus md amber -c amber_config.yaml
+nexus md openmm -c openmm_config.yaml
 ```
 
 Molecular dynamics output can be analysis using the command:
@@ -70,4 +71,4 @@ Molecular dynamics output can be analysis using the command:
 nexus md analyze -p your.prmtop -t trajectory.nc -m ":1-198" -n name -o output_dir
 ```
 
-Example outputs can be found in `results/2BPW_analysis_output/`. 2BPW is a HIV-1 protease-inhibitor complex, and was chosen for this example over DiAlanine because DiAlanine is too small to have meaningful protein analysis.
+Example outputs can be found in `results/2BPW_analysis_output/`. 2BPW is a HIV-1 protease-inhibitor complex, and was chosen for this example over DiAlanine because DiAlanine is too small to have meaningful protein analysis. This command can also load in the dcd trajectory format, which is the output when running openmm.

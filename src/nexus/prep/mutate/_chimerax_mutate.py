@@ -3,7 +3,7 @@ from pathlib import Path
 import re
 from typing import List
 from nexus.prep.prep_config import PrepConfig
-from nexus.core.trackers.logging_utils import setup_logger
+from nexus.core.trackers.logging_utils import CustomLogger
 
 def chimerax_mutate(pcfg: PrepConfig):
     input: List[Path] = pcfg.common.input
@@ -16,7 +16,7 @@ def chimerax_mutate(pcfg: PrepConfig):
 
     for input_path in input:
         output_path = output_dir / f"{input_path.stem}{suffix}"
-        log_path = setup_logger(output_path.with_suffix(".log"), time_verbose=False)
+        logger = CustomLogger(output_path.with_suffix(".log"), time_verbose=False)
 
         user_requested_states = {}
         setattr_commands = []
@@ -90,17 +90,17 @@ def chimerax_mutate(pcfg: PrepConfig):
 
         # Report clean, uncluttered errors if any occurred
         if failed_selections:
-            log_path.info("\n⚠️  Warning: ChimeraX reported empty selections during execution!")
+            logger.info("\n⚠️  Warning: ChimeraX reported empty selections during execution!")
             for cmd, failure in failed_selections:
-                log_path.info(f"  ❌ {failure}")
-                log_path.info(f"     Triggered by: {cmd}")
+                logger.info(f"  ❌ {failure}")
+                logger.info(f"     Triggered by: {cmd}")
 
         else:
-            log_path.info("\n✅ Requested mutations completed: ")
+            logger.info("\n✅ Requested mutations completed: ")
             for res_id, name in mutated_residues:
-                log_path.info(f"   - {res_id} was assigned {name}")
+                logger.info(f"   - {res_id} was assigned {name}")
 
-        log_path.info(f"✅ Saved mutated receptor to -> {output_path}")
+        logger.info(f"✅ Saved mutated receptor to -> {output_path}")
 
     return None
 

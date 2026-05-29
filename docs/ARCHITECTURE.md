@@ -140,9 +140,9 @@ The effective results directory is:
 
 Common runtime files:
 
-- `run.log`
-- `manifest.json`
-- `state.json`
+- `<project_name>_run.log`
+- `<project_name>_manifest.json`
+- `<project_name>_state.json`
 
 ## Extending NexusMol
 

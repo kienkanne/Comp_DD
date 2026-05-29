@@ -192,9 +192,9 @@ results/<project_name>/
 
 Working directories contain intermediate files plus:
 
-- `run.log` - combined console and file log.
-- `manifest.json` - stage status and timing metadata.
-- `state.json` - per-stage status and optional checkpoint output.
+- `<project_name>_run.log` - combined console and file log.
+- `<project_name>_manifest.json` - stage status and timing metadata.
+- `<project_name>_state.json` - per-stage status and optional checkpoint output.
 
 Docking results are copied into receptor-specific folders in `results/<project_name>/` when using the default `mix` behavior.
 

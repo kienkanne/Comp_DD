@@ -3,7 +3,7 @@ from pathlib import Path
 import re
 from string import Template
 from nexus.prep.prep_config import PrepConfig
-from nexus.core.trackers.logging_utils import setup_logger
+from nexus.core.trackers.logging_utils import CustomLogger
 
 def chimerax_rec_prep(pcfg: PrepConfig):
     input = pcfg.common.input
@@ -15,7 +15,7 @@ def chimerax_rec_prep(pcfg: PrepConfig):
 
     for input_path in input:
         output_path = output_dir / f"{input_path.stem}{suffix}"
-        log_path = setup_logger(output_path.with_suffix(".log"), time_verbose=False)
+        logger = CustomLogger(output_path.with_suffix(".log"), time_verbose=False)
 
         with open(Path(__file__).resolve().parents[0] / "_clean_template.py") as f:
             clean_template = f.read()     
@@ -61,16 +61,16 @@ def chimerax_rec_prep(pcfg: PrepConfig):
                         flagged_residues.append((res_id, amber_name))
 
         ## 5. Output Results
-        log_path.info(f"✅ Saved cleaned biological assembly receptor to -> {output_path}")
+        logger.info(f"✅ Saved cleaned biological assembly receptor to -> {output_path}")
         
         if chains_info:
-            log_path.info(f"ℹ️  Chains information:")
+            logger.info(f"ℹ️  Chains information:")
             for first_res, last_res in chains_info:
-                log_path.info(f"   - Start: {first_res}     End: {last_res}")
+                logger.info(f"   - Start: {first_res}     End: {last_res}")
 
         if flagged_residues:
-            log_path.info("\n⚠️  ChimeraX assigned non-standard protonation states:")
+            logger.info("\n⚠️  ChimeraX assigned non-standard protonation states:")
             for res_id, name in flagged_residues:
-                log_path.info(f"   - {res_id} was assigned {name}")
+                logger.info(f"   - {res_id} was assigned {name}")
 
     return None

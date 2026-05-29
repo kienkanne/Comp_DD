@@ -1,0 +1,23 @@
+{
+  "Setup": {
+    "status": "done",
+    "output": null
+  },
+  "Minimization": {
+    "status": "done",
+    "output": null
+  },
+  "Heating": {
+    "status": "done",
+    "output": null
+  },
+  "Equilibration": {
+    "status": "done",
+    "output": null
+  },
+  "Production": {
+    "status": "done",
+    "output": null
+  },
+  "Copying to results": "running"
+}

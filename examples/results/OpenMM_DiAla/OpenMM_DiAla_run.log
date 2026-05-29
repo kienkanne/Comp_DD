@@ -1,0 +1,15 @@
+2026-05-28 23:38:21 | INFO     | STAGE: Setup started
+2026-05-28 23:38:21 | INFO     | STAGE: Setup completed
+2026-05-28 23:38:21 | INFO     | STAGE: Minimization started
+2026-05-28 23:38:21 | INFO     | Initial PE: -40527.96628316055 kJ/mol
+2026-05-28 23:38:22 | INFO     | Final PE: -50999.350995141256 kJ/mol
+2026-05-28 23:38:22 | INFO     | STAGE: Minimization completed
+2026-05-28 23:38:22 | INFO     | STAGE: Heating started
+2026-05-28 23:39:22 | INFO     | STAGE: Heating completed
+2026-05-28 23:39:22 | INFO     | STAGE: Equilibration started
+2026-05-28 23:40:05 | INFO     | STAGE: Equilibration completed
+2026-05-28 23:40:05 | INFO     | STAGE: Production started
+2026-05-28 23:41:19 | INFO     | Finished full run with seed 1
+2026-05-28 23:41:19 | INFO     | STAGE: Production completed
+2026-05-28 23:41:19 | INFO     | STAGE: Copying to results started
+2026-05-28 23:41:19 | INFO     | Pipeline completed

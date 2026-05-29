@@ -5,7 +5,9 @@ from openmm import Platform
 import re
 
 from nexus.md.md_config import MDConfig
+from nexus.core.trackers.main_tracker import main_tracker
 
+@main_tracker("Setup")
 def setup(mcfg: MDConfig):
     prmtop = AmberPrmtopFile(mcfg.common.prmtop)
     inpcrd = AmberInpcrdFile(mcfg.common.inpcrd)

@@ -57,14 +57,40 @@ class PipelineContext(BaseModel):
         return cls._active_context
 
 
-from nexus.core.trackers.logging_utils import setup_logger
+from nexus.core.trackers.logging_utils import CustomLogger
 from nexus.core.trackers.manifest import Manifest
 from nexus.core.trackers.runstate import RunState
 
 
 def setup_context(working_dir, project_name):
     PipelineContext.set_ctx(PipelineContext(
-        logger = setup_logger(working_dir / f"{project_name}_run.log"),
+        logger = CustomLogger(working_dir / f"{project_name}_run.log"),
         manifest = Manifest(working_dir / f"{project_name}_manifest.json"),
         runstate = RunState(working_dir / f"{project_name}_state.json")
     ))
+
+
+def final_copy_trackers(results_dir):
+    """
+    Mark a pipeline completed and copy trackers to results directory
+    """
+    from pathlib import Path
+    import shutil
+    ctx = PipelineContext.get_ctx()
+    logger = ctx.logger
+    manifest = ctx.manifest
+    runstate = ctx.runstate
+
+    manifest.finalize(success=True)
+    logger.info("Pipeline completed")
+
+    log_path = logger.get_path()
+    manifest_path = manifest.get_path()
+    runstate_path = runstate.get_path()
+
+    for src in (log_path, manifest_path, runstate_path):
+        dst = results_dir / Path(src).name
+        if src.exists():
+            shutil.copy2(src, dst)
+
+    return True

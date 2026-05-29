@@ -1,36 +1,45 @@
 import logging
+from logging import Logger
 import sys
 from pathlib import Path
 
-def setup_logger(log_path: str, level=logging.INFO, time_verbose=True):
 
-    #Creates console + file logger.
-    log_file = Path(log_path)
-    log_file.parent.mkdir(parents=True, exist_ok=True)
+class CustomLogger(Logger):
+    def __init__(self, path: str, time_verbose: bool = True):
+        super().__init__(name="CustomLogger")
+        self.path = path
+        self.time_verbose = time_verbose
 
-    logger = logging.getLogger("docking")
-    logger.setLevel(level)
+        self._setup_logger()
 
-    for handler in logger.handlers[:]:
-        logger.removeHandler(handler)
-        handler.close()
+    def _setup_logger(self):
+        #Creates console + file logger.
+        log_file = Path(self.path)
+        log_file.parent.mkdir(parents=True, exist_ok=True)
 
-    formatter = logging.Formatter(
-        "%(asctime)s | %(levelname)-8s | %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S"
-    )
+        self.setLevel(logging.INFO)
 
-    fh = logging.FileHandler(log_file)
-    sh = logging.StreamHandler(sys.stdout)
-    
-    if time_verbose:
-        fh.setFormatter(formatter)
-        sh.setFormatter(formatter)
+        for handler in self.handlers[:]:
+            self.removeHandler(handler)
+            handler.close()
 
-    logger.addHandler(fh)
-    logger.addHandler(sh)
+        formatter = logging.Formatter(
+            "%(asctime)s | %(levelname)-8s | %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S"
+        )
 
-    return logger
+        fh = logging.FileHandler(log_file)
+        sh = logging.StreamHandler(sys.stdout)
+        
+        if self.time_verbose:
+            fh.setFormatter(formatter)
+            sh.setFormatter(formatter)
+
+        self.addHandler(fh)
+        self.addHandler(sh)
+
+    def get_path(self) -> str:
+        return self.path
 
 
 class DummyLogger:
