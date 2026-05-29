@@ -2,7 +2,7 @@
 
 NexusMol is a command-line toolkit for structure-based drug discovery workflows. It brings common preparation, docking, molecular dynamics, and analysis steps behind one Python CLI while delegating scientific heavy lifting to established tools such as ChimeraX, RDKit, Meeko, AutoDock Vina, DOCK6, Open Babel, and Amber.
 
-Current package version: `2.2.1`.
+Current package version: `2.3.0`.
 
 ## What NexusMol Does
 
