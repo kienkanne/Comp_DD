@@ -29,7 +29,6 @@ nexus = nexus.cli.main:main
 | `nexus prep` | Active | `rec`, `mutate`, `ligdock`, `sysmd` |
 | `nexus dock` | Active | `vina`, `dock6` |
 | `nexus md` | Active | `amber`, `analyze`|
-| `nexus validate` | Disabled | `vina`, `dock6` return immediately |
 
 ## Configuration Lifecycle
 

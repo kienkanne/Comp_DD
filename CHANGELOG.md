@@ -3,8 +3,9 @@
 ## 2.3.0
 - Overhauled `src/nexus/core` to use global `PipelineContext` setup, context-managed `shell()` and `python_parallel()`, and simplified stage tracking.
 - Marked `core/executors/base` and `core/executors/gnu_parallel` as deprecated; new workflows now use `shell()` and `python_parallel()` directly.
-- GNU parallel is no longer listed as a requirement in `environment.yaml`
-- MD trajectory files are removed from examples/
+- GNU parallel is no longer listed as a requirement in `environment.yaml`.
+- MD trajectory files are removed from examples/.
+- Removed `validate` module entirely.
 
 ## 2.2.2
 - Added OpenMM molecular dynamics pipeline with `nexus md openmm`

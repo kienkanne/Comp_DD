@@ -63,7 +63,6 @@ src/nexus/fetch/        RCSB fetch pipeline
 src/nexus/prep/         receptor, mutation, ligand, and sysmd preparation
 src/nexus/dock/         docking configs, Vina, DOCK6, score summaries
 src/nexus/md/           Amber pipeline, OpenMM pipeline, and CPPTRAJ analysis
-src/nexus/validate/     disabled validation code path
 examples/*.yaml         example config templates
 ```
 

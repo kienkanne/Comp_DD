@@ -415,8 +415,4 @@ nexus md analyze -p system.prmtop -t prod1.nc -m ":1-198" -n run1 -o analysis_ou
 | `-n`, `--name` | No | Analysis name. Defaults to `prmtop.stem`. |
 | `-o`, `--output-dir` | No | Output directory. Defaults to current directory. |
 
-The analysis writes RMSD/RMSF, hydrogen-bond, secondary-structure, PCA, clustering, and notebook outputs. The clustering mask is currently hard-coded in the template; see `SECURITY_AND_BUGS.md`.
-
-## Validation Config Status
-
-`src/nexus/validate/validate_config.py` contains a validation loader, and `src/nexus/validate/rmsd.py` contains RMSD helpers. The Typer commands `nexus validate vina` and `nexus validate dock6` currently return before invoking those functions. Treat validation config as inactive until the CLI path is re-enabled and tested.
+The analysis writes RMSD/RMSF, hydrogen-bond, secondary-structure, PCA, clustering, and notebook outputs.

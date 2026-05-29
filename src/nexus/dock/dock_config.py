@@ -22,7 +22,6 @@ class CommonConfig(BaseModel):
     n_jobs: Optional[int] = 1
     max_poses: Optional[int] = 8
 
-    mode: Optional[Literal["mix", "match"]] = "mix"
     program: Optional[Literal["vina", "dock6"]] = None
 
 
@@ -57,14 +56,6 @@ class MetadataConfig(BaseModel):
     model_config = ConfigDict(extra="allow")
 
 
-"""class ValidationConfig(BaseModel):
-    data: Optional[Path] = None
-    protein_suffix: Optional[str] = "_protein.pdb"
-    pocket_suffix: Optional[str] = "_pocket.pdb"
-    ligand_suffix: Optional[str] = "_ligand.sdf"
-
-"""
-
 class DockConfig(BaseModel):
     libs: Optional[LibsConfig] = LibsConfig()
     common: Optional[CommonConfig] = CommonConfig()
@@ -73,7 +64,6 @@ class DockConfig(BaseModel):
     receptors: Optional[ReceptorsConfig] = ReceptorsConfig()
     ligands: Optional[LigandsConfig] = LigandsConfig()
     metadata: Optional[MetadataConfig] = MetadataConfig()
-    #validation: Optional[ValidationConfig] = ValidationConfig()
 
 
 def load_dock_config(path):

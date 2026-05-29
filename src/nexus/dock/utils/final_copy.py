@@ -10,99 +10,54 @@ def final_copy(dcfg, rec_bundles, docking_summary, out_files):
 
     results_dir.mkdir(parents=True, exist_ok=True)
 
-    mode = getattr(dcfg.common, "mode", "mix")
+    rec_names = [r.name for r in rec_bundles]
+    groups = {name: [] for name in rec_names}
+    for out in out_files:
+        stem = Path(out).stem
+        for rec in rec_names:
+            if stem.startswith(f"{rec}_"):
+                groups[rec].append(out)
+                break
 
-    if mode == "mix":
-        rec_names = [r.name for r in rec_bundles]
-        groups = {name: [] for name in rec_names}
-        for out in out_files:
-            stem = Path(out).stem
+    # Copy per-receptor
+    for item, rec_name in zip(rec_bundles, rec_names):
+        rec_dir = results_dir / rec_name
+        (rec_dir / "poses").mkdir(parents=True, exist_ok=True)
+
+        # copy outputs
+        for out in groups.get(rec_name, []):
+            src = working_dir / out
+            dst = rec_dir / "poses" / Path(out).name
+            if src.exists():
+                shutil.copy2(src, dst)
+
+        # copy receptor file
+        rec_path = item.receptor
+        if rec_path.exists():
+            shutil.copy2(rec_path, rec_dir / rec_path.name)
+
+        # copy receptor-specific config if present on bundle
+        pocket = None
+        if hasattr(item, "pocket"):
+            pocket = item.pocket
+        if pocket and pocket.exists():
+            shutil.copy2(pocket, rec_dir)
+
+    # copy docking summary files to respective receptor dirs or to root
+    csv_paths_dict = {} # Used to add to metadata
+    if isinstance(docking_summary, (list, tuple)):
+        for csv in docking_summary:
             for rec in rec_names:
-                if stem.startswith(f"{rec}_"):
-                    groups[rec].append(out)
+                if rec in str(csv.stem):
+                    src = working_dir / csv
+                    dst = results_dir / rec / Path(csv).name
+                    if src.exists():
+                        shutil.copy2(src, dst)
+                    csv_paths_dict[rec] = dst
                     break
 
-        # Copy per-receptor
-        for item, rec_name in zip(rec_bundles, rec_names):
-            rec_dir = results_dir / rec_name
-            (rec_dir / "poses").mkdir(parents=True, exist_ok=True)
-
-            # copy outputs
-            for out in groups.get(rec_name, []):
-                src = working_dir / out
-                dst = rec_dir / "poses" / Path(out).name
-                if src.exists():
-                    shutil.copy2(src, dst)
-
-            # copy receptor file
-            rec_path = item.receptor
-            if rec_path.exists():
-                shutil.copy2(rec_path, rec_dir / rec_path.name)
-
-            # copy receptor-specific config if present on bundle
-            pocket = None
-            if hasattr(item, "pocket"):
-                pocket = item.pocket
-            if pocket and pocket.exists():
-                shutil.copy2(pocket, rec_dir)
-
-        # copy docking summary files to respective receptor dirs or to root
-        csv_paths_dict = {} # Used to add to metadata
-        if isinstance(docking_summary, (list, tuple)):
-            for csv in docking_summary:
-                for rec in rec_names:
-                    if rec in str(csv.stem):
-                        src = working_dir / csv
-                        dst = results_dir / rec / Path(csv).name
-                        if src.exists():
-                            shutil.copy2(src, dst)
-                        csv_paths_dict[rec] = dst
-                        break
-
-        for name, csv_path in csv_paths_dict.items():
-            setattr(dcfg.metadata, name, str(csv_path))
-
-    ### DISABLED
-    else:  # match mode -> single csv and a 'details' folder with everything
-        details = results_dir / "details"
-        details.mkdir(parents=True, exist_ok=True)
-        (details / "poses").mkdir(parents=True, exist_ok=True)
-
-        # copy all outputs into details/poses
-        for out in out_files:
-            src = working_dir / out
-            dst = details / "poses" / Path(out).name
-            if src.exists():
-                shutil.copy2(src, dst)
-
-        # copy all receptors and configs into details
-        for item in rec_bundles:
-            rec_path = item.receptor
-            if rec_path.exists():
-                shutil.copy2(rec_path, details / rec_path.name)
-            # possible config fields
-            if hasattr(item, "pocket"):
-                pocket = item.pocket
-                if pocket.exists():
-                    shutil.copy2(pocket, details)
-            if hasattr(item, "selected_spheres"):
-                sp = Path(item.selected_spheres)
-                if sp.exists():
-                    shutil.copy2(sp, details / sp.name)
-
-        # copy single csv to root as summary
-        if isinstance(docking_summary, (list, tuple)):
-            # pick first
-            csv = docking_summary[0] if docking_summary else None
-        else:
-            csv = docking_summary
-        if csv:
-            src = working_dir / csv
-            dst = results_dir / Path(csv).name
-            if src.exists():
-                shutil.copy2(src, dst)
-        ### DISABLED
-
+    for name, csv_path in csv_paths_dict.items():
+        setattr(dcfg.metadata, name, str(csv_path))
 
     final_copy_trackers(results_dir)
 

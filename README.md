@@ -209,7 +209,6 @@ src/nexus/
   fetch/                RCSB fetch config and pipeline
   md/                   Amber MD and CPPTRAJ analysis workflows
   prep/                 Receptor, mutation, ligand, and sysmd preparation
-  validate/             Disabled validation loader and RMSD helpers
 examples/
   EXAMPLES.md           Example command walkthrough
   *.yaml                Example config templates with local paths

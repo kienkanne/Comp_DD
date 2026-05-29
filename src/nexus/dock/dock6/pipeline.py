@@ -22,7 +22,6 @@ class DOCK6Pipeline():
 
         rec_bundles = dock6_parallel_prep_rec(self.dcfg)
         pairs = matchmixer(rec_bundles, lig_paths)
-        # Disable validate for now
         out_files = dock6_parallel_docking(self.dcfg, pairs)
         print (out_files)
         docking_summary = write_summary_csv(self.dcfg, out_files, rec_bundles)

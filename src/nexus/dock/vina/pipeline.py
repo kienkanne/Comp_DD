@@ -19,7 +19,6 @@ class VinaPipeline():
         rec_bundles = vina_parallel_prep_rec(self.dcfg)
 
         pairs = matchmixer(rec_bundles, lig_paths)
-        # Disable validate for now
         out_files = vina_parallel_docking(self.dcfg, pairs)
         docking_summary = write_summary_csv(self.dcfg, out_files, rec_bundles)
 

@@ -320,7 +320,6 @@ Output:
 | `main_tracker()` | Marks stage failed in `state.json`, records exception in `manifest.json`, finalizes manifest as failed, logs stack trace, and re-raises. |
 | Fetch ligand downloads | Individual ligand download failures are printed and skipped. |
 | Fetch assembly downloads | Missing or empty assembly files raise exceptions. |
-| Validation commands | Return immediately without running validation. |
 
 ## Persistent Runtime State
 
